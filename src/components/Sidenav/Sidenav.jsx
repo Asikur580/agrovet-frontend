@@ -58,6 +58,8 @@ const sidenav = (props) => {
       location.pathname == "/order-create" ||
       location.pathname == "/sales" ||
       location.pathname == "/sales-create" ||
+      location.pathname == "/sales-report" ||
+      location.pathname == "/payment-history-report" ||
       (Array.isArray(location.pathname.match("/invoice/")) &&
         location.pathname.match("/invoice/")[0] == "/invoice/")
     ) {
@@ -82,6 +84,8 @@ const sidenav = (props) => {
       location.pathname == "/order-create" ||
       location.pathname == "/sales" ||
       location.pathname == "/sales-create" ||
+      location.pathname == "/sales-report" ||
+      location.pathname == "/payment-history-report" ||
       (Array.isArray(location.pathname.match("/invoice/")) &&
         location.pathname.match("/invoice/")[0] == "/invoice/"),
   ]);
@@ -446,7 +450,7 @@ const sidenav = (props) => {
               <li>
                 <NavLink to="/sales" onClick={CloseSideNav}>
                   <FaHandPointRight className="icon" size={16} />
-                  <p>Sales</p>
+                  <p>Invoices</p>
                 </NavLink>
               </li>
             )}
@@ -454,7 +458,23 @@ const sidenav = (props) => {
               <li>
                 <NavLink to="/sales-create" onClick={CloseSideNav}>
                   <FaHandPointRight className="icon" size={16} />
-                  <p>Sales create</p>
+                  <p>Invoice create</p>
+                </NavLink>
+              </li>
+            )}
+            {sales == true && (
+              <li>
+                <NavLink to="/sales-report" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Sales report</p>
+                </NavLink>
+              </li>
+            )}
+            {sales == true && (
+              <li>
+                <NavLink to="/payment-history-report" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Payment history</p>
                 </NavLink>
               </li>
             )}

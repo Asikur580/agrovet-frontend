@@ -37,6 +37,8 @@ import Orders from "../pages/Order/Orders/Orders";
 import OrderCreate from "../pages/Order/OrderCreate/OrderCreate";
 import Sales from "../pages/Sale/Sales/Sales";
 import SalesCreate from "../pages/Sale/SalesCreate/SalesCreate";
+import SalesReport from "../pages/Sale/SalesReport/SalesReport";
+import PaymentHistoryReport from "../pages/Sale/PaymentHistoryReport/PaymentHistoryReport";
 import InvoiceMobile from "../pages/Invoices/InvoiceMobile";
 import InvoicePdf from "../pages/Invoices/InvoicePdf";
 import CostCategories from "../pages/CostCategories/CostCategories";
@@ -484,6 +486,30 @@ const AdminRoutes = ({ userRole, isAuthenticated }) => {
                       isAuthenticated={isAuthenticated}
                     >
                       <SalesCreate setLoader={setLoader} />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/sales-report"
+                  element={
+                    <PrivateRoute
+                      roles={["Developer", "Sale-page"]}
+                      userRole={userRole}
+                      isAuthenticated={isAuthenticated}
+                    >
+                      <SalesReport setLoader={setLoader} />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/payment-history-report"
+                  element={
+                    <PrivateRoute
+                      roles={["Developer", "Sale-page"]}
+                      userRole={userRole}
+                      isAuthenticated={isAuthenticated}
+                    >
+                      <PaymentHistoryReport setLoader={setLoader} />
                     </PrivateRoute>
                   }
                 />

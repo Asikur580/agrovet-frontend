@@ -1,0 +1,5 @@
+/* SalesReport.css */
+.searchEmployee {
+    display: flex;
+    flex-direction: column;
+}

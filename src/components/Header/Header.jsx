@@ -142,7 +142,7 @@ const Header = (props) => {
 
     const interval = setInterval(() => {
       GetNotification(); // call every 1 minute
-    }, 2000); // 1 minute
+    }, 60000); // 1 minute
 
     return () => clearInterval(interval);
   }, [GetNotification]);

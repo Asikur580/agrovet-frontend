@@ -115,9 +115,11 @@ const SaleCartUpdateModal2 = (props) => {
         });
         setLess(response.data.data.less);
         setPaid(response.data.data.paid);
-        setDiscountPercentage(
-          (response.data.data.discount * 100) / response.data.data.total_price
-        );
+        const fetchedDiscountPercent = response.data.data.total_price > 0 
+          ? (response.data.data.discount * 100) / response.data.data.total_price 
+          : 0;
+        setDiscountPercentage(fetchedDiscountPercent);
+        setDiscountAmountState(response.data.data.discount);
 
         const initialQuantities = {};
         const initialTotals = {};
@@ -334,7 +336,7 @@ const SaleCartUpdateModal2 = (props) => {
         total_item: data.length,
         total_price: totalPriceBeforeAdjustments,
         products: orderData,
-        discount: discountAmountState,
+        discount: totalPriceBeforeAdjustments > 0 ? (totalPriceBeforeAdjustments * discountPercentage) / 100 : 0,
         less: less,
         paid: paid,
         due: due,
