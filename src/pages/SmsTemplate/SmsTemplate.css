@@ -1,0 +1,41 @@
+.SmsTemplate .templateBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.SmsTemplate .card {
+  align-self: normal;
+  border: var(--table-border);
+  border-radius: 0.5rem;
+  width: 30%;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.SmsTemplate .card .title {
+  width: 100%;
+  background: var(--main-clr);
+  color: var(--light-1);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+.SmsTemplate .card .action {
+  width: 100%;
+  border-top: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.SmsTemplate .card .action .edit {
+  background: transparent;
+  color: var(--green);
+  padding: 0px;
+}
+.SmsTemplate .card .action .delete {
+  background: transparent;
+  color: var(--red);
+  padding: 0px;
+}

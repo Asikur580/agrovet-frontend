@@ -1,0 +1,264 @@
+import { useEffect, useState, lazy, Suspense, useContext } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Tooltip from "@mui/material/Tooltip";
+import DataTable from "react-data-table-component";
+import { HelmetProvider, Helmet } from "react-helmet-async";
+
+//=>>> Css
+import "../../../assets/css/DataTable.css";
+
+//=>>> Icons
+import { FaEdit } from "react-icons/fa";
+import { IoTrashBinSharp } from "react-icons/io5";
+
+//=>>> Components
+const CommonModal = lazy(() =>
+  import("../../../components/Modal/CommonModal/CommonModal")
+);
+const ModalTable = lazy(() =>
+  import("../../../components/Modal/CommonModal/ModalTable")
+);
+
+//=>>> Utilities
+import ApiConfig from "../../../assets/js/ApiConfig";
+import { AuthContext } from "../../../context/AuthContext";
+import { TableStyles, rowPerPage } from "../../../assets/js/Utility";
+import useStickyScroll from "../../../hooks/useStickyScroll";
+
+const EmployeeCostHistory = ({ setLoader }) => {
+  const { id } = useParams(); // customer id
+  const { headers, userRole } = useContext(AuthContext);
+  const customStyles = TableStyles();
+  const stickyRef = useStickyScroll(67);
+
+  const [empCostCat, setEmpCostCat] = useState();
+  const [apiData, setApiData] = useState([]);
+  const [searchData, setSearchData] = useState("");
+  const [filteredApiData, setFilteredApiData] = useState([]);
+  const [relodeTable, setRelodeTable] = useState(false);
+
+  const getApiData = async () => {
+    try {
+      setLoader(true);
+      await ApiConfig.get(`/employeeCost/${id}`, { headers }).then(
+        (response) => {
+          setApiData(response.data.data);
+          setFilteredApiData(response.data.data);
+          setLoader(false);
+        }
+      );
+    } catch (error) {
+      setLoader(false);
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getApiData();
+    setEmpCostCat(JSON.parse(sessionStorage.getItem("empCostCat")));
+  }, [relodeTable]);
+
+  //=>>> Input For modal
+  const inputFields = [
+    {
+      field: "sell_price",
+      type: "text",
+      label: "Amount",
+      isRequired: true,
+      placeholder: "Enter amount",
+    },
+  ];
+
+  //=>>> Column for datatable start
+  const columns = [
+    {
+      name: "Sl No",
+      field: "SlNo",
+      width: "80px",
+      selector: (row, index) => index + 1,
+    },
+    {
+      name: "Employee name",
+      field: "employee_name",
+      selector: (row) => row.employee_name,
+    },
+    {
+      name: "Cost category",
+      field: "employee_cost_category_name",
+      selector: (row) => row.employee_cost_category_name,
+    },
+    {
+      name: "Amount",
+      field: "amount",
+      selector: (row) => row.amount,
+    },
+    {
+      name: "Cost date",
+      field: "cost_date",
+      sortable: true,
+      selector: (row) => row.cost_date,
+    },
+    {
+      name: "Action",
+      width: "150px",
+      cell: (row) => (
+        <div className="d-flex" style={{ gap: "20px" }}>
+          <div className="shortModalBtn">
+            <Suspense fallback="...">
+              <CommonModal
+                id={row.id}
+                slug={`Edit cost`}
+                inputFields={inputFields}
+                ModalOpenBtnTitle={<FaEdit />}
+                className="editBtn"
+                identifier="costUpdateEmployee"
+                api={`/costUpdate/${row.id}`}
+                data={id}
+                data_2={empCostCat}
+                getSpecificDataApi="/costShow"
+                setRelodeTable={setRelodeTable}
+                setLoader={setLoader}
+                toolTip={`Edit ${row.amount}`}
+              />
+            </Suspense>
+          </div>
+          <Tooltip title={`Delete ${row.amount}`} placement="bottom">
+            <button>
+              <IoTrashBinSharp
+                className="deleteIcon c-pointer"
+                size={20}
+                onClick={async () => {
+                  const confirmation = confirm(
+                    "Do you want to delete this cost?"
+                  );
+                  if (confirmation) {
+                    const payload = new FormData();
+                    payload.append("id", row.id);
+
+                    setLoader(true);
+                    await ApiConfig.post(`/costDelete/${row.id}`, payload, {
+                      headers,
+                    })
+                      .then((response) => {
+                        if (response.data.status == true) {
+                          setRelodeTable((prev) => !prev);
+                          console.clear();
+                          setLoader(false);
+                          toast.success(response.data.message);
+                        } else {
+                          setLoader(false);
+                          toast.error(response.data.error);
+                        }
+                      })
+                      .catch((e) => {
+                        console.log(`Error = ${e}`);
+                      });
+                  } else {
+                    return;
+                  }
+                }}
+              />
+            </button>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+  //=>>> Column for datatable end
+
+  //=>>> Searching function
+  useEffect(() => {
+    const result = apiData.filter((filteredApiData) => {
+      return filteredApiData.employee_name
+        .toLowerCase()
+        .match(searchData.toLowerCase());
+    });
+    setFilteredApiData(result);
+  }, [searchData]);
+
+  //=>>> Print section start
+  const [selectedRows, setSelectedRows] = useState(false);
+  const [toggledClearRows, setToggleClearRows] = useState(false);
+  const handleClearRows = () => {
+    setToggleClearRows(!toggledClearRows);
+  };
+
+  const handleTabelSelectChange = ({ selectedRows }) => {
+    setSelectedRows(selectedRows);
+    sessionStorage.setItem("printEmployeeCost", JSON.stringify(selectedRows));
+  };
+
+  const tableHead = [
+    "Sl no",
+    "Employee name",
+    "Cost category",
+    "Amount",
+    "Date",
+  ];
+  //=>>> Print section end
+
+  return (
+    <HelmetProvider>
+      <Helmet>
+        <title>Cost history</title>
+        <meta name="description" content="Agrovet software" />
+      </Helmet>
+
+      {/* For go to top */}
+      <input
+        type="file"
+        autoFocus
+        style={{ height: "0", opacity: 0, pointerEvents: "none" }}
+      />
+      {/* For go to top */}
+
+      <div className="users content animated fadeInDown">
+        <h1 className="page-title">Cost history</h1>
+        <div
+          ref={stickyRef}
+          className="sticky top-[67px] z-50 flex justify-between mb-2"
+        >
+          <div className="searchInput">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchData}
+              onChange={(e) => setSearchData(e.target.value)}
+            />
+          </div>
+
+          {["Developer", "Employee-cost-print"].some((item) =>
+            userRole.includes(item)
+          ) && (
+            <Suspense fallback="...">
+              <ModalTable
+                id={null}
+                slug={`Employee cost's details`}
+                inputFields={[]}
+                ModalOpenBtnTitle={"Print"}
+                className="addBtn"
+                identifier="printEmployeeCost"
+                data={selectedRows}
+                tableHead={tableHead}
+                width={""}
+              />
+            </Suspense>
+          )}
+        </div>
+
+        <DataTable
+          columns={columns}
+          data={filteredApiData}
+          customStyles={customStyles}
+          pagination
+          paginationRowsPerPageOptions={rowPerPage}
+          selectableRows
+          onSelectedRowsChange={handleTabelSelectChange}
+          clearSelectedRows={toggledClearRows}
+        />
+      </div>
+    </HelmetProvider>
+  );
+};
+
+export default EmployeeCostHistory;

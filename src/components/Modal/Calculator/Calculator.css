@@ -1,0 +1,21 @@
+.calculator .inputBox {
+  border: var(--table-border);
+  border-radius: 8px;
+  width: 100%;
+}
+.calculator label {
+  color: var(--dark-3);
+  display: inline-block;
+  margin: 10px 0 7px 0;
+  font-size: 14px;
+}
+.calculator .inputBox input {
+  border: none;
+  outline: none;
+  color: var(--dark-3);
+  background: transparent;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  padding: 3px 15px;
+}

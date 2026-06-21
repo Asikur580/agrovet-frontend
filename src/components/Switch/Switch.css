@@ -1,0 +1,19 @@
+.switch-box-title {
+  text-align: center;
+  font-size: 1.3rem !important;
+  margin-bottom: 13px;
+  color: var(--dark-2) !important;
+}
+.main-switch-box {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.main-switch-box .swith-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.main-swith-box .swith-box .label {
+  color: var(--light-2) !important;
+}

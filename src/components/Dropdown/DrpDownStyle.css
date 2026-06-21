@@ -1,0 +1,12 @@
+.drpDwnLabel {
+  color: var(--dark-3);
+}
+.drpDwnInputBox {
+  border: var(--table-border);
+  color: var(--dark-2);
+  padding: 0 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

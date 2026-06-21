@@ -1,0 +1,164 @@
+.invoice-container {
+  margin: 0 auto 0 auto;
+  background: var(--light-1);
+  padding: 20px;
+  border: var(--table-border);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  color: #000;
+  /* background-color: rgba(102, 51, 153, 0.308); */
+}
+.invoice-header {
+  text-align: center;
+}
+.invoice-header .compName {
+  font-size: 2.1rem;
+  font-family: BlippoBlack;
+  color: #000;
+}
+.invoice-header p {
+  font-weight: 600;
+}
+.invoice-header h2 {
+  font-size: 1.3rem;
+  margin: 5px 0;
+  font-weight: 900;
+  font-family: sans-serif;
+}
+
+.invoice-details {
+  margin-top: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.invoice-details strong {
+  font-weight: 900;
+}
+.invoice-details .full-width {
+  width: 100%;
+}
+.invoice-details .left {
+  width: 65%;
+}
+.invoice-details .right {
+  width: 35%;
+}
+/* .invoice-details div {
+  display: flex;
+  justify-content: space-between;
+}
+.invoice-details div span {
+  width: 45%;
+}
+.invoice-details div .full-width {
+  width: 100%;
+} */
+
+.invoice-container .product-table {
+  width: 100%;
+  margin-top: 15px;
+  border-collapse: collapse;
+}
+.invoice-container .product-table tr th {
+  background-color: #ebebeb !important;
+  font-weight: 900 !important;
+}
+.invoice-container .product-table tr th,
+.invoice-container .product-table tr td {
+  border: 1px solid #3b3b3b;
+  padding: 2px;
+  text-align: center;
+  color: #000;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+/* .invoice-container .product-table tr .prodName {
+  text-align: left;
+} */
+
+.invoiceCustomize {
+  margin: 10px 0 20px 0;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  /* grid-template-columns: 1fr 1fr; */
+}
+.invoiceCustomize table {
+  width: 100%;
+}
+.invoiceCustomize table tr td {
+  padding: 5px 1px;
+  font-weight: 600;
+}
+.invoiceCustomize table tr td:first-child {
+  width: 160px;
+}
+.invoiceCustomize table tr td:nth-child(2) {
+  width: 15px;
+  text-align: center;
+  font-weight: 900;
+}
+.invoiceCustomize .tk {
+  font-weight: 900;
+}
+
+.invoice-footer {
+  margin-top: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.invoice-footer div {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.note {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 30px;
+  /* color: #666; */
+}
+
+/*___ Print start ___*/
+.printBtn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 5px 10px;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 70px 40px;
+    padding: 0;
+  }
+  @page :first {
+    size: A4 portrait;
+    margin: 50px 40px;
+    padding: 0;
+  }
+  @page {
+    @top-center {
+      content: "";
+    }
+  }
+  @page {
+    @bottom-center {
+      content: "";
+    }
+  }
+
+  body {
+    print-color-adjust: exact;
+  }
+  .invoice-container {
+    border: none;
+    padding: 0;
+    min-height: 100vh;
+  }
+  .invoice-footer {
+    margin-top: auto;
+  }
+}
+/*___ Print end ___*/

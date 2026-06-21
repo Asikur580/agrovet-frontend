@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon-DsSQB_p5.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Company</title>
+    <script type="module" crossorigin src="/assets/index-jKshSbuy.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BAFq0Hqt.css" />
+
+    <!-- Clock start -->
+    <style>
+      :root {
+        --bg: #252525;
+        --main-clr: #252525;
+        --shadow: 10px 10px 20px 0px #fff, -10px -10px 20px 0px #4a20fd;
+      }
+      body {
+        background: var(--bg);
+      }
+      .box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100vh;
+      }
+      .clkBox {
+        color: #fff;
+        width: 50%;
+        height: 50%;
+        background: var(--main-clr);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+      }
+      .clkBox {
+        font-size: 25px;
+      }
+      .clkBox .title {
+        margin-bottom: 30px;
+        color: #fff;
+      }
+      .clkBox #clock {
+        width: 500px;
+        font-size: 50px;
+      }
+      .controlBtn {
+        text-align: center;
+      }
+      .controlBtn button {
+        color: #fff;
+        font-size: 20px;
+        background: var(--bg);
+        border: none;
+        box-shadow: 5px 5px 10px 0px #000, -5px -5px 10px 0px #000;
+        padding: 10px;
+        margin: 0 10px;
+        cursor: pointer;
+      }
+      .controlBtn button:focus {
+        box-shadow: -5px -5px 10px 0px #000 inset, 5px 5px 10px 0px #000 inset;
+      }
+
+      @media screen and (max-width: 800px) {
+        .clkBox .title {
+          font-size: 16px;
+        }
+        .clkBox #clock {
+          font-size: 30px;
+        }
+      }
+      @media screen and (max-width: 550px) {
+        .clkBox #clock {
+          font-size: 17px;
+        }
+      }
+
+      .map-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .map-container svg {
+        fill: #00010c;
+        filter: drop-shadow(1px 1px 10px rgb(1, 27, 173));
+      }
+      .map-container svg path:hover {
+        fill: #010023;
+      }
+    </style>
+    <!-- Clock end -->
+  </head>
+  <body>
+    <!-- <div id="root"></div> -->
+
+    <!-- Clock start -->
+    <div class="box">
+      <div class="clkBox">
+        <div style="text-align: center">
+          <h3 class="title">Digital Clock</h3>
+          <div id="clock">
+            <span id="hrs">00</span>
+            <span>:</span>
+            <span id="min">00</span>
+            <span>:</span>
+            <span id="sec">00</span>
+            <span id="dayNight"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let hrs = document.querySelector("#hrs");
+      let min = document.querySelector("#min");
+      let sec = document.querySelector("#sec");
+      let dayNight = document.querySelector("#dayNight");
+      let amPm = "AM";
+
+      setInterval(() => {
+        const time = new Date();
+
+        let h = (hrs.innerHTML =
+          (time.getHours() < 10 ? "0" : "") + time.getHours());
+        min.innerHTML = (time.getMinutes() < 10 ? "0" : "") + time.getMinutes();
+        sec.innerHTML = (time.getSeconds() < 10 ? "0" : "") + time.getSeconds();
+        dayNight.textContent = h > 12 ? "PM" : amPm;
+      }, 1000);
+    </script>
+    <!-- Clock end -->
+  </body>
+</html>

@@ -1,0 +1,178 @@
+.side-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 245px;
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--light-1);
+  box-shadow: 1px 1px 0px #0000002e;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  transition: var(--trans);
+  z-index: 99;
+}
+.d-none {
+  display: none;
+}
+.side-nav::-webkit-scrollbar {
+  display: none;
+}
+.side-nav .brand {
+  text-align: center;
+  font-size: 1.9rem;
+  font-family: "Dancing Script", serif;
+  font-weight: 900;
+  color: var(--main-clr);
+  text-transform: capitalize;
+  position: fixed;
+  background: var(--light-1);
+  width: 245px;
+  padding: 15px 0 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+.side-nav .brand .toggler {
+  font-size: 1.5rem;
+  opacity: 0;
+  position: absolute;
+  right: 2px;
+  top: 29px;
+  transition: 2s all;
+  cursor: pointer;
+}
+.side-nav .brand .toggler.show {
+  opacity: 1;
+}
+.side-nav .side-menu {
+  margin-top: 70px;
+  padding: 0 10px;
+}
+.side-nav .side-menu > li {
+  list-style: none;
+  cursor: pointer;
+  margin: 10px 0;
+}
+.side-nav .side-menu li a {
+  text-decoration: none;
+  color: var(--dark-3);
+  transition: var(--trans);
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 20px;
+  font-weight: 400;
+  font-size: 1rem;
+}
+.side-nav .side-menu li a div .icon {
+  margin-right: 10px;
+}
+.side-nav .side-menu li a:hover,
+.side-nav .side-menu li a.active {
+  color: var(--main-clr);
+  background: var(--link-hover);
+  border-radius: 50px;
+  /* border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px; */
+}
+.side-nav .side-menu .indicate-section {
+  padding-left: 7px;
+  font-size: 0.9rem;
+  color: #a39f9f;
+  margin-top: 10px;
+}
+.side-nav .bottom-box {
+  text-align: center;
+  margin: auto auto 0 auto;
+  padding: 20px 0;
+}
+.side-nav .bottom-box .button {
+  padding: 10px 35px;
+}
+.side-nav .bottom-box .button .icon {
+  margin-left: 10px;
+}
+
+.side-nav .side-nav-dropdown {
+  display: none;
+  overflow: hidden;
+  transition: var(--trans);
+}
+.side-nav .side-nav-dropdown-parent .drpLink {
+  padding: 7px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.side-nav .side-nav-dropdown-parent .drpLink .icon {
+  margin-right: 10px;
+}
+.side-nav .side-nav-dropdown-parent:hover,
+.side-nav .side-nav-dropdown-parent.active {
+  background: var(--link-hover);
+  color: var(--main-clr);
+  border-radius: 20px;
+}
+.side-nav .side-menu .side-nav-dropdown-parent .right-icon {
+  transition: var(--trans);
+}
+.side-nav .side-menu .side-nav-dropdown-parent.active .right-icon {
+  transform: rotate(180deg);
+}
+
+.side-nav .side-menu .side-nav-dropdown-parent.active .side-nav-dropdown {
+  display: block;
+  transition: var(--trans);
+  animation: sideNavDrpDownAnim 300ms ease-in-out;
+}
+.side-nav .side-nav-dropdown > li {
+  margin: 10px 0;
+}
+.side-nav .side-nav-dropdown > li:last-of-type {
+  margin-bottom: 0;
+}
+.side-nav .side-nav-dropdown > li > a {
+  padding: 5px 20px 5px 40px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+}
+
+/*___ Dropdown animation start ___*/
+@keyframes sideNavDrpDownAnim {
+  0% {
+    transform: scaleY(0);
+  }
+  80% {
+    transform: scaleY(1.1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+/*___ Dropdown animation end ___*/
+
+/* Responsive */
+@media screen and (max-width: 950px) {
+  .side-nav {
+    left: -250px;
+    box-shadow: none;
+  }
+  .side-nav.active {
+    left: 0 !important;
+  }
+}
+
+/*___ Print start ___*/
+@media print {
+  .side-nav {
+    display: none;
+  }
+}
+/*___ Print end ___*/

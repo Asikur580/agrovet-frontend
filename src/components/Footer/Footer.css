@@ -1,0 +1,29 @@
+.Footer {
+  margin: auto auto auto 245px;
+  font-size: 1.1rem;
+  text-align: center;
+  border-top: var(--table-border);
+  padding: 10px 0;
+  /* background: var(--dark-1); */
+  /* box-shadow: var(--shadow); */
+}
+.Footer a {
+  color: var(--main-clr);
+  font-weight: 600;
+}
+
+/*___ Responsive start ___*/
+@media screen and (max-width: 950px) {
+  .Footer {
+    margin-left: 0;
+  }
+}
+/*___ Responsive end ___*/
+
+/*___ Print start ___*/
+@media print {
+  .Footer {
+    display: none;
+  }
+}
+/*___ Print end ___*/

@@ -1,0 +1,11 @@
+.signupContainer {
+  width: 100%;
+  max-width: 2000px;
+  height: 100vh;
+  padding: 0 30px;
+}
+
+.signup {
+  width: 100%;
+  justify-content: center;
+}

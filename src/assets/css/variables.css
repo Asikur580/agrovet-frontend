@@ -1,0 +1,33 @@
+:root {
+  --light-1: #fff;
+  --light-2: #f5f4f4;
+  --light-3: #d6d4d4;
+
+  --dark-1: #1f1e1e;
+  --dark-2: #2c2b2b;
+  --dark-3: #616161;
+
+  /* --main-clr: #fa8d26; */
+  --main-clr: #3b5898;
+  --light-blue: rgb(194 205 241);
+  --dark-blue: #0d0144;
+
+  --orange: #f48726;
+  --red: #fd1010;
+  --green: #2baf03;
+  --light-purple: #8805fc;
+  --dropdown-box-clr: #dfdbdb;
+  /* --link-hover: #4644461c; */
+  --link-hover: #0609f42b;
+
+  --gradient-bg: rgb(2, 135, 157);
+  --gradient_1: linear-gradient(330deg, rgb(2 154 179) 0%, rgb(0 45 71) 100%);
+
+  --trans: 0.3s all ease;
+  --shadow: 3px 3px 5px var(--light-3);
+  --cardShadow: 2px 2px 5px var(--light-3), -2px -2px 5px var(--light-3);
+  --border: 1px solid #d6d6d6;
+  --table-border: 1px solid #adacac;
+}
+
+/* @media (prefers-color-scheme: dark) {} */

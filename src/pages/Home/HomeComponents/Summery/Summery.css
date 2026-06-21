@@ -1,0 +1,43 @@
+.Summery {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.Summery .card {
+  flex-basis: 20%;
+  min-width: 200px;
+  border: var(--table-border);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+.Summery .icon {
+  background: var(--gradient_1);
+  color: #fff;
+  padding: 8px;
+  border-radius: 0.5rem;
+  margin-right: 25px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+}
+.Summery .summeryTitle {
+  font-size: 1rem;
+  color: var(--dark-2);
+}
+.Summery .amount {
+  font-size: 1.6rem;
+  color: rgb(126 130 251);
+  font-weight: bold;
+}
+
+/*==> Responsive  */
+@media screen and (max-width: 470px) {
+  .Summery .card {
+    flex-basis: 80%;
+  }
+}

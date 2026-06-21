@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+
+/* @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap"); */
+
+@font-face {
+  font-family: Dancing Script;
+  src: url(../../assets/fonts/DancingScript-VariableFont_wght.ttf);
+}
+
+@font-face {
+  font-family: BlippoBlack;
+  src: url(../../assets/fonts/tt0511m.ttf);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

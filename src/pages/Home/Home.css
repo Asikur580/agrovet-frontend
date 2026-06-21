@@ -1,0 +1,105 @@
+/*** Top section start ***/
+.Home .top-box .box {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: var(--cardShadow);
+  color: #fff;
+  background: var(--gradient-bg);
+  background: var(--gradient_1);
+}
+/*** Top section end ***/
+
+/*** Report section start ***/
+.Home .reportBox {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.Home .reportBox .left {
+  width: 60%;
+}
+.Home .reportBox .left .leftBox {
+  border: var(--table-border);
+  max-height: fit-content;
+}
+.Home .reportBox .left .leftTxtBox {
+  min-height: 300px;
+  max-height: 100px;
+  overflow-y: scroll;
+}
+.Home .reportBox .left .leftBox::-webkit-scrollbar {
+  display: none;
+}
+
+.Home .reportBox .right {
+  width: 40%;
+}
+.Home .reportBox .right .box {
+  border: var(--table-border);
+  height: fit-content;
+  max-height: 230px;
+  min-height: 230px;
+  overflow-y: scroll;
+}
+.Home .reportBox .right .box:not(:last-of-type) {
+  margin-bottom: 20px;
+}
+.Home .reportBox .right .box::-webkit-scrollbar {
+  display: none;
+}
+.Home .reportBox .right .box .message {
+  height: 150px;
+  color: var(--dark-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/*** Report section end ***/
+
+/*** Due Invoice component start ***/
+.reportBoxMini {
+  border-bottom: var(--border);
+  padding: 5px 0;
+}
+.reportBoxMini:last-of-type {
+  border-bottom: none;
+}
+/*** Due Invoice component end ***/
+
+/*** Chart section start ***/
+/* .Home .reportBox .left canvas {
+} */
+/*** Chart section end ***/
+
+/*==> Responsive <==*/
+@media screen and (max-width: 1000px) {
+  .Home .reportBox {
+    flex-direction: column;
+  }
+  .Home .reportBox .left,
+  .Home .reportBox .right {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 950px) {
+  .Home .reportBox {
+    flex-direction: row;
+  }
+  .Home .reportBox .left {
+    width: 60%;
+  }
+  .Home .reportBox .right {
+    width: 40%;
+  }
+}
+@media screen and (max-width: 750px) {
+  .Home .reportBox {
+    flex-direction: column;
+  }
+  .Home .reportBox .left,
+  .Home .reportBox .right {
+    width: 100%;
+  }
+}

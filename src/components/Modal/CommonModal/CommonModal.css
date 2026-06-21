@@ -1,0 +1,192 @@
+/* Modal open btn */
+.shortModalBtn {
+  width: 22px;
+}
+
+.addBtn {
+  font-weight: 600 !important;
+  background: var(--main-clr) !important;
+  color: #fff !important;
+  font-size: 0.9em !important;
+  padding: 10px;
+}
+.editBtn {
+  color: var(--green) !important;
+  font-size: 1.2rem !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  background: transparent;
+  /* background: #2baf034d !important;
+    padding: 8px !important;
+    border-radius: 50%; */
+}
+.deleteIcon {
+  color: var(--red);
+  background: transparent;
+}
+.createUserIcon {
+  color: var(--light-purple) !important;
+  font-size: 1.28rem !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  background: transparent;
+  /* background: #8805fc61 !important;
+    padding: 8px !important;
+    border-radius: 50%; */
+}
+.createRelationIcon {
+  color: var(--orange) !important;
+  font-size: 1.28rem !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  background: transparent;
+  /* background: #8805fc61 !important;
+    padding: 8px !important;
+    border-radius: 50%; */
+}
+.viewDetailsIcon {
+  color: #0a57f7 !important;
+  font-size: 1.28rem !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  background: transparent;
+}
+
+/* Modal header */
+.modalTitle {
+  font-size: 1.3rem;
+  color: var(--dark-3);
+  text-transform: capitalize;
+}
+
+/* Modal body */
+.modalContent form {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  flex-direction: column;
+}
+.modalContent form label {
+  color: var(--dark-3);
+  display: inline-block;
+  margin: 10px 0 7px 0;
+  font-size: 14px;
+}
+.modalContent form .inputBox {
+  border: var(--table-border);
+  border-radius: 8px;
+  width: 100%;
+}
+.modalContent form .inputBox input {
+  border: none;
+  outline: none;
+  color: var(--dark-3);
+  background: transparent;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  padding: 3px 15px;
+}
+.modalContent form .inputBox input:focus::placeholder {
+  padding-left: 10px;
+}
+.modalContent form .inputBox input .showHide {
+  cursor: pointer;
+}
+.modalContent form .button {
+  padding: 8px 30px 6px 30px;
+  margin-top: 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  display: inline-block;
+}
+.modalContent form .button:active {
+  background: var(--dark-blue);
+}
+.modalContent .form-bottom {
+  width: 100%;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.modalContent .form-bottom a {
+  font-size: 14px;
+  transition: 0.3s all ease;
+  color: #f8f9fa;
+}
+.modalContent .form-bottom a.hover {
+  color: #fd5203;
+}
+.modalContent .form-bottom span {
+  margin: 0 10px;
+  color: #f8f9fa;
+}
+
+.modalContent .select-from-modal {
+  width: 100%;
+}
+.modalContent .select-from-modal .select {
+  width: 100%;
+  border: var(--table-border);
+  border-radius: 8px;
+  background: var(--light-1);
+  color: var(--dark-3);
+}
+
+/*Modal Table start */
+.modalTableOpenBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--dark-3) !important;
+}
+.modalTableOpenBtn:hover {
+  background: var(--light-blue) !important;
+}
+.activeModalTable {
+  background: var(--light-blue);
+}
+
+.modalTableContent table tr {
+  border-bottom: var(--border);
+  height: 35px;
+  padding: 0 20px;
+  transition: var(--trans);
+  cursor: default;
+}
+.modalTableContent table tr:last-of-type {
+  border-bottom: none;
+}
+.modalTableContent table tr:hover {
+  background: var(--light-blue);
+}
+.modalTableContent table tr .seperator {
+  width: 20px;
+  font-weight: 900;
+}
+
+.modalTableContent .dueInvoiceTable tr td:first-child {
+  width: 40%;
+  padding-left: 10px;
+}
+
+.modalTableContent .printTable {
+  overflow-x: scroll;
+}
+.modalTableContent .printTable::-webkit-scrollbar {
+  display: none;
+}
+.modalTableContent .printTable table {
+  border: var(--border);
+}
+.modalTableContent .printTable th,
+.modalTableContent .printTable td {
+  padding: 0 15px;
+}
+/*Modal Table end */
+
+/* Modal footer */
+:where(.css-dev-only-do-not-override-161f05s).ant-modal .ant-modal-footer,
+.ant-modal-footer {
+  display: none;
+}

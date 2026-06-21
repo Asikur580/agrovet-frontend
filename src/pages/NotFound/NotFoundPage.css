@@ -1,0 +1,34 @@
+.NotFoundPage {
+  background: var(--light-1);
+  width: 100%;
+  height: 100vh;
+  color: var(--dark-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 15px;
+}
+.NotFoundPage .title {
+  color: var(--main-clr);
+  font-size: 2rem;
+  font-weight: 600;
+}
+.NotFoundPage .description {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-3);
+}
+/* .NotFoundPage h1 {
+  font-size: 40px;
+  color: var(--main-clr);
+  font-weight: 600;
+}
+.NotFoundPage h2 {
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--dark-2);
+}
+.NotFoundPage h3 {
+  font-size: 30px;
+} */

@@ -1,0 +1,109 @@
+:where(.css-dev-only-do-not-override-161f05s).ant-btn-variant-outlined:not(
+    :disabled
+  ):not(.ant-btn-disabled):hover,
+:where(.css-dev-only-do-not-override-161f05s).ant-btn-variant-outlined,
+:where(.css-161f05s).ant-btn-variant-outlined:not(:disabled):not(
+    .ant-btn-disabled
+  ):hover,
+:where(.css-161f05s).ant-btn-variant-outlined {
+  border-color: transparent !important;
+  padding: 0;
+}
+:where(.css-dev-only-do-not-override-161f05s).ant-btn:not(
+    :disabled
+  ):focus-visible,
+:where(.css-161f05s).ant-btn:not(:disabled):focus-visible {
+  outline: none;
+}
+
+/* Date picker */
+:where(.css-dev-only-do-not-override-161f05s).ant-picker-outlined,
+:where(.css-161f05s).ant-picker-outlined:hover,
+:where(.css-161f05s).ant-picker-outlined:focus-within {
+  border: var(--table-border) !important;
+  background: var(--light-1);
+}
+:where(.css-dev-only-do-not-override-161f05s).ant-space-vertical,
+:where(.css-161f05s).ant-space-vertical {
+  width: 100%;
+}
+:where(.css-161f05s).ant-picker .ant-picker-suffix {
+  color: #838383;
+}
+:where(.css-dev-only-do-not-override-161f05s).ant-picker
+  .ant-picker-input
+  > input {
+  font-size: 1rem;
+}
+
+/* Button */
+:where(.css-dev-only-do-not-override-161f05s).ant-btn-variant-outlined:not(
+    :disabled
+  ):not(.ant-btn-disabled):hover,
+:where(.css-dev-only-do-not-override-161f05s).ant-btn-variant-outlined,
+:where(.css-161f05s).ant-btn-variant-outlined:not(:disabled):not(
+    .ant-btn-disabled
+  ):hover,
+:where(.css-161f05s).ant-btn-variant-outlined {
+  padding: 10px;
+}
+
+/* Image */
+:where(.css-dev-only-do-not-override-161f05s).ant-image .ant-image-mask {
+  border-radius: 0.5rem;
+}
+
+/* Check box */
+:where(.css-dev-only-do-not-override-161f05s).ant-tree
+  .ant-tree-checkbox
+  .ant-tree-checkbox-inner,
+:where(.css-161f05s).ant-tree .ant-tree-checkbox .ant-tree-checkbox-inner {
+  border: 1px solid var(--main-clr);
+  width: 20px;
+  height: 20px;
+}
+
+/* ===== RangePicker Mobile Responsive Fix ===== */
+@media screen and (max-width: 550px) {
+  /* Make the picker input fit within mobile screen */
+  .searchDate .ant-picker {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .searchDate .ant-picker .ant-picker-input > input {
+    font-size: 0.8rem;
+  }
+  .searchDate .ant-picker .ant-picker-separator,
+  .searchDate .ant-picker .ant-picker-range-separator {
+    padding: 0 4px;
+  }
+
+  /* Make the dropdown panel stack vertically on mobile */
+  .ant-picker-dropdown .ant-picker-panels,
+  .salesRangePickerDropdown .ant-picker-panels {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+  }
+  .ant-picker-dropdown .ant-picker-panel-container,
+  .salesRangePickerDropdown .ant-picker-panel-container {
+    max-width: calc(100vw - 24px) !important;
+    overflow-x: auto !important;
+  }
+  .ant-picker-dropdown,
+  .salesRangePickerDropdown {
+    max-width: calc(100vw - 10px) !important;
+  }
+  .ant-picker-dropdown .ant-picker-date-panel,
+  .salesRangePickerDropdown .ant-picker-date-panel {
+    width: auto !important;
+  }
+  .ant-picker-dropdown .ant-picker-panel,
+  .salesRangePickerDropdown .ant-picker-panel {
+    width: 100% !important;
+  }
+  /* Ensure the footer/presets area wraps properly */
+  .ant-picker-dropdown .ant-picker-footer,
+  .salesRangePickerDropdown .ant-picker-footer {
+    flex-wrap: wrap;
+  }
+}

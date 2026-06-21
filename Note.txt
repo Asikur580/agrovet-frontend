@@ -1,0 +1,16 @@
+# Our weekpoints
+> Dashboard-page permission এর id(9) কখনও change হওয়া যাবেনা ***
+
+# Un-used
+> Switch
+
+# Check before build
+ ==> From env:
+    > VITE_BASE_URL
+    > VITE_IMG_URL
+    > VITE_APP_SECURITY_URL
+==> SystemSecurity.jsx:
+    > credentials object
+
+# Problem
+> jakariaislam310732@gmail.com (designation: ?)

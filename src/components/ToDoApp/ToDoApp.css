@@ -1,0 +1,172 @@
+.ToDoApp {
+  color: #fff;
+  z-index: 1000;
+  position: sticky;
+}
+.ToDoApp .iconBox {
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  justify-content: center;
+  position: fixed;
+  right: 10px;
+  bottom: 100px;
+  background: #2baf03;
+  padding: 7px;
+  cursor: pointer;
+}
+
+.toDoAppBox {
+  position: fixed;
+  right: 10px;
+  bottom: 70px;
+  background: #2c2b2b;
+  box-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
+  width: 350px;
+  height: 400px;
+  padding: 8px 10px 30px 10px;
+  border-radius: 8px;
+  transition: 0.3s all ease;
+  overflow: hidden;
+  opacity: 0;
+  z-index: -1;
+  visibility: hidden;
+}
+.toDoAppBox.active {
+  opacity: 1;
+  z-index: 1000;
+  visibility: visible;
+}
+.toDoAppBox.fullWidth {
+  opacity: 1;
+  z-index: 1000;
+  width: 50%;
+  height: 80%;
+  visibility: visible;
+  /* max-width: 600px; */
+  /* max-height: 80%; */
+}
+.toDoAppBox .closeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.toDoAppBox .closeIcon .icon {
+  border-radius: 50%;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 3px;
+  color: #fff;
+  cursor: pointer;
+}
+.toDoAppBox .closeIcon .icon:first-child {
+  background: #2baf03;
+}
+.toDoAppBox .closeIcon .icon:nth-child(2) {
+  background: #fcad1c;
+  margin-left: 8px;
+}
+.toDoAppBox .closeIcon .icon:last-child {
+  background: #fd1010;
+  margin-left: 8px;
+}
+
+.ToDoApp .todoBox {
+  background: transparent;
+  color: #fff;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+.ToDoApp .todoBox::-webkit-scrollbar {
+  display: none;
+}
+.ToDoApp .todoBox .todoIcon {
+  width: 25px;
+  height: 25px;
+}
+.ToDoApp .todoBox .toDoTitle {
+  font-size: 20px;
+  font-weight: 500;
+}
+.ToDoApp .todoBox .addTaskBox {
+  background: #2c2b2b;
+  position: sticky;
+  top: 0;
+  padding: 10px 20px;
+  transition: 0.3s all ease;
+}
+.ToDoApp .todoBox .addTaskBox .head {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.ToDoApp .todoBox .addTask {
+  background: #dddddd;
+  border-radius: 50px;
+  margin: 10px 0 10px 0;
+  display: flex;
+  align-items: center;
+}
+.ToDoApp .todoBox .addTask input {
+  color: #2c2b2b;
+  width: 80%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 8px 15px;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 50px;
+}
+.ToDoApp .todoBox .addTask button {
+  background: #f48726;
+  color: #fff;
+  border: none;
+  outline: none;
+  padding: 0;
+  width: 20%;
+  height: 40px;
+  font-size: 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.ToDo_Items {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #454444;
+}
+.ToDo_Items:last-of-type {
+  border-bottom: none;
+}
+.ToDo_Items .toDoOnlyOneItems {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.ToDo_Items .toDoOnlyOneItems img {
+  width: 20px;
+  height: 20px;
+}
+.ToDo_Items .deleteIcon {
+  width: 15px;
+  height: auto;
+}
+.ToDo_Items .line-throw {
+  text-decoration: line-through;
+}
+
+/*__ Responsive __*/
+@media screen and (max-width: 750px) {
+  .toDoAppBox.fullWidth {
+    width: 80%;
+  }
+}
