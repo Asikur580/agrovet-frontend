@@ -79,6 +79,7 @@ const SaleCartModal2 = (props) => {
   const [inputValues, setInputValues] = useState({
     customer_id: "0",
     pay_type: "0",
+    offer: "",
   });
   const handleInputValue = (e) => {
     setInputValues({ ...inputValues, [e.target.name]: e.target.value });
@@ -292,7 +293,7 @@ const SaleCartModal2 = (props) => {
         Object.values(resetTotals).reduce((sum, value) => sum + value, 0)
       );
     }
-    setInputValues({ customer_id: "0", pay_type: "0" });
+    setInputValues({ customer_id: "0", pay_type: "0", offer: "" });
     data.length = 0;
     handleCancel();
     handleClearRows();
@@ -353,13 +354,14 @@ const SaleCartModal2 = (props) => {
         due: due,
         grand_total: netTotal,
         sale_type: inputValues.pay_type,
+        offer: inputValues.offer || null,
       };
 
       setLoader(true);
       await ApiConfig.post(api, payload, { headers })
         .then((response) => {
           if (response.data.status == true) {
-            setInputValues({ customer_id: "0", pay_type: "0" });
+            setInputValues({ customer_id: "0", pay_type: "0", offer: "" });
             // setDate("YYYY-MM-DD");
             setLoader(false);
             setRelodeTable((prev) => !prev);
@@ -593,6 +595,23 @@ const SaleCartModal2 = (props) => {
               </div>
             )}
             {/* ___ Pay type Section End  ___ */}
+
+            {/* ___ Offer Section Start  ___ */}
+            {data.length !== 0 && (
+              <div className="select-from-cart-modal">
+                <label>Offer</label>
+                <div className="inputBox">
+                  <input
+                    type="text"
+                    name="offer"
+                    placeholder="Enter offer details..."
+                    value={inputValues.offer}
+                    onChange={handleInputValue}
+                  />
+                </div>
+              </div>
+            )}
+            {/* ___ Offer Section End  ___ */}
 
             {data.length !== 0 && (
               <>

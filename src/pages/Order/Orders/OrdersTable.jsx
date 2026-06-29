@@ -199,6 +199,12 @@ const OrdersTable = (props) => {
         grow: 2,
         selector: (row) => row.order_date,
       },
+      {
+        name: "Offer",
+        field: "offer",
+        grow: 2,
+        selector: (row) => row.offer || "-",
+      },
     ];
     //=>>> Push status
     columns.push({

@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect, useContext } from "react";
+/* eslint-disable react/prop-types */
+import { useRef, useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { Tooltip } from "@mui/material";
-import { Button, Modal, Flex, Radio } from "antd";
+import { Button, Modal, Flex, Radio, Select } from "antd";
 import Draggable from "react-draggable";
 
 //=>>> Icons
@@ -49,12 +50,13 @@ const OrderCartUpdateModal = (props) => {
 
     if (identifier === "orderUpdate") {
       GetSpecificData();
+      GetProductsData();
     }
   };
-  const handleOk = (e) => {
+  const handleOk = () => {
     setOpen(false);
   };
-  const handleCancel = (e) => {
+  const handleCancel = () => {
     setOpen(false);
   };
   const onStart = (_event, uiData) => {
@@ -85,16 +87,21 @@ const OrderCartUpdateModal = (props) => {
     customer_id: "0",
     customer_name: "",
     pay_type: "0",
+    offer: "",
   });
-  //=>>> New code start (Click tp or flat change database pricce)
-  // const [paramForDbpriceToggleOnTpFlat, setParamForDbpriceToggleOnTpFlat] =
-  //   useState({});
-  // const [valueForDbpriceToggleOnTpFlat, setValueForDbpriceToggleOnTpFlat] =
-  //   useState({});
-  // const [tpOrFlatCounter, setTpOrFlatCounter] = useState(1);
-  //=>>> New code end (Click tp or flat change database pricce)
 
+  const [productsData, setProductsData] = useState([]);
   const [data, setData] = useState([]);
+
+  const GetProductsData = async () => {
+    try {
+      const response = await ApiConfig.get("/products", { headers });
+      setProductsData(response.data.data || []);
+    } catch (error) {
+      console.error(`Error fetching products: ${error}`);
+    }
+  };
+
   const GetSpecificData = async () => {
     setLoader(true);
     try {
@@ -109,6 +116,7 @@ const OrderCartUpdateModal = (props) => {
           customer_id: response.data.data.customer.id,
           customer_name: response.data.data.customer.name,
           pay_type: response.data.data.order_type,
+          offer: response.data.data.offer || "",
         });
         setDiscount(response.data.data.discount);
 
@@ -117,25 +125,13 @@ const OrderCartUpdateModal = (props) => {
         const initialDbPrice = {};
         const initialBonus = {};
         const initialTpOrFlat = {};
-        //=>>> New code start (Click tp or flat change database pricce)
-        // const initialParamForDbpriceToggleOnTpFlat = {};
-        //=>>> New code end (Click tp or flat change database pricce)
         products.forEach((item) => {
-          initialQuantities[item.product.id] = item.quantity || 1;
-          initialTotals[item.product.id] =
-            (item.quantity || 1) * item.unit_price;
-          initialBonus[item.id] = item.bonus_qty;
-          initialTpOrFlat[item.id] = item.price_type;
-          initialDbPrice[item.id] = item.unit_price;
-          //=>>> New code start (Click tp or flat change database pricce)
-          // initialParamForDbpriceToggleOnTpFlat[item.id] = {
-          //   product_id: item.id,
-          //   price_type: initialTpOrFlat[item.id],
-          //   unit_price: item.unit_price,
-          //   flat_price: item.product.flat_price,
-          // };
-          // initialDbPrice[item.id] = valueForDbpriceToggleOnTpFlat[item.id];
-          //=>>> New code end (Click tp or flat change database pricce)
+          const productId = item.product.id;
+          initialQuantities[productId] = item.quantity || 1;
+          initialTotals[productId] = (item.quantity || 1) * item.unit_price;
+          initialBonus[productId] = item.bonus_qty;
+          initialTpOrFlat[productId] = item.price_type || "tp";
+          initialDbPrice[productId] = item.unit_price;
         });
 
         setQuantities(initialQuantities);
@@ -146,9 +142,6 @@ const OrderCartUpdateModal = (props) => {
         setTotal(
           Object.values(initialTotals).reduce((sum, val) => sum + val, 0)
         );
-        //=>>> New code start (Click tp or flat change database pricce)
-        // setParamForDbpriceToggleOnTpFlat(initialParamForDbpriceToggleOnTpFlat);
-        //=>>> New code end (Click tp or flat change database pricce)
       } else {
         console.error(response.data.error);
       }
@@ -159,28 +152,11 @@ const OrderCartUpdateModal = (props) => {
     }
   };
 
-  //=>>> New code start (Click tp or flat change database pricce)
-  // useEffect(() => {
-  //   const newValues = {};
-
-  //   Object.values(paramForDbpriceToggleOnTpFlat).forEach((item) => {
-  //     if (tpOrFlat[item.product_id] === "tp") {
-  //       newValues[item.product_id] = 100;
-  //     } else if (tpOrFlat[item.product_id] === "flat") {
-  //       newValues[item.product_id] = 200;
-  //     }
-  //   });
-
-  //   setValueForDbpriceToggleOnTpFlat(newValues);
-  // }, [tpOrFlatCounter]);
-  // console.log(valueForDbpriceToggleOnTpFlat);
-  //=>>> New code end (Click tp or flat change database pricce)
-
   const handleInputValue = (e) => {
     setInputValues({ ...inputValues, [e.target.name]: e.target.value });
   };
 
-  const handleInc = (productId, index) => {
+  const handleInc = (productId) => {
     // if (quantities[productId] < data[index].quantity) {} else {toast.error("you don't have sufficient products in your stock");}
 
     setQuantities((prev) => {
@@ -204,7 +180,7 @@ const OrderCartUpdateModal = (props) => {
     });
   };
 
-  const handleQtyInput = (id, value, price) => {
+  const handleQtyInput = (id, value) => {
     // Validate input value
     const numericValue = parseInt(value, 10);
     setQuantities((prev) => {
@@ -212,7 +188,7 @@ const OrderCartUpdateModal = (props) => {
         ...prev,
         [id]: numericValue,
       };
-      updateTotals(newQuantities, price, id);
+      updateTotals(newQuantities);
       return newQuantities;
     });
   };
@@ -228,12 +204,42 @@ const OrderCartUpdateModal = (props) => {
   const updateTotals = (newQuantities, updatedDbPrice = dbPrice) => {
     const newTotals = {};
     data.forEach((item) => {
-      const price = parseFloat(updatedDbPrice[item.id]) || item.unit_price;
-      newTotals[item.product.id] =
-        (newQuantities[item.product.id] || 1) * price;
+      const productId = item.product.id;
+      const price = parseFloat(updatedDbPrice[productId]) || item.unit_price;
+      newTotals[productId] = (newQuantities[productId] || 1) * price;
     });
     setTotals(newTotals);
     setTotal(Object.values(newTotals).reduce((sum, val) => sum + val, 0));
+  };
+
+  const handleAddProduct = (productId) => {
+    const selectedProduct = productsData.find((item) => item.id === productId);
+    if (!selectedProduct) return;
+
+    const alreadyAdded = data.some((item) => item.product.id === productId);
+    if (alreadyAdded) {
+      toast.warning("This product is already added");
+      return;
+    }
+
+    setData((prev) => [
+      ...prev,
+      {
+        id: `new-${selectedProduct.id}`,
+        product: selectedProduct,
+        quantity: 1,
+        unit_price: selectedProduct.sell_price,
+        bonus_qty: 0,
+        price_type: "tp",
+      },
+    ]);
+    setQuantities((prev) => ({ ...prev, [productId]: 1 }));
+    setDbPrice((prev) => ({
+      ...prev,
+      [productId]: selectedProduct.sell_price || 0,
+    }));
+    setBonus((prev) => ({ ...prev, [productId]: 0 }));
+    setTpOrFlat((prev) => ({ ...prev, [productId]: "tp" }));
   };
 
   const handleRemoveItem = (productId) => {
@@ -242,14 +248,32 @@ const OrderCartUpdateModal = (props) => {
 
     // Remove the product's quantity and total without resetting others
     setQuantities((prev) => {
-      const { [productId]: _, ...rest } = prev; // Exclude the removed product
-      return rest;
+      const nextQuantities = { ...prev };
+      delete nextQuantities[productId];
+      return nextQuantities;
     });
 
     setTotals((prev) => {
-      const { [productId]: _, ...rest } = prev; // Exclude the removed total
-      setGrandTotal(Object.values(rest).reduce((sum, val) => sum + val, 0)); // Update grand total
-      return rest;
+      const nextTotals = { ...prev };
+      delete nextTotals[productId];
+      setGrandTotal(Object.values(nextTotals).reduce((sum, val) => sum + val, 0)); // Update grand total
+      return nextTotals;
+    });
+
+    setDbPrice((prev) => {
+      const nextDbPrice = { ...prev };
+      delete nextDbPrice[productId];
+      return nextDbPrice;
+    });
+    setBonus((prev) => {
+      const nextBonus = { ...prev };
+      delete nextBonus[productId];
+      return nextBonus;
+    });
+    setTpOrFlat((prev) => {
+      const nextTpOrFlat = { ...prev };
+      delete nextTpOrFlat[productId];
+      return nextTpOrFlat;
     });
   };
 
@@ -266,13 +290,27 @@ const OrderCartUpdateModal = (props) => {
     const grand_Total =
       discount == 0 ? total : total - total * (discount / 100);
     setGrandTotal(grand_Total);
-  }, [discount, quantities]);
+  }, [discount, total]);
+
+  useEffect(() => {
+    const newTotals = {};
+    data.forEach((item) => {
+      const productId = item.product.id;
+      const price = parseFloat(dbPrice[productId]) || item.unit_price;
+      newTotals[productId] = (quantities[productId] || 1) * price;
+    });
+    setTotals(newTotals);
+    setTotal(Object.values(newTotals).reduce((sum, val) => sum + val, 0));
+  }, [data, quantities, dbPrice]);
 
   const CancelOrder = () => {
     setQuantities({});
     setTotals({});
+    setDbPrice({});
+    setBonus({});
+    setTpOrFlat({});
     setGrandTotal(0);
-    setInputValues({ customer_id: "0", customer_name: "" });
+    setInputValues({ customer_id: "0", customer_name: "", offer: "" });
     setData([]);
     handleCancel();
   };
@@ -287,13 +325,13 @@ const OrderCartUpdateModal = (props) => {
     } else if (inputValues.pay_type <= "0" || !inputValues.pay_type) {
       toast.error("Please select a payment method!");
     } else {
-      const orderData = data.map((item, index) => ({
+      const orderData = data.map((item) => ({
         product_id: item.product.id,
         quantity: quantities[item.product.id] || 0,
         product_name: item.product.name,
-        unit_price: dbPrice[item.id] || 0,
-        bonus_qty: bonus[item.id] || 0,
-        price_type: tpOrFlat[item.id] || "tp",
+        unit_price: dbPrice[item.product.id] || 0,
+        bonus_qty: bonus[item.product.id] || 0,
+        price_type: tpOrFlat[item.product.id] || "tp",
       }));
 
       const payload = {
@@ -302,6 +340,7 @@ const OrderCartUpdateModal = (props) => {
         order_date: date,
         discount: discount,
         order_type: inputValues.pay_type,
+        offer: inputValues.offer || null,
       };
       // console.log(payload);
 
@@ -401,7 +440,32 @@ const OrderCartUpdateModal = (props) => {
               </select>
             </div>
 
-            {data.map((item, index) => {
+            <div className="select-from-cart-modal">
+              <label>Add product</label>
+              <Select
+                showSearch
+                allowClear
+                style={{ width: "100%" }}
+                placeholder="Search and add product"
+                optionFilterProp="label"
+                value={undefined}
+                onChange={handleAddProduct}
+                options={
+                  Array.isArray(productsData)
+                    ? productsData.map((item) => ({
+                        value: item.id,
+                        label: `${item.name} (${item.pack_size})`,
+                        disabled: data.some(
+                          (cartItem) => cartItem.product.id === item.id
+                        ),
+                      }))
+                    : []
+                }
+              />
+            </div>
+
+            {data.map((item) => {
+              const productId = item.product.id;
               return (
                 <div key={item.product.id} className="cartItemCard d-flex">
                   <div className="left">
@@ -413,13 +477,13 @@ const OrderCartUpdateModal = (props) => {
                       <div className="inputBox noTopPadd">
                         <input
                           type="number"
-                          value={dbPrice[item.id] || ""}
-                          onChange={(e) => handleDbPrice(e, item.id)}
+                          value={dbPrice[productId] || ""}
+                          onChange={(e) => handleDbPrice(e, productId)}
                         />
                       </div>
                     </div>
                     <p className="price d-flex">
-                      Total: {(totals[item.product.id] || 0).toFixed(2)}
+                      Total: {(totals[productId] || 0).toFixed(2)}
                       <FaBangladeshiTakaSign size={15} />
                     </p>
 
@@ -428,11 +492,10 @@ const OrderCartUpdateModal = (props) => {
                         onChange={(e) => {
                           setTpOrFlat({
                             ...tpOrFlat,
-                            [item.id]: e.target.value,
+                            [productId]: e.target.value,
                           });
-                          setTpOrFlatCounter(tpOrFlatCounter + 1);
                         }}
-                        defaultValue={tpOrFlat[item.id]}
+                        value={tpOrFlat[productId] || "tp"}
                         disabled
                       >
                         <Radio.Button value="tp">Tp</Radio.Button>
@@ -445,11 +508,11 @@ const OrderCartUpdateModal = (props) => {
                       <div className="inputBox noTopPadd">
                         <input
                           type="number"
-                          value={bonus[item.id] || ""}
+                          value={bonus[productId] || ""}
                           onChange={(e) => {
                             setBonus({
                               ...bonus,
-                              [item.id]: e.target.value,
+                              [productId]: e.target.value,
                             });
                           }}
                         />
@@ -460,26 +523,26 @@ const OrderCartUpdateModal = (props) => {
                     <button
                       type="button"
                       className="button"
-                      onClick={() => handleInc(item.product.id, index)}
+                      onClick={() => handleInc(productId)}
                     >
                       +
                     </button>
                     <input
                       type="text"
                       className="display"
-                      value={quantities[item.product.id] || 0}
+                      value={quantities[productId] || 0}
                       onChange={(e) =>
                         handleQtyInput(
-                          item.product.id,
+                          productId,
                           e.target.value,
-                          dbPrice[item.product.id]
+                          dbPrice[productId]
                         )
                       }
                     />
                     <button
                       type="button"
                       className="button"
-                      onClick={() => handleDec(item.product.id)}
+                      onClick={() => handleDec(productId)}
                     >
                       -
                     </button>
@@ -487,7 +550,7 @@ const OrderCartUpdateModal = (props) => {
                       size={20}
                       color="red"
                       className="c-pointer"
-                      onClick={() => handleRemoveItem(item.product.id)}
+                      onClick={() => handleRemoveItem(productId)}
                     />
                   </div>
                 </div>
@@ -531,6 +594,23 @@ const OrderCartUpdateModal = (props) => {
               </div>
             )}
             {/* ___ Pay type Section End  ___ */}
+
+            {/* ___ Offer Section Start  ___ */}
+            {data.length !== 0 && (
+              <div className="select-from-cart-modal">
+                <label>Offer</label>
+                <div className="inputBox">
+                  <input
+                    type="text"
+                    name="offer"
+                    placeholder="Enter offer details..."
+                    value={inputValues.offer}
+                    onChange={handleInputValue}
+                  />
+                </div>
+              </div>
+            )}
+            {/* ___ Offer Section End  ___ */}
 
             {data.length !== 0 && (
               <div className="cartSummaryInputs">

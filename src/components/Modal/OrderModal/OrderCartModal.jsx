@@ -70,6 +70,7 @@ const OrderCartModal = (props) => {
   const [inputValues, setInputValues] = useState({
     customer_id: "0",
     pay_type: "0",
+    offer: "",
   });
   const handleInputValue = (e) => {
     setInputValues({ ...inputValues, [e.target.name]: e.target.value });
@@ -228,7 +229,7 @@ const OrderCartModal = (props) => {
         Object.values(resetTotals).reduce((sum, value) => sum + value, 0)
       );
     }
-    setInputValues({ customer_id: "0" });
+    setInputValues({ customer_id: "0", offer: "" });
     data.length = 0;
     handleCancel();
     handleClearRows();
@@ -288,6 +289,7 @@ const OrderCartModal = (props) => {
         order_date: date,
         discount: discount,
         order_type: inputValues.pay_type,
+        offer: inputValues.offer || null,
       };
 
       setLoader(true);
@@ -535,6 +537,23 @@ const OrderCartModal = (props) => {
               </div>
             )}
             {/* ___ Pay type Section End  ___ */}
+
+            {/* ___ Offer Section Start  ___ */}
+            {data.length !== 0 && (
+              <div className="select-from-cart-modal">
+                <label>Offer</label>
+                <div className="inputBox">
+                  <input
+                    type="text"
+                    name="offer"
+                    placeholder="Enter offer details..."
+                    value={inputValues.offer}
+                    onChange={handleInputValue}
+                  />
+                </div>
+              </div>
+            )}
+            {/* ___ Offer Section End  ___ */}
 
             {data.length !== 0 && (
               <div className="cartSummaryInputs">
