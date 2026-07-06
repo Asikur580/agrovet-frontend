@@ -20,6 +20,10 @@ import { DataContext } from "../../../context/DataContext";
 
 const SaleCartModal2 = (props) => {
   const { headers } = useContext(AuthContext);
+  const roundPointValue = (value) => {
+    const numericValue = parseFloat(value);
+    return Number.isNaN(numericValue) ? 0 : Math.round(numericValue);
+  };
   const { customerDataContext } = useContext(DataContext);
   const {
     slug,
@@ -173,7 +177,7 @@ const SaleCartModal2 = (props) => {
   };
 
   const handleQtyInput = (index, value, price) => {
-    const numericValue = parseInt(value, 10);
+    const numericValue = roundPointValue(value);
     setQuantities((prev) => {
       const newQuantities = {
         ...prev,
@@ -245,7 +249,18 @@ const SaleCartModal2 = (props) => {
   useEffect(() => {
     const discountAmount = (grandTotal * discount) / 100; // Calculate discount as percentage
     const adjustedTotal = Math.max(grandTotal - discountAmount - less, 0);
-    setNetTotal(adjustedTotal);
+
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    setNetTotal(customRound(adjustedTotal));
   }, [grandTotal, discount, less]);
 
   // Recalculate due whenever netTotal or paid changes
@@ -336,8 +351,8 @@ const SaleCartModal2 = (props) => {
     } else {
       const orderData = data.map((item, index) => ({
         product_id: item.id,
-        quantity: quantities[index] || 0,
-        bonus_qty: bonus[item.id] || 0,
+        quantity: roundPointValue(quantities[index]),
+        bonus_qty: roundPointValue(bonus[item.id]),
         price_type: tpOrFlat[item.id] || "tp",
         unit_price: dbPrice[item.id] || 0,
       }));
@@ -489,7 +504,7 @@ const SaleCartModal2 = (props) => {
                           onChange={(e) => {
                             setTpOrFlat({
                               ...tpOrFlat,
-                              [item.id]: e.target.value,
+                              [item.id]: roundPointValue(e.target.value),
                             });
                             //=>>> New code start (Click tp or flat change database pricce)
                             setTpOrFlatCount(tpOrFlatCount + 1);
@@ -511,7 +526,7 @@ const SaleCartModal2 = (props) => {
                             onChange={(e) => {
                               setBonus({
                                 ...bonus,
-                                [item.id]: e.target.value,
+                                [item.id]: roundPointValue(e.target.value),
                               });
                             }}
                           />
@@ -654,11 +669,11 @@ const SaleCartModal2 = (props) => {
 
                   <div className="cartTotal d-flex">
                     <p className="d-flex">
-                      Grand Total: {netTotal.toFixed(2)}{" "}
+                      Grand Total: {netTotal}{" "}
                       <FaBangladeshiTakaSign size={18} />
                     </p>
                     <p className="d-flex">
-                      Due: {due.toFixed(2)} <FaBangladeshiTakaSign size={18} />
+                      Due: {due} <FaBangladeshiTakaSign size={18} />
                     </p>
                   </div>
                 </div>

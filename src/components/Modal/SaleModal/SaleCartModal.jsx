@@ -137,9 +137,20 @@ const SaleCartUpdateModal = (props) => {
         const discountAmount = (totalPrice * discountFromApi) / 100;
         setDiscount(discountAmount);
 
-        const newGrandTotal = totalPrice - discountAmount - less;
-        setGrandTotal(newGrandTotal);
-        setDue(newGrandTotal - paid);
+        const rawGrandTotal = totalPrice - discountAmount - less;
+        // Custom rounding: x.50 -> x, x.51 -> x + 1
+        const customRound = (num) => {
+          const fixedNum = Number(num).toFixed(2);
+          const [integerPart, decimalPart] = fixedNum.split(".");
+          if (parseInt(decimalPart, 10) > 50) {
+            return parseInt(integerPart, 10) + 1;
+          }
+          return parseInt(integerPart, 10);
+        };
+        const roundedGrandTotal = customRound(rawGrandTotal);
+
+        setGrandTotal(roundedGrandTotal);
+        setDue(roundedGrandTotal - paid);
       } else {
         console.error(response.data.error);
       }
@@ -237,15 +248,43 @@ const SaleCartUpdateModal = (props) => {
     const total = Object.values(newTotals).reduce((sum, val) => sum + val, 0);
     const discountAmount = (total * discountPercentage) / 100;
     setDiscount(discountAmount);
-    setGrandTotal(total - discountAmount - less);
-    setDue(total - discountAmount - less - paid);
+    
+    const rawGrandTotal = total - discountAmount - less;
+
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    const roundedGrandTotal = customRound(rawGrandTotal);
+    
+    setGrandTotal(roundedGrandTotal);
+    setDue(roundedGrandTotal - paid);
   };
 
   const updateGrandTotal = (discount, less, paid) => {
     const total = Object.values(totals).reduce((sum, val) => sum + val, 0);
-    const newGrandTotal = total - discount - less;
-    setGrandTotal(newGrandTotal);
-    setDue(newGrandTotal - paid);
+    const rawGrandTotal = total - discount - less;
+
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    const roundedGrandTotal = customRound(rawGrandTotal);
+
+    setGrandTotal(roundedGrandTotal);
+    setDue(roundedGrandTotal - paid);
   };
 
   const CancelOrder = () => {
@@ -539,11 +578,11 @@ const SaleCartUpdateModal = (props) => {
 
               <div className="cartTotal d-flex">
                 <p className="d-flex">
-                  Grand Total: {grandTotal.toFixed(2)}
+                  Grand Total: {grandTotal}
                   <FaBangladeshiTakaSign size={18} />
                 </p>
                 <p className="d-flex">
-                  Due: {due.toFixed(2)}
+                  Due: {due}
                   <FaBangladeshiTakaSign size={18} />
                 </p>
               </div>

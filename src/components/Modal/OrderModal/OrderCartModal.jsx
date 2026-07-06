@@ -17,6 +17,10 @@ import SingleDatePicker from "../../DatePicker/SingleDatePicker";
 
 const OrderCartModal = (props) => {
   const { headers } = useContext(AuthContext);
+  const roundPointValue = (value) => {
+    const numericValue = parseFloat(value);
+    return Number.isNaN(numericValue) ? 0 : Math.round(numericValue);
+  };
   const { customerDataContext } = useContext(DataContext);
   const {
     slug,
@@ -142,7 +146,7 @@ const OrderCartModal = (props) => {
 
   const handleQtyInput = (index, value, price) => {
     // Validate input value
-    const numericValue = parseInt(value, 10);
+    const numericValue = roundPointValue(value);
     setQuantities((prev) => {
       const newQuantities = {
         ...prev,
@@ -202,9 +206,19 @@ const OrderCartModal = (props) => {
     }
   };
   useEffect(() => {
-    const grand_Total =
-      discount == 0 ? total : total - total * (discount / 100);
-    setGrandTotal(grand_Total);
+    let grand_Total = discount == 0 ? total : total - total * (discount / 100);
+    
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    setGrandTotal(customRound(grand_Total));
   }, [discount, quantities, total]);
 
   const CancelOrder = () => {
@@ -277,8 +291,8 @@ const OrderCartModal = (props) => {
     } else {
       const orderData = data.map((item, index) => ({
         product_id: item.id,
-        quantity: quantities[index] || 0,
-        bonus_qty: bonus[item.id] || 0,
+        quantity: roundPointValue(quantities[index]),
+        bonus_qty: roundPointValue(bonus[item.id]),
         price_type: tpOrFlat[item.id] || "tp",
         unit_price: dbPrice[item.id] || 0,
       }));
@@ -428,7 +442,7 @@ const OrderCartModal = (props) => {
                             // Update the TP/Flat selection
                             setTpOrFlat({
                               ...tpOrFlat,
-                              [item.id]: e.target.value,
+                              [item.id]: roundPointValue(e.target.value),
                             });
                             
                             // Immediately update the price for this specific item based on selection
@@ -454,7 +468,7 @@ const OrderCartModal = (props) => {
                             onChange={(e) => {
                               setBonus({
                                 ...bonus,
-                                [item.id]: e.target.value,
+                                [item.id]: roundPointValue(e.target.value),
                               });
                             }}
                           />
@@ -571,7 +585,7 @@ const OrderCartModal = (props) => {
 
                 <div className="cartTotal d-flex">
                   <p className="d-flex">
-                    Grand Total: {grandTotal.toFixed(2)}{" "}
+                    Grand Total: {grandTotal}{" "}
                     <FaBangladeshiTakaSign size={18} />
                   </p>
                 </div>

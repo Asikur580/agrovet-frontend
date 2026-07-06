@@ -277,9 +277,19 @@ const OrderCartUpdateModal = (props) => {
     }
   };
   useEffect(() => {
-    const grand_Total =
-      discount == 0 ? total : total - total * (discount / 100);
-    setGrandTotal(grand_Total);
+    let grand_Total = discount == 0 ? total : total - total * (discount / 100);
+
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    setGrandTotal(customRound(grand_Total));
   }, [discount, quantities]);
 
   const ClearAllStates = () => {
@@ -567,7 +577,7 @@ const OrderCartUpdateModal = (props) => {
 
                 <div className="cartTotal d-flex">
                   <p className="d-flex">
-                    Grand Total: {grandTotal.toFixed(2)}{" "}
+                    Grand Total: {grandTotal}{" "}
                     <FaBangladeshiTakaSign size={18} />
                   </p>
                 </div>

@@ -19,6 +19,10 @@ import SingleDatePicker from "../../DatePicker/SingleDatePicker";
 
 const SaleCartUpdateModal2 = (props) => {
   const { headers } = useContext(AuthContext);
+  const roundPointValue = (value) => {
+    const numericValue = parseFloat(value);
+    return Number.isNaN(numericValue) ? 0 : Math.round(numericValue);
+  };
   const { customerDataContext } = useContext(DataContext);
   const {
     id,
@@ -165,7 +169,7 @@ const SaleCartUpdateModal2 = (props) => {
     // console.log([e.target.name] + " = " + e.target.value);
   };
   const handleDuQeuantity = (e, productId) => {
-    setDueQuantity({ ...dueQuantity, [productId]: e.target.value });
+    setDueQuantity({ ...dueQuantity, [productId]: roundPointValue(e.target.value) });
   };
 
   const handleInc = (productId) => {
@@ -192,7 +196,7 @@ const SaleCartUpdateModal2 = (props) => {
 
   const handleQtyInput = (id, value, price) => {
     // Validate input value
-    const numericValue = parseInt(value, 10);
+    const numericValue = roundPointValue(value);
     setQuantities((prev) => {
       const newQuantities = {
         ...prev,
@@ -249,9 +253,22 @@ const SaleCartUpdateModal2 = (props) => {
   const updateGrandTotal = (discount, less, paid) => {
     const total = Object.values(totals).reduce((sum, val) => sum + val, 0);
     const discountAmount = (total * discount) / 100;
-    const newGrandTotal = total - discountAmount - less;
-    setGrandTotal(newGrandTotal);
-    setDue(newGrandTotal - paid);
+    const rawGrandTotal = total - discountAmount - less;
+
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    const roundedGrandTotal = customRound(rawGrandTotal);
+
+    setGrandTotal(roundedGrandTotal);
+    setDue(roundedGrandTotal - paid);
     setDiscountAmountState(discountAmount);
   };
 
@@ -290,12 +307,24 @@ const SaleCartUpdateModal2 = (props) => {
       0
     );
     const discountAmount = (newGrandTotal * discountPercentage) / 100;
-    const adjustedTotal = newGrandTotal - discountAmount - less;
+    const rawAdjustedTotal = newGrandTotal - discountAmount - less;
+
+    // Custom rounding: x.50 -> x, x.51 -> x + 1
+    const customRound = (num) => {
+      const fixedNum = Number(num).toFixed(2);
+      const [integerPart, decimalPart] = fixedNum.split(".");
+      if (parseInt(decimalPart, 10) > 50) {
+        return parseInt(integerPart, 10) + 1;
+      }
+      return parseInt(integerPart, 10);
+    };
+
+    const roundedAdjustedTotal = customRound(rawAdjustedTotal);
 
     setTotals(newTotals);
     setTotalPriceBeforeAdjustments(newGrandTotal);
-    setGrandTotal(adjustedTotal);
-    setDue(adjustedTotal - paid);
+    setGrandTotal(roundedAdjustedTotal);
+    setDue(roundedAdjustedTotal - paid);
   }, [dbPrice, quantities, discountPercentage, less, paid, data]);
 
   const CancelOrder = () => {
@@ -321,10 +350,10 @@ const SaleCartUpdateModal2 = (props) => {
     } else {
       const orderData = data.map((item) => ({
         product_id: item.product.id,
-        quantity: quantities[item.product.id] || 0,
+        quantity: roundPointValue(quantities[item.product.id]),
         unit_price: dbPrice[item.product.id] || 0,
-        due_quantity: dueQuantity[item.product.id] || 0,
-        bonus_qty: bonus[item.product.id] || 0,
+        due_quantity: roundPointValue(dueQuantity[item.product.id]),
+        bonus_qty: roundPointValue(bonus[item.product.id]),
         price_type: tpOrFlat[item.product.id] || "tp",
       }));
       // console.log("___Order data___");
@@ -468,7 +497,7 @@ const SaleCartUpdateModal2 = (props) => {
                         onChange={(e) => {
                           setTpOrFlat({
                             ...tpOrFlat,
-                            [item.product.id]: e.target.value,
+                            [item.product.id]: roundPointValue(e.target.value),
                           });
                         }}
                         defaultValue={tpOrFlat[item.product.id]}
@@ -500,7 +529,7 @@ const SaleCartUpdateModal2 = (props) => {
                           onChange={(e) => {
                             setBonus({
                               ...bonus,
-                              [item.product.id]: e.target.value,
+                              [item.product.id]: roundPointValue(e.target.value),
                             });
                           }}
                         />
@@ -620,11 +649,11 @@ const SaleCartUpdateModal2 = (props) => {
               </div>
               <div className="cartTotal d-flex">
                 <p className="d-flex">
-                  Grand Total: {grandTotal.toFixed(2)}
+                  Grand Total: {grandTotal}
                   <FaBangladeshiTakaSign size={18} />
                 </p>
                 <p className="d-flex">
-                  Due: {due.toFixed(2)}
+                  Due: {due}
                   <FaBangladeshiTakaSign size={18} />
                 </p>
               </div>
