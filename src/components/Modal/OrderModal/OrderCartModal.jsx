@@ -439,14 +439,19 @@ const OrderCartModal = (props) => {
                       <Flex vertical gap="middle">
                         <Radio.Group
                           onChange={(e) => {
+                            const selectedType = e.target.value;
+
                             // Update the TP/Flat selection
-                            setTpOrFlat({
-                              ...tpOrFlat,
-                              [item.id]: roundPointValue(e.target.value),
-                            });
-                            
+                            setTpOrFlat((prev) => ({
+                              ...prev,
+                              [item.id]: selectedType,
+                            }));
+
                             // Immediately update the price for this specific item based on selection
-                            const newPrice = e.target.value === "tp" ? item.sell_price : item.flat_price;
+                            const newPrice =
+                              selectedType === "tp"
+                                ? item.sell_price
+                                : item.flat_price;
                             setDbPrice((prev) => ({
                               ...prev,
                               [item.id]: newPrice,

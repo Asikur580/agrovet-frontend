@@ -502,13 +502,23 @@ const SaleCartModal2 = (props) => {
                       <Flex vertical gap="middle">
                         <Radio.Group
                           onChange={(e) => {
-                            setTpOrFlat({
-                              ...tpOrFlat,
-                              [item.id]: roundPointValue(e.target.value),
-                            });
-                            //=>>> New code start (Click tp or flat change database pricce)
-                            setTpOrFlatCount(tpOrFlatCount + 1);
-                            //=>>> New code end (Click tp or flat change database pricce)
+                            const selectedType = e.target.value;
+
+                            setTpOrFlat((prev) => ({
+                              ...prev,
+                              [item.id]: selectedType,
+                            }));
+
+                            const newPrice =
+                              selectedType === "tp"
+                                ? item.sell_price
+                                : item.flat_price;
+                            setDbPrice((prev) => ({
+                              ...prev,
+                              [item.id]: newPrice,
+                            }));
+
+                            setTpOrFlatCount((prev) => prev + 1);
                           }}
                           value={tpOrFlat[item.id] || "tp"}
                         >
