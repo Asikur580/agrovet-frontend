@@ -415,6 +415,15 @@ const InvoicePdf = ({ setLoader }) => {
                   </View>
                 </View>
                 <View style={styles.totalSectionRow}>
+                  <Text style={styles.totalSectionLabel}>Paid</Text>
+                  <View style={styles.totalSectionValBox}>
+                    <Text style={styles.totalSectionColon}>:</Text>{" "}
+                    <Text style={styles.totalSectionValue}>
+                      {Number(apiData.paid).toFixed(2)}/-
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.totalSectionRow}>
                   <Text style={styles.totalSectionLabel}>
                     Net Payable Amount
                   </Text>
@@ -424,7 +433,8 @@ const InvoicePdf = ({ setLoader }) => {
                       {(
                         Number(apiData.total_price).toFixed(2) -
                         Number(apiData.discount).toFixed(2) -
-                        Number(apiData.less).toFixed(2)
+                        Number(apiData.less).toFixed(2) -
+                        Number(apiData.paid).toFixed(2)
                       ).toFixed(2)}
                       /-
                     </Text>
