@@ -30,9 +30,11 @@ const SalesReport = ({ setLoader }) => {
       (totals, item) => {
         totals.quantity += Number(item.total_quantity || 0);
         totals.amount += Number(item.total_amount || 0);
+        totals.cash_sale += Number(item.total_cash_sale || 0);
+        totals.credit_sale += Number(item.total_credit_sale || 0);
         return totals;
       },
-      { quantity: 0, amount: 0 }
+      { quantity: 0, amount: 0, cash_sale: 0, credit_sale: 0 }
     );
   }, [apiData]);
 
@@ -96,6 +98,8 @@ const SalesReport = ({ setLoader }) => {
             <td>${escapeExcelCell(item.product_name)}</td>
             <td>${escapeExcelCell(item.pack_size)}</td>
             <td>${Number(item.total_quantity || 0)}</td>
+            <td>${Number(item.total_cash_sale || 0).toFixed(2)}</td>
+            <td>${Number(item.total_credit_sale || 0).toFixed(2)}</td>
             <td>${Number(item.total_amount || 0).toFixed(2)}</td>
           </tr>`
       )
@@ -110,13 +114,15 @@ const SalesReport = ({ setLoader }) => {
           <table border="1">
             <thead>
               <tr>
-                <th colspan="5">Product-wise Sales Report</th>
+                <th colspan="7">Product-wise Sales Report</th>
               </tr>
               <tr>
                 <th>Sl No</th>
                 <th>Product Name</th>
                 <th>Pack Size</th>
                 <th>Total Quantity</th>
+                <th>Cash Sale</th>
+                <th>Credit Sale</th>
                 <th>Amount</th>
               </tr>
             </thead>
@@ -125,6 +131,8 @@ const SalesReport = ({ setLoader }) => {
               <tr>
                 <td colspan="3"><strong>Filtered Total</strong></td>
                 <td><strong>${filteredTotals.quantity}</strong></td>
+                <td><strong>${filteredTotals.cash_sale.toFixed(2)}</strong></td>
+                <td><strong>${filteredTotals.credit_sale.toFixed(2)}</strong></td>
                 <td><strong>${filteredTotals.amount.toFixed(2)}</strong></td>
               </tr>
             </tbody>
@@ -167,6 +175,18 @@ const SalesReport = ({ setLoader }) => {
       dataIndex: "total_quantity",
       key: "total_quantity",
       render: (val) => val || 0,
+    },
+    {
+      title: "Cash Sale",
+      dataIndex: "total_cash_sale",
+      key: "total_cash_sale",
+      render: (val) => Number(val || 0).toFixed(2),
+    },
+    {
+      title: "Credit Sale",
+      dataIndex: "total_credit_sale",
+      key: "total_credit_sale",
+      render: (val) => Number(val || 0).toFixed(2),
     },
     {
       title: "Amount",

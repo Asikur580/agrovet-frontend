@@ -1,10 +1,9 @@
 export const DateFormater = (param) => {
-  const paramDate = new Date(param).toLocaleDateString();
-  const fullDateArr = paramDate.split("/");
-  const fullDate = `${fullDateArr[2]}-${
-    fullDateArr[0].length == 1 ? `0${fullDateArr[0]}` : fullDateArr[0]
-  }-${fullDateArr[1].length == 1 ? `0${fullDateArr[1]}` : fullDateArr[1]}`;
-  return fullDate;
+  const date = new Date(param);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 export const DateRange = (range) => {

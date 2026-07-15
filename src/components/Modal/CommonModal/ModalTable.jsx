@@ -440,6 +440,11 @@ const ModalTable = (props) => {
                                       >
                                         {item.proprietor_name}
                                       </td>
+                                      <td
+                                        className={`${prTr.b} ${prTr.bc} ${prTr.px}`}
+                                      >
+                                        {Number(item.due || 0).toFixed(2)}
+                                      </td>
                                     </>
                                   ) : (
                                     ""
