@@ -917,6 +917,18 @@ const ModalTable = (props) => {
                               );
                             })}
                         </tbody>
+                        {identifier == "printCustomer" && (
+                          <tfoot>
+                            <tr className="border h-[35px] font-bold text-center">
+                              <td colSpan={4} className="text-right pr-4 border border-border_clr">Total Due:</td>
+                              <td className="border border-border_clr px-2">
+                                {Number(
+                                  sessionStoreData.reduce((acc, curr) => acc + Number(curr.due || 0), 0)
+                                ).toFixed(2)}
+                              </td>
+                            </tr>
+                          </tfoot>
+                        )}
                       </table>
                     </div>
                   ) : (
@@ -1184,6 +1196,87 @@ const ModalTable = (props) => {
                       </tbody>
                     </table> */}
                   </div>
+                </>
+              );
+            } else if (identifier == "printSalesSummary") {
+              const summary = Array.isArray(sessionStoreData) && sessionStoreData.length > 0 ? sessionStoreData[0] : null;
+              return (
+                <>
+                  <div className="text-end mb-3">
+                    <button
+                      className="printBtn font-bold text-main_clr border border-solid border-main_clr rounded-md px-4 py-1"
+                      style={{ top: "12px", right: "50px" }}
+                      onClick={() => reactToPrintFn()}
+                    >
+                      print
+                    </button>
+                  </div>
+
+                  {summary ? (
+                    <div ref={contentRef} className="printTable px-4">
+                      <h1 className="hidden print:block text-2xl text-center font-bold mb-3">
+                        {slug}
+                      </h1>
+                      
+                      <div className="mb-4 flex justify-between border-b pb-2 text-[15px]">
+                         <div><strong>Date Range:</strong> {summary.dateRange}</div>
+                         <div><strong>Employee:</strong> {summary.employeeName}</div>
+                      </div>
+
+                      <table className="w-full mt-4 text-left border text-[15px]">
+                        <tbody>
+                          <tr className="border-b h-[35px]">
+                            <td className="px-3 border-r font-semibold w-1/2">Total Invoices</td>
+                            <td className="px-3 w-1/2">{summary.totalInvoices}</td>
+                          </tr>
+                          <tr className="border-b h-[35px]">
+                            <td className="px-3 border-r font-semibold">Cash Invoices</td>
+                            <td className="px-3">{summary.cashInvoicesCount} (Amount: {summary.totalCashAmount.toFixed(2)}/-)</td>
+                          </tr>
+                          <tr className="border-b h-[35px]">
+                            <td className="px-3 border-r font-semibold">Credit Invoices</td>
+                            <td className="px-3">{summary.creditInvoicesCount} (Amount: {summary.totalCreditAmount.toFixed(2)}/-)</td>
+                          </tr>
+                          <tr className="h-[35px] bg-gray-100">
+                            <td className="px-3 border-r font-bold text-[16px]">Total Sales Amount</td>
+                            <td className="px-3 font-bold text-[16px]">{summary.totalSalesAmount.toFixed(2)}/-</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      {summary.invoices && summary.invoices.length > 0 && (
+                        <div className="mt-8">
+                          <h2 className="text-lg font-bold mb-3 border-b pb-1">Invoices List</h2>
+                          <table className="w-full text-left border text-[14px]">
+                            <thead>
+                              <tr className="bg-gray-100 border-b">
+                                <th className="px-2 py-1 border-r">Sl</th>
+                                <th className="px-2 py-1 border-r">Date</th>
+                                <th className="px-2 py-1 border-r">Customer</th>
+                                <th className="px-2 py-1 border-r">Employee</th>
+                                <th className="px-2 py-1 border-r">Type</th>
+                                <th className="px-2 py-1">Grand Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {summary.invoices.map((inv, idx) => (
+                                <tr key={inv.id || idx} className="border-b">
+                                  <td className="px-2 py-1 border-r">{idx + 1}</td>
+                                  <td className="px-2 py-1 border-r">{inv.invoice_date || inv.sale_date}</td>
+                                  <td className="px-2 py-1 border-r">{inv.customer_name || (inv.customer && inv.customer.customer_name) || "N/A"}</td>
+                                  <td className="px-2 py-1 border-r">{inv.employee_name || (inv.employee && inv.employee.name) || "N/A"}</td>
+                                  <td className="px-2 py-1 border-r capitalize">{inv.sale_type || inv.pay_type || inv.invoice_type || inv.payment_method || "N/A"}</td>
+                                  <td className="px-2 py-1">{Number(inv.grand_total || 0).toFixed(2)}/-</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    "Opps! Data not found."
+                  )}
                 </>
               );
             }

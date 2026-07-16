@@ -113,6 +113,7 @@ const SalesTable = (props) => {
       name: "Date",
       field: "created_at",
       grow: 2,
+      minWidth: "130px",
       selector: (row) =>
         matchDesignationSlug ? row.invoice_date : row.sale_date,
     },
@@ -337,7 +338,7 @@ const SalesTable = (props) => {
   };
   useEffect(() => {
     filterData();
-  }, [searchData, dateVal]);
+  }, [searchData, dateVal, apiData]);
 
   //=>>> Calculate sum of grand total
   const calculateGrandTotal = () => {
