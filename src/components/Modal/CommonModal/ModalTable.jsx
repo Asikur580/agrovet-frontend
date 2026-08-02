@@ -1125,33 +1125,33 @@ const ModalTable = (props) => {
                     <table className="w-full dueInvoiceTable">
                       <thead>
                         <tr className="bg-gray-300 border text-center h-[35px]">
-                          <th>Sales</th>
-                          <th>Dues</th>
-                          <th>Cogs</th>
-                          <th>Salaries</th>
-                          <th>Costs</th>
-                          <th>Net profit</th>
+                          <th>Product Sales</th>
+                          <th>Product Buy Price</th>
+                          <th>Salary Cost</th>
+                          <th>Employee Add Cost</th>
+                          <th>Office Cost</th>
+                          <th>Net Profit / Loss</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr className="border h-[35px] text-center">
                           <td className={`${prTr.b} ${prTr.bc} ${prTr.px}`}>
-                            {Number(sessionStoreData.sales).toFixed(2)}/-
+                            {Number(sessionStoreData["Product Sales"]).toFixed(2)}/-
                           </td>
                           <td className={`${prTr.b} ${prTr.bc} ${prTr.px}`}>
-                            {Number(sessionStoreData.dues).toFixed(2)}/-
+                            {Number(sessionStoreData["Product Buy Price"]).toFixed(2)}/-
                           </td>
                           <td className={`${prTr.b} ${prTr.bc} ${prTr.px}`}>
-                            {Number(sessionStoreData.cogs).toFixed(2)}/-
+                            {Number(sessionStoreData["Salary Cost"]).toFixed(2)}/-
                           </td>
                           <td className={`${prTr.b} ${prTr.bc} ${prTr.px}`}>
-                            {Number(sessionStoreData.salaries).toFixed(2)}/-
+                            {Number(sessionStoreData["Employee Add Cost"]).toFixed(2)}/-
                           </td>
                           <td className={`${prTr.b} ${prTr.bc} ${prTr.px}`}>
-                            {Number(sessionStoreData.costs).toFixed(2)}/-
+                            {Number(sessionStoreData["Office Cost"]).toFixed(2)}/-
                           </td>
                           <td className={`${prTr.b} ${prTr.bc} ${prTr.px}`}>
-                            {Number(sessionStoreData.net_profit).toFixed(2)}/-
+                            {Number(sessionStoreData["Net Profit / Loss"]).toFixed(2)}/-
                           </td>
                         </tr>
                       </tbody>

@@ -26,19 +26,22 @@ const CashCreditSales = () => {
   const [spinnerLoader, setSpinnerLoader] = useState(false);
   const [printData, setPrintData] = useState({});
   const countedDays = 365;
-  const [dateRang, setDateRang] = useState(daysPrevToToday(countedDays));
+  const [dateRang, setDateRang] = useState({
+    startDate: daysPrevToToday(countedDays),
+    endDate: DateFormater(new Date()),
+  });
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
       setSpinnerLoader(true);
-      const api = `/cashCreditSale?from_date=${dateRang}&to_date=${DateFormater(
-        new Date()
-      )}`;
+      const fromDate = dateRang?.startDate || daysPrevToToday(countedDays);
+      const toDate = dateRang?.endDate || DateFormater(new Date());
+      const api = `/cashCreditSale?from_date=${fromDate}&to_date=${toDate}`;
       const response = await ApiConfig.get(api, { headers });
       if (response.data.status) {
         const datas = Object.values(response.data.data);
-        if (dateRang != 0) {
+        if (dateRang !== "0" && dateRang !== 0) {
           setApiData(datas);
           sessionStorage.setItem("Cash/credit sales", JSON.stringify(datas));
           //=>>> For Print
@@ -98,7 +101,25 @@ const CashCreditSales = () => {
       },
       title: {
         display: true,
-        text: "Sample Pie Chart",
+        text: "Cash/Credit wise sales",
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const value = Number(context.raw).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return ` ${context.label}: ${value} /-`;
+          },
+        },
+      },
+      datalabels: {
+        formatter: (value) => {
+          return Number(value).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        color: "#333",
+        font: {
+          weight: "bold",
+          size: 12,
+        },
       },
     },
   };
@@ -139,13 +160,13 @@ const CashCreditSales = () => {
         <p>
           Cash :{" "}
           <span style={{ color: "rgba(7, 155, 253, 1)" }}>
-            {Number(apiData[0]).toFixed(2)}/-
+            {Number(apiData[0]).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/-
           </span>
         </p>
         <p>
           Credit :{" "}
           <span style={{ color: "rgba(247, 132, 0, 1)" }}>
-            {Number(apiData[1]).toFixed(2)}/-
+            {Number(apiData[1]).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/-
           </span>
         </p>
       </div>

@@ -26,19 +26,22 @@ const ProfitLoss = () => {
   const [spinnerLoader, setSpinnerLoader] = useState(false);
   const [printData, setPrintData] = useState({});
   const countedDays = 365;
-  const [dateRang, setDateRang] = useState(daysPrevToToday(countedDays));
+  const [dateRang, setDateRang] = useState({
+    startDate: daysPrevToToday(countedDays),
+    endDate: DateFormater(new Date()),
+  });
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
       setSpinnerLoader(true);
-      const api = `/profit-loss-report?from_date=${dateRang}&to_date=${DateFormater(
-        new Date()
-      )}`;
+      const fromDate = dateRang?.startDate || daysPrevToToday(countedDays);
+      const toDate = dateRang?.endDate || DateFormater(new Date());
+      const api = `/profit-loss-report?from_date=${fromDate}&to_date=${toDate}`;
       const response = await ApiConfig.get(api, { headers });
       if (response.status == 200) {
         const datas = response.data;
-        if (dateRang != 0) {
+        if (dateRang !== "0" && dateRang !== 0) {
           setApiData(datas);
           sessionStorage.setItem("ProfitLoss", JSON.stringify(datas));
           //=>>> For Print
@@ -100,10 +103,10 @@ const ProfitLoss = () => {
         </div>
       </div>
 
-      {apiData ? (
+      {apiData && Object.keys(apiData).length > 0 ? (
         <BarChart data={apiData} identifier="profit-loss report" />
       ) : (
-        <p className="message">{msg}</p>
+        <p className="message">{msg || "Opps! Data not found."}</p>
       )}
 
       {/* <div className="flex items-center justify-end gap-5 mt-10 sm:gap-16 flex-col sm:flex-row">

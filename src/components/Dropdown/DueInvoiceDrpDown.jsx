@@ -5,18 +5,20 @@ import { IoIosSearch } from "react-icons/io";
 import "./DrpDownStyle.css";
 
 //=>>> Components
-import { daysPrevToToday } from "../../assets/js/DateFormater";
+import { daysPrevToToday, DateFormater } from "../../assets/js/DateFormater";
 import ModalTable from "../Modal/CommonModal/ModalTable";
 import Spinner from "../../components/Loader/Spinner";
 
-const DueInvoiceDrpDown = ({ setDateRang, printData, spinnerLoader }) => {
-  const [daysInput, setDaysInput] = useState(30);
+const DueInvoiceDrpDown = ({ countedDays, setDateRang, printData, spinnerLoader }) => {
   const [btnRotater, setBtnRotater] = useState(false);
+  const [fromDate, setFromDate] = useState(countedDays ? daysPrevToToday(countedDays) : "");
+  const [toDate, setToDate] = useState(countedDays ? DateFormater(new Date()) : "");
 
-  const handleDayOfDueInv = () => {
-    setDaysInput(daysInput);
-    const modifiedDate = daysPrevToToday(daysInput);
-    daysInput != 0 ? setDateRang(modifiedDate) : setDateRang("0");
+  const handleDateRange = () => {
+    if (fromDate || toDate) {
+      setDateRang({ startDate: fromDate, endDate: toDate });
+      setBtnRotater(false);
+    }
   };
 
   const tableHead = ["Sl", "Customer name", "Total", "Due", "Date"];
@@ -26,22 +28,42 @@ const DueInvoiceDrpDown = ({ setDateRang, printData, spinnerLoader }) => {
       key: "1",
       label: (
         <div>
-          <label className="drpDwnLabel">Type previous days</label>
-          <div className="drpDwnInputBox">
-            <input
-              type="text"
-              value={daysInput}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val >= 0) {
-                  setDaysInput(val);
-                  setBtnRotater(false);
-                }
-              }}
-            />
-            <button onClick={handleDayOfDueInv}>
-              <IoIosSearch size={20} />
-            </button>
+          <div className="w-56">
+            <label className="drpDwnLabel block mb-2">Select date range</label>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-10">From:</span>
+                <input
+                  type="date"
+                  className="border border-gray-300 rounded px-2 py-1 outline-none text-sm flex-1 font-sans cursor-pointer"
+                  value={fromDate}
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                    setBtnRotater(false);
+                  }}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-10">To:</span>
+                <input
+                  type="date"
+                  className="border border-gray-300 rounded px-2 py-1 outline-none text-sm flex-1 font-sans cursor-pointer"
+                  value={toDate}
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                    setBtnRotater(false);
+                  }}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                />
+              </div>
+              <button 
+                onClick={handleDateRange}
+                className="bg-green-600 hover:bg-green-700 text-white px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1 mt-1 w-full"
+              >
+                <IoIosSearch size={20} /> <span className="text-sm font-medium">Search</span>
+              </button>
+            </div>
           </div>
 
           {spinnerLoader && (

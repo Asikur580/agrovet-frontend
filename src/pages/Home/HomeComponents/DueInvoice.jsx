@@ -27,7 +27,10 @@ const DueInvoice = () => {
   const [msg, setMsg] = useState("");
   const [spinnerLoader, setSpinnerLoader] = useState(false);
   const [printData, setPrintData] = useState({});
-  const [dateRang, setDateRang] = useState(daysPrevToToday(30));
+  const [dateRang, setDateRang] = useState({
+    startDate: daysPrevToToday(30),
+    endDate: daysPrevToToday(0),
+  });
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
@@ -37,7 +40,12 @@ const DueInvoice = () => {
       if (response.data.status) {
         const datas = Object.values(response.data.data);
         setApiData(datas);
-        const filtering = datas.filter((item) => dateRang <= item.sale_date);
+        const filtering = datas.filter((item) => {
+          let isValid = true;
+          if (dateRang?.startDate) isValid = isValid && item.sale_date >= dateRang.startDate;
+          if (dateRang?.endDate) isValid = isValid && item.sale_date <= dateRang.endDate;
+          return isValid;
+        });
         setFilteredApiData(filtering);
         //=>>> For Print
         sessionStorage.setItem("printDueInvoice", JSON.stringify(filtering));
@@ -66,12 +74,17 @@ const DueInvoice = () => {
 
   //=>>> Filtering for day wise query start
   const filteringByDate = useMemo(() => {
-    if (!dateRang || dateRang === 0) return [];
-    return apiData.filter((item) => dateRang <= item.sale_date);
+    if (!dateRang || dateRang === "0" || dateRang === 0) return [];
+    return apiData.filter((item) => {
+      let isValid = true;
+      if (dateRang?.startDate) isValid = isValid && item.sale_date >= dateRang.startDate;
+      if (dateRang?.endDate) isValid = isValid && item.sale_date <= dateRang.endDate;
+      return isValid;
+    });
   }, [dateRang, apiData]);
 
   useEffect(() => {
-    if (dateRang != 0) {
+    if (dateRang !== "0" && dateRang !== 0) {
       setSpinnerLoader(true);
       setFilteredApiData(filteringByDate);
       setPrintData(filteringByDate);
@@ -135,6 +148,7 @@ const DueInvoice = () => {
             Due Invoices <span>({filteredApiData.length})</span>
           </h1>
           <DueInvoiceDrpDown
+            countedDays={30}
             dateRang={dateRang}
             setDateRang={setDateRang}
             printData={printData}

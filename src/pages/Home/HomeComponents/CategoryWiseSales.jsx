@@ -29,19 +29,22 @@ const CategoryWiseSales = () => {
   const [spinnerLoader, setSpinnerLoader] = useState(false);
   const [printData, setPrintData] = useState({});
   const countedDays = 30;
-  const [dateRang, setDateRang] = useState(daysPrevToToday(countedDays));
+  const [dateRang, setDateRang] = useState({
+    startDate: daysPrevToToday(countedDays),
+    endDate: DateFormater(new Date()),
+  });
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
       setSpinnerLoader(true);
-      const api = `/categoryWiseSalesReport?from_date=${dateRang}&to_date=${DateFormater(
-        new Date()
-      )}`;
+      const fromDate = dateRang?.startDate || daysPrevToToday(countedDays);
+      const toDate = dateRang?.endDate || DateFormater(new Date());
+      const api = `/categoryWiseSalesReport?from_date=${fromDate}&to_date=${toDate}`;
       const response = await ApiConfig.get(api, { headers });
       if (response.data.status) {
         const datas = Object.values(response.data.data);
-        if (dateRang != 0) {
+        if (dateRang !== "0" && dateRang !== 0) {
           setApiData(datas);
           //=>>> For Print
           sessionStorage.setItem(
