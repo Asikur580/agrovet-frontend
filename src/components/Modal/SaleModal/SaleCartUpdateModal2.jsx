@@ -495,13 +495,18 @@ const SaleCartUpdateModal2 = (props) => {
                     <Flex vertical gap="middle">
                       <Radio.Group
                         onChange={(e) => {
+                          const newType = e.target.value;
                           setTpOrFlat({
                             ...tpOrFlat,
-                            [item.product.id]: roundPointValue(e.target.value),
+                            [item.product.id]: newType,
                           });
+                          const newPrice = newType === "flat" ? item.product.flat_price : item.product.sell_price;
+                          setDbPrice((prev) => ({
+                            ...prev,
+                            [item.product.id]: newPrice || 0,
+                          }));
                         }}
-                        defaultValue={tpOrFlat[item.product.id]}
-                        disabled
+                        value={tpOrFlat[item.product.id] || "tp"}
                       >
                         <Radio.Button value="tp">Tp</Radio.Button>
                         <Radio.Button value="flat">Flat</Radio.Button>

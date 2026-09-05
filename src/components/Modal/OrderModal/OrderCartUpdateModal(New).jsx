@@ -451,14 +451,20 @@ const OrderCartUpdateModal = (props) => {
                     <Flex vertical gap="middle">
                       <Radio.Group
                         onChange={(e) => {
+                          const newType = e.target.value;
                           setTpOrFlat({
                             ...tpOrFlat,
-                            [item.id]: e.target.value,
+                            [item.id]: newType,
                           });
-                          setTpOrFlatCounter(tpOrFlatCounter + 1);
+                          const flatPrice = item.product?.flat_price ?? item.flat_price;
+                          const sellPrice = item.product?.sell_price ?? item.sell_price;
+                          const newPrice = newType === "flat" ? flatPrice : sellPrice;
+                          setDbPrice((prev) => ({
+                            ...prev,
+                            [item.id]: newPrice || 0,
+                          }));
                         }}
-                        defaultValue={tpOrFlat[item.id]}
-                        disabled
+                        value={tpOrFlat[item.id] || "tp"}
                       >
                         <Radio.Button value="tp">Tp</Radio.Button>
                         <Radio.Button value="flat">Flat</Radio.Button>

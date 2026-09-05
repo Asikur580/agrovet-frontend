@@ -500,13 +500,18 @@ const OrderCartUpdateModal = (props) => {
                     <Flex vertical gap="middle">
                       <Radio.Group
                         onChange={(e) => {
+                          const newType = e.target.value;
                           setTpOrFlat({
                             ...tpOrFlat,
-                            [productId]: e.target.value,
+                            [productId]: newType,
                           });
+                          const newPrice = newType === "flat" ? item.product.flat_price : item.product.sell_price;
+                          setDbPrice((prev) => ({
+                            ...prev,
+                            [productId]: newPrice || 0,
+                          }));
                         }}
                         value={tpOrFlat[productId] || "tp"}
-                        disabled
                       >
                         <Radio.Button value="tp">Tp</Radio.Button>
                         <Radio.Button value="flat">Flat</Radio.Button>
