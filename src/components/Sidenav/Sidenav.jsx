@@ -68,7 +68,8 @@ const sidenav = (props) => {
       dropdown.sms == true ||
       location.pathname == "/send-sms-anyone" ||
       location.pathname == "/send-sms-everyone" ||
-      location.pathname == "/sms-template"
+      location.pathname == "/sms-template" ||
+      location.pathname == "/sms-history"
     ) {
       setDropdown({ ...dropdown, sms: true });
     } else {
@@ -79,6 +80,7 @@ const sidenav = (props) => {
     location.pathname == "/send-sms-anyone" ||
       location.pathname == "/send-sms-everyone" ||
       location.pathname == "/sms-template" ||
+      location.pathname == "/sms-history" ||
       //==> Product settings
       location.pathname == "/orders" ||
       location.pathname == "/order-create" ||
@@ -302,6 +304,14 @@ const sidenav = (props) => {
                   <NavLink to="/sms-template" onClick={CloseSideNav}>
                     <FaHandPointRight className="icon" size={16} />
                     <p>Sms template</p>
+                  </NavLink>
+                </li>
+              )}
+              {sms == true && (
+                <li>
+                  <NavLink to="/sms-history" onClick={CloseSideNav}>
+                    <FaHandPointRight className="icon" size={16} />
+                    <p>Sms history</p>
                   </NavLink>
                 </li>
               )}

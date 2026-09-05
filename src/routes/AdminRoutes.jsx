@@ -25,6 +25,7 @@ import Permissions from "../pages/Permissions/Permissions";
 import SendSmsAnyone from "../pages/SendSmsAnyone/SendSmsAnyone";
 import SendSmsEveryone from "../pages/SendSmsEveryone/SendSmsEveryone";
 import SmsTemplate from "../pages/SmsTemplate/SmsTemplate";
+import SmsHistory from "../pages/SmsHistory/SmsHistory";
 import Designation from "../pages/Designation/Designation";
 import Employees from "../pages/Employees/Employees";
 import Users from "../pages/Users/Users";
@@ -198,6 +199,18 @@ const AdminRoutes = ({ userRole, isAuthenticated }) => {
                       isAuthenticated={isAuthenticated}
                     >
                       <SendSmsAnyone setLoader={setLoader} />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/sms-history"
+                  element={
+                    <PrivateRoute
+                      roles={["Developer", "Sms"]}
+                      userRole={userRole}
+                      isAuthenticated={isAuthenticated}
+                    >
+                      <SmsHistory setLoader={setLoader} />
                     </PrivateRoute>
                   }
                 />

@@ -12,6 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import DataTable from "react-data-table-component";
 import "../../assets/css/DataTable.css";
 import { FaEdit, FaEye } from "react-icons/fa";
+import { Switch } from "antd";
 import { IoTrashBinSharp } from "react-icons/io5";
 import ApiConfig from "../../assets/js/ApiConfig";
 import { TableStyles, rowPerPage } from "../../assets/js/Utility";
@@ -93,6 +94,24 @@ const CustomerTable = ({
     [setSelectedRows]
   );
 
+  const handleSmsToggle = async (checked, customerId) => {
+    try {
+      setLoader(true);
+      const response = await ApiConfig.post(`/customerToggleSms/${customerId}`, {}, { headers });
+      if (response.data.status) {
+        toast.success(response.data.message);
+        setRelodeTable((prev) => !prev);
+      } else {
+        toast.error(response.data.message || "Failed to toggle SMS status");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred while toggling SMS status");
+    } finally {
+      setLoader(false);
+    }
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -109,6 +128,18 @@ const CustomerTable = ({
       {
         name: "Due",
         selector: (row) => row.due || 0,
+      },
+      {
+        name: "SMS",
+        width: "90px",
+        cell: (row) => (
+          <Switch
+            checked={row.sms_enabled}
+            onChange={(checked) => handleSmsToggle(checked, row.id)}
+            checkedChildren="On"
+            unCheckedChildren="Off"
+          />
+        ),
       },
       {
         name: "Action",
