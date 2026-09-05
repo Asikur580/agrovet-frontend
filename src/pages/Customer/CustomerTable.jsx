@@ -127,7 +127,7 @@ const CustomerTable = ({
       { name: "Credit Limit", selector: (row) => row.credit_limit || 0 },
       {
         name: "Due",
-        selector: (row) => row.due || 0,
+        selector: (row) => row.due ? parseFloat(row.due).toFixed(2) : "0.00",
       },
       {
         name: "SMS",
