@@ -1164,7 +1164,7 @@ const CommonModal = (props) => {
                         name={items.field}
                         placeholder={`${items.placeholder}`}
                         onChange={(e) => handleInputValue(e, items.isRequired)}
-                        value={inputValue[items.field] || ""}
+                        value={inputValue[items.field] ?? ""}
                         disabled={items.isDisabled}
                       />
                     </div>

@@ -86,7 +86,16 @@ const EmployeesTable = (props) => {
       field: "Employee name",
       grow: 4,
       selector: (row) => row.name,
-      // wrap: true,
+      cell: (row) => (
+        <div>
+          <div>{row.name}</div>
+          {row.user?.email && (
+            <div style={{ fontSize: "0.8rem", opacity: 0.6 }}>
+              {row.user.email}
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       name: "Phone",
