@@ -546,7 +546,7 @@ const AdminRoutes = ({ userRole, isAuthenticated }) => {
                       userRole={userRole}
                       isAuthenticated={isAuthenticated}
                     >
-                      <InvoicePdf setLoader={setLoader} />
+                      <InvoiceMobile setLoader={setLoader} />
                     </PrivateRoute>
                   }
                 />

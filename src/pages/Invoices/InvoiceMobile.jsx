@@ -102,6 +102,11 @@ const InvoiceMobile = ({ setLoader }) => {
           </div> */}
           <div className="flex justify-between">
             <div className="left">
+              {custData.customer_id && (
+                <div>
+                  <strong>Customer Id:</strong> {custData.customer_id}
+                </div>
+              )}
               <div>
                 <strong>Customer Name:</strong> {custData.customer_name}
               </div>
@@ -114,6 +119,11 @@ const InvoiceMobile = ({ setLoader }) => {
               <div>
                 <strong>Cell:</strong> {custData.phone}
               </div>
+              {apiData.offer && (
+                <div>
+                  <strong>Offer:</strong> {apiData.offer}
+                </div>
+              )}
             </div>
             <div className="right">
               <div>
@@ -198,31 +208,57 @@ const InvoiceMobile = ({ setLoader }) => {
                   <td>Total</td>
                   <td>:</td>
                   <td>
-                    {Number(apiData.total_price).toFixed(2)}
+                    {Number(apiData.total_price || 0).toFixed(2)}
                     <span className="tk">/-</span>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    Discount -{" "}
-                    {1 /
-                      (Number(apiData.total_price).toFixed(2) /
-                        (Number(apiData.discount).toFixed(2) * 100))}
-                    %
-                  </td>
-                  <td>:</td>
-                  <td>
-                    {Number(apiData.discount).toFixed(2)}
-                    <span className="tk">/-</span>
-                  </td>
-                </tr>
+                {Number(apiData.discount || 0) > 0 && (
+                  <tr>
+                    <td>
+                      Discount -{" "}
+                      {Number(
+                        1 /
+                          (Number(apiData.total_price).toFixed(2) /
+                            (Number(apiData.discount).toFixed(2) * 100))
+                      ).toFixed(0)}
+                      %
+                    </td>
+                    <td>:</td>
+                    <td>
+                      {Number(apiData.discount).toFixed(2)}
+                      <span className="tk">/-</span>
+                    </td>
+                  </tr>
+                )}
+                {Number(apiData.less || 0) > 0 && (
+                  <tr>
+                    <td>Less</td>
+                    <td>:</td>
+                    <td>
+                      {Number(apiData.less).toFixed(2)}
+                      <span className="tk">/-</span>
+                    </td>
+                  </tr>
+                )}
+                {Number(apiData.paid || 0) > 0 && (
+                  <tr>
+                    <td>Paid</td>
+                    <td>:</td>
+                    <td>
+                      {Number(apiData.paid).toFixed(2)}
+                      <span className="tk">/-</span>
+                    </td>
+                  </tr>
+                )}
                 <tr>
                   <td>Net Payable Amount</td>
                   <td>:</td>
                   <td>
                     {(
-                      Number(apiData.total_price).toFixed(2) -
-                      Number(apiData.discount).toFixed(2)
+                      Number(apiData.total_price || 0) -
+                      Number(apiData.discount || 0) -
+                      Number(apiData.less || 0) -
+                      Number(apiData.paid || 0)
                     ).toFixed(2)}
                     <span className="tk">/-</span>
                   </td>
