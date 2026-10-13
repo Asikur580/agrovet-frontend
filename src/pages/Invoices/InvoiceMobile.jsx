@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import { useReactToPrint } from "react-to-print";
+import html2pdf from "html2pdf.js";
+import { FaPrint, FaDownload } from "react-icons/fa";
 
 //=>>> Css
 import "./Invoice.css";
@@ -55,7 +57,151 @@ const InvoiceMobile = ({ setLoader }) => {
   const contentRef = useRef();
   const reactToPrintFn = useReactToPrint({
     contentRef,
+    documentTitle: `Invoice-${custData.customer_name || id || ""}`,
+    pageStyle: `
+      @page {
+        size: A4 portrait;
+        margin: 15mm 10mm;
+      }
+      * {
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .invoice-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+        background: #ffffff !important;
+      }
+      .invoice-actions, .no-print {
+        display: none !important;
+      }
+      .product-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+      .product-table th, .product-table td {
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+      }
+      .product-table th {
+        background-color: #ebebeb !important;
+      }
+    `,
   });
+
+  //=>>> Download PDF
+  const [downloading, setDownloading] = useState(false);
+  const handleDownload = () => {
+    if (!contentRef.current) return;
+    setDownloading(true);
+    const element = contentRef.current;
+
+    // Temporarily remove border and box-shadow from the live element so html2canvas captures zero border
+    const prevBorder = element.style.border;
+    const prevShadow = element.style.boxShadow;
+    element.style.setProperty("border", "none", "important");
+    element.style.setProperty("box-shadow", "none", "important");
+
+    const opt = {
+      margin: [8, 8, 8, 8],
+      filename: `Invoice-${custData.customer_name || id || "invoice"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        scrollY: 0,
+        scrollX: 0,
+        onclone: (clonedDoc) => {
+          const style = clonedDoc.createElement("style");
+          style.innerHTML = `
+            .invoice-container {
+              border: none !important;
+              box-shadow: none !important;
+              outline: none !important;
+            }
+            .product-table {
+              border-collapse: collapse !important;
+              width: 100% !important;
+            }
+            .product-table th,
+            .product-table td {
+              border: 1px solid #000 !important;
+              padding-top: 2px !important;
+              padding-bottom: 12px !important;
+              padding-left: 4px !important;
+              padding-right: 4px !important;
+              vertical-align: middle !important;
+              line-height: 1.2 !important;
+              font-family: Arial, "DM Sans", Kalpurush, sans-serif !important;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+
+          const invoice = clonedDoc.querySelector(".invoice-container");
+          if (invoice) {
+            invoice.style.animation = "none";
+            invoice.style.webkitAnimation = "none";
+            invoice.style.transform = "none";
+            invoice.style.opacity = "1";
+            invoice.style.setProperty("box-shadow", "none", "important");
+            invoice.style.setProperty("border", "none", "important");
+            invoice.style.setProperty("outline", "none", "important");
+            invoice.style.background = "#ffffff";
+            invoice.style.color = "#000000";
+          }
+          const table = clonedDoc.querySelector(".product-table");
+          if (table) {
+            table.style.borderCollapse = "collapse";
+          }
+          const cells = clonedDoc.querySelectorAll(
+            ".product-table th, .product-table td"
+          );
+          cells.forEach((cell) => {
+            cell.style.setProperty("border", "1px solid #000", "important");
+            cell.style.setProperty("padding-top", "2px", "important");
+            cell.style.setProperty("padding-bottom", "12px", "important");
+            cell.style.setProperty("padding-left", "4px", "important");
+            cell.style.setProperty("padding-right", "4px", "important");
+            cell.style.setProperty("vertical-align", "middle", "important");
+            cell.style.setProperty("line-height", "1.2", "important");
+            cell.style.setProperty(
+              "font-family",
+              'Arial, "DM Sans", Kalpurush, sans-serif',
+              "important"
+            );
+          });
+        },
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        element.style.border = prevBorder;
+        element.style.boxShadow = prevShadow;
+        setDownloading(false);
+      })
+      .catch((err) => {
+        element.style.border = prevBorder;
+        element.style.boxShadow = prevShadow;
+        console.error("PDF download error:", err);
+        setDownloading(false);
+      });
+  };
 
   return (
     <HelmetProvider>
@@ -74,15 +220,29 @@ const InvoiceMobile = ({ setLoader }) => {
 
       <div
         ref={contentRef}
-        className="invoice-container content animated fadeInDown"
+        className="invoice-container"
       >
         <div className="invoice-header">
-          <button
-            className="button printBtn no-print"
-            onClick={() => reactToPrintFn()}
+          <div
+            className="invoice-actions no-print"
+            data-html2canvas-ignore="true"
           >
-            print
-          </button>
+            <button
+              type="button"
+              className="button printBtn"
+              onClick={() => reactToPrintFn()}
+            >
+              <FaPrint /> Print
+            </button>
+            <button
+              type="button"
+              className="button downloadBtn"
+              onClick={handleDownload}
+              disabled={downloading}
+            >
+              <FaDownload /> {downloading ? "Downloading..." : "Download"}
+            </button>
+          </div>
           <p className="compName">RADIANT AGROVET</p>
           <p>House # 37, Road # 01, Dhaka Uddyan, Mohammadpur, Dhaka-1207</p>
           <h2>INVOICE</h2>
