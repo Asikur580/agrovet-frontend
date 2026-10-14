@@ -61,16 +61,25 @@ const InvoiceMobile = ({ setLoader }) => {
     pageStyle: `
       @page {
         size: A4 portrait;
-        margin: 15mm 10mm;
+        margin: 10mm 10mm 10mm 10mm;
       }
       * {
         color: #000000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+        -webkit-text-fill-color: #000000 !important;
+        text-shadow: none !important;
+        box-sizing: border-box !important;
       }
-      body {
+      html, body {
+        height: 100% !important;
         background: #ffffff !important;
         color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif !important;
+        -webkit-font-smoothing: antialiased !important;
+        text-rendering: geometricPrecision !important;
       }
       .invoice-container {
         width: 100% !important;
@@ -81,20 +90,117 @@ const InvoiceMobile = ({ setLoader }) => {
         box-shadow: none !important;
         color: #000000 !important;
         background: #ffffff !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: calc(100vh - 22mm) !important;
+        box-sizing: border-box !important;
+        font-family: Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif !important;
       }
       .invoice-actions, .no-print {
         display: none !important;
       }
+      .invoice-header .compName {
+        font-size: 24pt !important;
+        font-weight: 900 !important;
+        color: #000000 !important;
+        line-height: 1.1 !important;
+      }
+      .invoice-header p {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+      }
+      .invoice-header h2 {
+        font-size: 14pt !important;
+        font-weight: 900 !important;
+        color: #000000 !important;
+        margin: 8px 0 12px 0 !important;
+      }
+      .invoice-details {
+        font-size: 10pt !important;
+        line-height: 1.4 !important;
+        color: #000000 !important;
+        font-family: Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif !important;
+      }
+      .invoice-details > div {
+        display: flex !important;
+        justify-content: space-between !important;
+      }
+      .invoice-details strong {
+        font-weight: 800 !important;
+        color: #000000 !important;
+      }
+      .invoice-details div, .invoice-details span {
+        font-weight: 700 !important;
+        color: #000000 !important;
+      }
       .product-table {
         width: 100% !important;
         border-collapse: collapse !important;
+        margin-top: 12px !important;
+        font-family: Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif !important;
       }
-      .product-table th, .product-table td {
-        border: 1px solid #000000 !important;
-        color: #000000 !important;
+      .product-table thead {
+        display: table-header-group !important;
+      }
+      .product-table tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
       .product-table th {
-        background-color: #ebebeb !important;
+        background-color: transparent !important;
+        border: 1.2px solid #000000 !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        font-size: 9pt !important;
+        padding: 4px 3px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+      }
+      .product-table td {
+        border: 1.2px solid #000000 !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+        font-size: 9pt !important;
+        padding: 4px 3px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+      }
+      .product-table th.prodName,
+      .product-table td.prodName {
+        text-align: left !important;
+        padding-left: 8px !important;
+      }
+      .invoiceCustomize table tr td {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+        padding: 3px 1px !important;
+      }
+      .invoiceCustomize table tr td:first-child {
+        font-weight: 800 !important;
+      }
+      .invoiceCustomize table tr td:last-child {
+        font-weight: 800 !important;
+      }
+      .invoice-footer {
+        margin-top: auto !important;
+        padding-top: 40px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        font-weight: 700 !important;
+      }
+      .invoice-footer div span {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+      }
+      .note {
+        font-size: 8.5pt !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+        margin-top: 20px !important;
+        margin-bottom: 0 !important;
       }
     `,
   });
@@ -130,6 +236,14 @@ const InvoiceMobile = ({ setLoader }) => {
               border: none !important;
               box-shadow: none !important;
               outline: none !important;
+              font-family: Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif !important;
+              display: flex !important;
+              flex-direction: column !important;
+              min-height: 1060px !important;
+            }
+            .invoice-footer {
+              margin-top: auto !important;
+              padding-top: 40px !important;
             }
             .product-table {
               border-collapse: collapse !important;
@@ -137,14 +251,26 @@ const InvoiceMobile = ({ setLoader }) => {
             }
             .product-table th,
             .product-table td {
-              border: 1px solid #000 !important;
+              border: 1.2px solid #000 !important;
               padding-top: 2px !important;
               padding-bottom: 12px !important;
               padding-left: 4px !important;
               padding-right: 4px !important;
               vertical-align: middle !important;
               line-height: 1.2 !important;
-              font-family: Arial, "DM Sans", Kalpurush, sans-serif !important;
+              font-family: Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif !important;
+              font-weight: 700 !important;
+              text-align: center !important;
+              box-sizing: border-box !important;
+            }
+            .product-table th.prodName,
+            .product-table td.prodName {
+              text-align: left !important;
+              padding-left: 8px !important;
+            }
+            .product-table th {
+              background-color: transparent !important;
+              font-weight: 800 !important;
             }
           `;
           clonedDoc.head.appendChild(style);
@@ -169,7 +295,7 @@ const InvoiceMobile = ({ setLoader }) => {
             ".product-table th, .product-table td"
           );
           cells.forEach((cell) => {
-            cell.style.setProperty("border", "1px solid #000", "important");
+            cell.style.setProperty("border", "1.2px solid #000", "important");
             cell.style.setProperty("padding-top", "2px", "important");
             cell.style.setProperty("padding-bottom", "12px", "important");
             cell.style.setProperty("padding-left", "4px", "important");
@@ -178,9 +304,16 @@ const InvoiceMobile = ({ setLoader }) => {
             cell.style.setProperty("line-height", "1.2", "important");
             cell.style.setProperty(
               "font-family",
-              'Arial, "DM Sans", Kalpurush, sans-serif',
+              'Arial, "Helvetica Neue", Helvetica, "Segoe UI", Kalpurush, sans-serif',
               "important"
             );
+            cell.style.setProperty("font-weight", "700", "important");
+            if (cell.classList.contains("prodName")) {
+              cell.style.setProperty("text-align", "left", "important");
+              cell.style.setProperty("padding-left", "8px", "important");
+            } else {
+              cell.style.setProperty("text-align", "center", "important");
+            }
           });
         },
       },
