@@ -24,6 +24,9 @@ const CategoryWiseSales = lazy(() =>
 const CreditLimitList = lazy(() => import("./HomeComponents/CreditLimitList"));
 const LowStockAlerts = lazy(() => import("./HomeComponents/LowStockAlerts"));
 const Summery = lazy(() => import("./HomeComponents/Summery/Summery"));
+const TopSellingProducts = lazy(() =>
+  import("./HomeComponents/TopSellingProducts")
+);
 
 //=>>> Utility
 import { AuthContext } from "../../context/AuthContext";
@@ -52,6 +55,13 @@ const Home = ({ setLoader }) => {
             {/* Top Boxes */}
             <div className="mb-5">
               <Summery />
+            </div>
+
+            {/* Top Selling Products - Monthly Overview */}
+            <div className="mb-5">
+              <Suspense fallback={<Spinner />}>
+                <TopSellingProducts setLoader={setLoader} />
+              </Suspense>
             </div>
 
             {/* Report Box */}

@@ -60,6 +60,7 @@ const sidenav = (props) => {
       location.pathname == "/sales-create" ||
       location.pathname == "/sales-report" ||
       location.pathname == "/payment-history-report" ||
+      location.pathname == "/top-selling-products" ||
       (Array.isArray(location.pathname.match("/invoice/")) &&
         location.pathname.match("/invoice/")[0] == "/invoice/")
     ) {
@@ -88,6 +89,7 @@ const sidenav = (props) => {
       location.pathname == "/sales-create" ||
       location.pathname == "/sales-report" ||
       location.pathname == "/payment-history-report" ||
+      location.pathname == "/top-selling-products" ||
       (Array.isArray(location.pathname.match("/invoice/")) &&
         location.pathname.match("/invoice/")[0] == "/invoice/"),
   ]);
@@ -485,6 +487,14 @@ const sidenav = (props) => {
                 <NavLink to="/payment-history-report" onClick={CloseSideNav}>
                   <FaHandPointRight className="icon" size={16} />
                   <p>Payment history</p>
+                </NavLink>
+              </li>
+            )}
+            {sales == true && (
+              <li>
+                <NavLink to="/top-selling-products" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Top selling products</p>
                 </NavLink>
               </li>
             )}
