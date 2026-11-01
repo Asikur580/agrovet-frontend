@@ -1,8 +1,19 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Modal, Spin, Tooltip } from "antd";
-import { FaCrown, FaTrophy, FaMedal, FaArrowRight, FaBoxesStacked, FaReceipt, FaMoneyBillWave } from "react-icons/fa6";
-import { MdOutlineDateRange } from "react-icons/md";
+import {
+  FaCrown,
+  FaTrophy,
+  FaMedal,
+  FaArrowRight,
+  FaBoxesStacked,
+  FaReceipt,
+  FaMoneyBillWave,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCalendarDays,
+  FaInbox,
+} from "react-icons/fa6";
 
 // Utility
 import ApiConfig from "../../../assets/js/ApiConfig";
@@ -73,17 +84,34 @@ const TopSellingProducts = ({ setLoader }) => {
     fetchTopSelling();
   }, [fetchTopSelling]);
 
-  // Active month object
-  const activeMonthData = useMemo(() => {
-    if (!data.monthly_data?.length) return null;
-    return (
-      data.monthly_data.find((m) => m.month_key === activeMonthKey) ||
-      data.monthly_data.find((m) => m.has_sales) ||
-      data.monthly_data[0]
-    );
+  // Active month index & object
+  const activeMonthIndex = useMemo(() => {
+    if (!data.monthly_data?.length) return 0;
+    const idx = data.monthly_data.findIndex((m) => m.month_key === activeMonthKey);
+    return idx >= 0 ? idx : 0;
   }, [data.monthly_data, activeMonthKey]);
 
+  const activeMonthData = useMemo(() => {
+    if (!data.monthly_data?.length) return null;
+    return data.monthly_data[activeMonthIndex] || data.monthly_data[0];
+  }, [data.monthly_data, activeMonthIndex]);
+
   const activeTopProduct = activeMonthData?.top_product;
+
+  const handlePrevMonth = () => {
+    if (activeMonthIndex > 0 && data.monthly_data?.[activeMonthIndex - 1]) {
+      setActiveMonthKey(data.monthly_data[activeMonthIndex - 1].month_key);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (
+      activeMonthIndex < (data.monthly_data?.length || 12) - 1 &&
+      data.monthly_data?.[activeMonthIndex + 1]
+    ) {
+      setActiveMonthKey(data.monthly_data[activeMonthIndex + 1].month_key);
+    }
+  };
 
   const formatNumber = (num) => {
     return Number(num || 0).toLocaleString("en-IN");
@@ -101,7 +129,9 @@ const TopSellingProducts = ({ setLoader }) => {
       {/* Header */}
       <div className="TopSellingWidget-header">
         <div className="TopSellingWidget-title-wrap">
-          <FaTrophy className="TopSellingWidget-icon" />
+          <div className="TopSellingWidget-icon-box">
+            <FaTrophy className="TopSellingWidget-icon" />
+          </div>
           <div>
             <h3 className="TopSellingWidget-title">
               Top Selling Products
@@ -114,17 +144,20 @@ const TopSellingProducts = ({ setLoader }) => {
 
         <div className="TopSellingWidget-controls">
           {/* Year selector */}
-          <select
-            className="TopSellingWidget-select"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-          >
-            {data.available_years?.map((y) => (
-              <option key={y} value={y}>
-                {y} Year
-              </option>
-            ))}
-          </select>
+          <div className="TopSellingWidget-select-wrapper">
+            <FaCalendarDays className="TopSellingWidget-select-icon" />
+            <select
+              className="TopSellingWidget-select"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+            >
+              {data.available_years?.map((y) => (
+                <option key={y} value={y}>
+                  {y} Year
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Sort By Toggle */}
           <div className="TopSellingWidget-toggle">
@@ -153,119 +186,182 @@ const TopSellingProducts = ({ setLoader }) => {
           {/* View Full Report Link */}
           <Link to="/top-selling-products" className="TopSellingWidget-viewall-btn">
             <span>Full Report</span>
-            <FaArrowRight size={12} />
+            <FaArrowRight size={11} />
           </Link>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-10">
+        <div className="flex items-center justify-center py-12">
           <Spin tip="Loading top selling products..." />
         </div>
       ) : (
         <>
           {/* Active / Featured Month Top Selling Product Highlight */}
           <div className="TopSellingWidget-featured">
-            <div className="TopSellingWidget-featured-left">
-              <span className="TopSellingWidget-badge">
-                <FaCrown size={12} color="#b45309" />
-                {activeMonthData?.month_name} {activeMonthData?.year} • #1 Top Seller
-              </span>
+            {/* Top Navigation & Month Badge Bar */}
+            <div className="TopSellingWidget-badge-bar">
+              <div className="TopSellingWidget-badge">
+                <FaCrown size={13} className="TopSellingWidget-crown-icon" />
+                <span>
+                  {activeMonthData?.month_name} {activeMonthData?.year}
+                </span>
+                <span className="TopSellingWidget-badge-divider">•</span>
+                <span className="TopSellingWidget-badge-highlight">#1 TOP SELLER</span>
+              </div>
 
-              {activeTopProduct ? (
-                <>
-                  <h2 className="TopSellingWidget-product-name">
+              {/* Prev / Next Month Navigator */}
+              <div className="TopSellingWidget-month-nav">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  disabled={activeMonthIndex <= 0}
+                  className="TopSellingWidget-nav-btn"
+                  title="Previous Month"
+                >
+                  <FaChevronLeft size={11} />
+                  <span>Prev</span>
+                </button>
+                <span className="TopSellingWidget-nav-counter">
+                  {monthShortNames[activeMonthIndex]} ({activeMonthIndex + 1}/12)
+                </span>
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  disabled={activeMonthIndex >= (data.monthly_data?.length || 12) - 1}
+                  className="TopSellingWidget-nav-btn"
+                  title="Next Month"
+                >
+                  <span>Next</span>
+                  <FaChevronRight size={11} />
+                </button>
+              </div>
+            </div>
+
+            {/* Featured Product Content */}
+            {activeTopProduct ? (
+              <div className="TopSellingWidget-featured-body">
+                {/* Product Info (Left) */}
+                <div className="TopSellingWidget-featured-left">
+                  <h2 className="TopSellingWidget-product-name" title={activeTopProduct.product_name}>
                     {activeTopProduct.product_name}
                   </h2>
-                  <div>
+
+                  <div className="TopSellingWidget-tags">
                     {activeTopProduct.pack_size && (
-                      <span className="TopSellingWidget-pack">
+                      <span className="TopSellingWidget-tag-pack">
                         Pack: {activeTopProduct.pack_size}
                       </span>
                     )}
                     {activeTopProduct.category_name && (
-                      <span className="text-xs text-gray-600 mr-2">
-                        • {activeTopProduct.category_name}
+                      <span className="TopSellingWidget-tag-category">
+                        {activeTopProduct.category_name}
                       </span>
                     )}
                     {activeTopProduct.brand_name && (
-                      <span className="text-xs text-gray-500">
-                        ({activeTopProduct.brand_name})
+                      <span className="TopSellingWidget-tag-brand">
+                        {activeTopProduct.brand_name}
                       </span>
                     )}
                   </div>
 
-                  <div className="mt-3">
+                  <div className="TopSellingWidget-action-wrap">
                     <button
                       type="button"
                       onClick={() => setModalOpen(true)}
-                      className="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
+                      className="TopSellingWidget-view-top5-btn"
                     >
-                      <FaMedal size={13} color="#2563eb" />
-                      View Top 5 Products of {activeMonthData.month_name}
+                      <FaMedal size={14} className="TopSellingWidget-medal-icon" />
+                      <span>View Top 5 Products of {activeMonthData?.month_name}</span>
+                      <FaArrowRight size={11} className="TopSellingWidget-arrow-icon" />
                     </button>
                   </div>
-                </>
-              ) : (
-                <p className="text-gray-500 text-sm italic my-2">
-                  No sales recorded for {activeMonthData?.month_name} {selectedYear}.
-                </p>
-              )}
-            </div>
-
-            {/* Stats for the top product */}
-            {activeTopProduct ? (
-              <div className="TopSellingWidget-stats-grid">
-                <div className="TopSellingWidget-stat-card">
-                  <div className="flex items-center justify-center gap-1.5 text-blue-600 mb-1">
-                    <FaBoxesStacked size={14} />
-                    <span className="TopSellingWidget-stat-label">Total Sold</span>
-                  </div>
-                  <p className="TopSellingWidget-stat-value primary">
-                    {formatNumber(activeTopProduct.total_quantity)}
-                    <span className="text-xs font-normal text-gray-500 ml-1">pcs</span>
-                  </p>
-                  {activeTopProduct.bonus_quantity > 0 && (
-                    <span className="text-[11px] text-gray-500">
-                      (Bonus: {formatNumber(activeTopProduct.bonus_quantity)})
-                    </span>
-                  )}
                 </div>
 
-                <div className="TopSellingWidget-stat-card">
-                  <div className="flex items-center justify-center gap-1.5 text-emerald-600 mb-1">
-                    <FaMoneyBillWave size={14} />
-                    <span className="TopSellingWidget-stat-label">Total Sales</span>
+                {/* Stat Cards (Right) */}
+                <div className="TopSellingWidget-stats-grid">
+                  {/* Card: Total Sold */}
+                  <div className="TopSellingWidget-stat-card card-sold">
+                    <div className="TopSellingWidget-stat-header">
+                      <div className="TopSellingWidget-stat-icon-wrap icon-sold">
+                        <FaBoxesStacked size={14} />
+                      </div>
+                      <span className="TopSellingWidget-stat-label">Total Sold</span>
+                    </div>
+                    <div className="TopSellingWidget-stat-value primary">
+                      {formatNumber(activeTopProduct.total_quantity)}
+                      <span className="TopSellingWidget-stat-unit">pcs</span>
+                    </div>
+                    <div className="TopSellingWidget-stat-sub">
+                      {activeTopProduct.bonus_quantity > 0 ? (
+                        <span>Bonus: <strong>{formatNumber(activeTopProduct.bonus_quantity)}</strong> pcs</span>
+                      ) : (
+                        <span>Billed quantity</span>
+                      )}
+                    </div>
                   </div>
-                  <p className="TopSellingWidget-stat-value success">
-                    {formatCurrency(activeTopProduct.total_amount)}
-                  </p>
-                  <span className="text-[11px] text-gray-500">Grand Total</span>
-                </div>
 
-                <div className="TopSellingWidget-stat-card">
-                  <div className="flex items-center justify-center gap-1.5 text-amber-600 mb-1">
-                    <FaReceipt size={14} />
-                    <span className="TopSellingWidget-stat-label">Invoices</span>
+                  {/* Card: Total Sales */}
+                  <div className="TopSellingWidget-stat-card card-sales">
+                    <div className="TopSellingWidget-stat-header">
+                      <div className="TopSellingWidget-stat-icon-wrap icon-sales">
+                        <FaMoneyBillWave size={14} />
+                      </div>
+                      <span className="TopSellingWidget-stat-label">Total Sales</span>
+                    </div>
+                    <div className="TopSellingWidget-stat-value success">
+                      {formatCurrency(activeTopProduct.total_amount)}
+                    </div>
+                    <div className="TopSellingWidget-stat-sub">
+                      <span>Total Revenue</span>
+                    </div>
                   </div>
-                  <p className="TopSellingWidget-stat-value amber">
-                    {formatNumber(activeTopProduct.total_invoices)}
-                  </p>
-                  <span className="text-[11px] text-gray-500">Total Orders</span>
+
+                  {/* Card: Invoices */}
+                  <div className="TopSellingWidget-stat-card card-invoices">
+                    <div className="TopSellingWidget-stat-header">
+                      <div className="TopSellingWidget-stat-icon-wrap icon-invoices">
+                        <FaReceipt size={14} />
+                      </div>
+                      <span className="TopSellingWidget-stat-label">Invoices</span>
+                    </div>
+                    <div className="TopSellingWidget-stat-value amber">
+                      {formatNumber(activeTopProduct.total_invoices)}
+                      <span className="TopSellingWidget-stat-unit">Orders</span>
+                    </div>
+                    <div className="TopSellingWidget-stat-sub">
+                      <span>Customer Invoices</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center text-gray-400 text-xs p-4">
-                Select a month with sales below to inspect top performers.
+              <div className="TopSellingWidget-empty-month">
+                <div className="TopSellingWidget-empty-icon-wrap">
+                  <FaInbox size={26} />
+                </div>
+                <div>
+                  <h4 className="TopSellingWidget-empty-title">
+                    No sales recorded for {activeMonthData?.month_name} {selectedYear}
+                  </h4>
+                  <p className="TopSellingWidget-empty-desc">
+                    Use the Next / Prev controls or click any active month below to inspect top performers.
+                  </p>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Month-by-Month Overview Strip */}
+          {/* Month-by-Month Overview Strip (Balanced 12 Months) */}
           <div className="TopSellingWidget-months-container">
             <div className="TopSellingWidget-months-header">
-              <h4>Monthly Top Sellers ({selectedYear})</h4>
-              <span className="text-xs text-gray-500">
+              <div className="flex items-center gap-2">
+                <FaCalendarDays className="text-blue-600" size={14} />
+                <h4 className="TopSellingWidget-months-title">
+                  Monthly Top Sellers ({selectedYear})
+                </h4>
+              </div>
+              <span className="TopSellingWidget-months-hint">
                 Click any month to inspect details
               </span>
             </div>
@@ -280,23 +376,31 @@ const TopSellingProducts = ({ setLoader }) => {
                     key={m.month_key}
                     className={`TopSellingWidget-month-card ${
                       isActive ? "active" : ""
-                    }`}
+                    } ${topProd ? "has-data" : "no-data"}`}
                     onClick={() => setActiveMonthKey(m.month_key)}
+                    role="button"
+                    tabIndex={0}
                   >
                     <div className="TopSellingWidget-month-top">
                       <span className="TopSellingWidget-month-name">
                         {monthShortNames[m.month_number - 1]}
                       </span>
-                      {topProd && (
-                        <span className="TopSellingWidget-month-badge">
-                          #1
-                        </span>
+                      {topProd ? (
+                        <span className="TopSellingWidget-month-badge">#1</span>
+                      ) : (
+                        <span className="TopSellingWidget-month-badge-empty">-</span>
                       )}
                     </div>
 
                     {topProd ? (
-                      <div>
-                        <Tooltip title={`${topProd.product_name} (${topProd.pack_size || "N/A"})`}>
+                      <div className="TopSellingWidget-month-content">
+                        <Tooltip
+                          title={`${topProd.product_name} (${topProd.pack_size || "N/A"}) - ${
+                            sortBy === "quantity"
+                              ? `${formatNumber(topProd.total_quantity)} pcs`
+                              : formatCurrency(topProd.total_amount)
+                          }`}
+                        >
                           <p className="TopSellingWidget-month-prod">
                             {topProd.product_name}
                           </p>
@@ -308,7 +412,9 @@ const TopSellingProducts = ({ setLoader }) => {
                         </p>
                       </div>
                     ) : (
-                      <p className="TopSellingWidget-month-empty">No sales</p>
+                      <div className="TopSellingWidget-month-content">
+                        <p className="TopSellingWidget-month-empty">No sales</p>
+                      </div>
                     )}
                   </div>
                 );
@@ -321,80 +427,81 @@ const TopSellingProducts = ({ setLoader }) => {
       {/* Top 5 Modal for active month */}
       <Modal
         title={
-          <div className="flex items-center gap-2">
-            <FaTrophy color="#f59e0b" />
-            <span>
-              Top Products of {activeMonthData?.month_name} {activeMonthData?.year}
+          <div className="flex items-center gap-2 text-slate-800">
+            <FaTrophy color="#f59e0b" size={18} />
+            <span className="font-bold">
+              Top 5 Products of {activeMonthData?.month_name} {activeMonthData?.year}
             </span>
           </div>
         }
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width={750}
+        width={780}
       >
         {activeMonthData?.top_products?.length > 0 ? (
-          <table className="TopSelling-modal-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Product Name</th>
-                <th>Pack Size</th>
-                <th>Category</th>
-                <th style={{ textAlign: "right" }}>Total Quantity</th>
-                <th style={{ textAlign: "right" }}>Total Sales (Tk)</th>
-                <th style={{ textAlign: "center" }}>Invoices</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeMonthData.top_products.map((p, idx) => (
-                <tr key={p.product_id || idx}>
-                  <td>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "24px",
-                        height: "24px",
-                        borderRadius: "50%",
-                        fontSize: "0.75rem",
-                        fontWeight: "bold",
-                        backgroundColor:
-                          idx === 0
-                            ? "#fef3c7"
-                            : idx === 1
-                            ? "#f1f5f9"
-                            : idx === 2
-                            ? "#fed7aa"
-                            : "#f3f4f6",
-                        color:
-                          idx === 0
-                            ? "#b45309"
-                            : idx === 1
-                            ? "#475569"
-                            : idx === 2
-                            ? "#c2410c"
-                            : "#6b7280",
-                      }}
-                    >
-                      {idx + 1}
-                    </span>
-                  </td>
-                  <td className="font-semibold text-slate-900">{p.product_name}</td>
-                  <td>{p.pack_size || "-"}</td>
-                  <td>{p.category_name || "-"}</td>
-                  <td style={{ textAlign: "right" }} className="font-semibold text-blue-700">
-                    {formatNumber(p.total_quantity)}
-                  </td>
-                  <td style={{ textAlign: "right" }} className="font-semibold text-emerald-700">
-                    {formatCurrency(p.total_amount)}
-                  </td>
-                  <td style={{ textAlign: "center" }}>{p.total_invoices}</td>
+          <div className="overflow-x-auto">
+            <table className="TopSelling-modal-table">
+              <thead>
+                <tr>
+                  <th style={{ width: "50px", textAlign: "center" }}>Rank</th>
+                  <th>Product Name</th>
+                  <th>Pack Size</th>
+                  <th>Category</th>
+                  <th style={{ textAlign: "right" }}>Total Quantity</th>
+                  <th style={{ textAlign: "right" }}>Total Sales</th>
+                  <th style={{ textAlign: "center", width: "80px" }}>Invoices</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {activeMonthData.top_products.map((p, idx) => (
+                  <tr key={p.product_id || idx}>
+                    <td style={{ textAlign: "center" }}>
+                      <span
+                        className="TopSelling-rank-circle"
+                        style={{
+                          backgroundColor:
+                            idx === 0
+                              ? "#fef3c7"
+                              : idx === 1
+                              ? "#f1f5f9"
+                              : idx === 2
+                              ? "#ffedd5"
+                              : "#f8fafc",
+                          color:
+                            idx === 0
+                              ? "#b45309"
+                              : idx === 1
+                              ? "#475569"
+                              : idx === 2
+                              ? "#c2410c"
+                              : "#64748b",
+                          border:
+                            idx === 0
+                              ? "1px solid #fde68a"
+                              : "1px solid #e2e8f0",
+                        }}
+                      >
+                        {idx + 1}
+                      </span>
+                    </td>
+                    <td className="font-semibold text-slate-900">{p.product_name}</td>
+                    <td className="text-slate-600">{p.pack_size || "-"}</td>
+                    <td className="text-slate-600">{p.category_name || "-"}</td>
+                    <td style={{ textAlign: "right" }} className="font-semibold text-blue-700">
+                      {formatNumber(p.total_quantity)}
+                    </td>
+                    <td style={{ textAlign: "right" }} className="font-semibold text-emerald-700">
+                      {formatCurrency(p.total_amount)}
+                    </td>
+                    <td style={{ textAlign: "center" }} className="text-slate-700 font-medium">
+                      {p.total_invoices}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className="text-gray-500 py-6 text-center">No data found for this month.</p>
         )}

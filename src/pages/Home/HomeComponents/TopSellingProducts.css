@@ -1,12 +1,13 @@
 .TopSellingWidget {
-  background: var(--light-1);
-  border: var(--border);
-  border-radius: 10px;
-  box-shadow: var(--cardShadow);
-  padding: 16px 20px;
+  background: var(--light-1, #ffffff);
+  border: var(--border, 1px solid #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  padding: 18px 22px;
   margin-bottom: 24px;
 }
 
+/* Header */
 .TopSellingWidget-header {
   display: flex;
   align-items: center;
@@ -14,35 +15,44 @@
   flex-wrap: wrap;
   gap: 12px;
   padding-bottom: 14px;
-  border-bottom: var(--border);
+  border-bottom: 1px solid #eef2f6;
   margin-bottom: 16px;
 }
 
 .TopSellingWidget-title-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.TopSellingWidget-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.15);
 }
 
 .TopSellingWidget-icon {
-  color: #f59e0b;
-  font-size: 22px;
+  color: #d97706;
+  font-size: 20px;
 }
 
 .TopSellingWidget-title {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--dark-1);
+  color: #0f172a;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  letter-spacing: -0.2px;
 }
 
 .TopSellingWidget-subtitle {
   font-size: 0.82rem;
-  color: var(--dark-3);
-  margin: 0;
+  color: #64748b;
+  margin: 2px 0 0 0;
 }
 
 .TopSellingWidget-controls {
@@ -52,79 +62,97 @@
   flex-wrap: wrap;
 }
 
+.TopSellingWidget-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.TopSellingWidget-select-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 13px;
+  color: #64748b;
+  pointer-events: none;
+}
+
 .TopSellingWidget-select {
-  padding: 5px 12px;
-  border-radius: 6px;
+  padding: 6px 12px 6px 28px;
+  border-radius: 8px;
   border: 1px solid #cbd5e1;
-  background-color: #fff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--dark-1);
+  background-color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #1e293b;
   outline: none;
   cursor: pointer;
-  transition: var(--trans);
+  transition: all 0.2s ease;
 }
 
 .TopSellingWidget-select:focus {
-  border-color: var(--main-clr);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 .TopSellingWidget-toggle {
   display: inline-flex;
   background: #f1f5f9;
-  border-radius: 6px;
-  padding: 2px;
+  border-radius: 8px;
+  padding: 3px;
   border: 1px solid #e2e8f0;
 }
 
 .TopSellingWidget-toggle-btn {
   border: none;
   background: transparent;
-  padding: 4px 10px;
+  padding: 4px 12px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--dark-3);
-  border-radius: 4px;
+  color: #64748b;
+  border-radius: 6px;
   cursor: pointer;
-  transition: var(--trans);
+  transition: all 0.2s ease;
+}
+
+.TopSellingWidget-toggle-btn:hover {
+  color: #1e293b;
 }
 
 .TopSellingWidget-toggle-btn.active {
-  background: var(--main-clr);
-  color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
 }
 
 .TopSellingWidget-viewall-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
-  background-color: #f8fafc;
-  color: var(--main-clr);
-  border: 1px solid var(--main-clr);
-  border-radius: 6px;
+  padding: 6px 14px;
+  background-color: #ffffff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
-  transition: var(--trans);
+  transition: all 0.2s ease;
 }
 
 .TopSellingWidget-viewall-btn:hover {
-  background-color: var(--main-clr);
-  color: #fff;
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
 /* Featured Month Banner */
 .TopSellingWidget-featured {
-  display: grid;
-  grid-template-columns: 1fr 1.6fr;
-  gap: 16px;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fd 100%);
   border: 1px solid #bfdbfe;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   position: relative;
   overflow: hidden;
 }
@@ -132,13 +160,103 @@
 .TopSellingWidget-featured::before {
   content: "";
   position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 140px;
-  height: 140px;
-  background: radial-gradient(circle, rgba(59, 88, 152, 0.1) 0%, transparent 70%);
+  top: -50px;
+  right: -50px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
+}
+
+/* Badge bar & Month Navigation */
+.TopSellingWidget-badge-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.TopSellingWidget-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.TopSellingWidget-crown-icon {
+  color: #d97706;
+}
+
+.TopSellingWidget-badge-divider {
+  color: #d97706;
+  opacity: 0.6;
+}
+
+.TopSellingWidget-badge-highlight {
+  color: #b45309;
+}
+
+/* Month Navigation */
+.TopSellingWidget-month-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  padding: 3px 6px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.TopSellingWidget-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.TopSellingWidget-nav-btn:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.TopSellingWidget-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.TopSellingWidget-nav-counter {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  padding: 0 4px;
+}
+
+/* Featured Body Layout */
+.TopSellingWidget-featured-body {
+  display: grid;
+  grid-template-columns: 1fr 1.55fr;
+  gap: 16px;
+  align-items: center;
 }
 
 .TopSellingWidget-featured-left {
@@ -147,146 +265,315 @@
   justify-content: center;
 }
 
-.TopSellingWidget-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: #fef3c7;
-  color: #b45309;
-  width: fit-content;
-  margin-bottom: 8px;
-}
-
 .TopSellingWidget-product-name {
-  font-size: 1.25rem;
+  font-size: 1.32rem;
   font-weight: 700;
   color: #0f172a;
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   line-height: 1.3;
+  letter-spacing: -0.2px;
 }
 
-.TopSellingWidget-pack {
+.TopSellingWidget-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.TopSellingWidget-tag-pack {
   display: inline-block;
   background: #e2e8f0;
   color: #334155;
   padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.78rem;
+  border-radius: 6px;
+  font-size: 0.76rem;
   font-weight: 600;
-  margin-right: 8px;
 }
 
-.TopSellingWidget-meta {
-  font-size: 0.82rem;
+.TopSellingWidget-tag-category {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.TopSellingWidget-tag-brand {
+  display: inline-block;
   color: #64748b;
-  margin-top: 4px;
+  font-size: 0.76rem;
+  font-weight: 500;
 }
 
+.TopSellingWidget-action-wrap {
+  margin-top: 2px;
+}
+
+.TopSellingWidget-view-top5-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+  transition: all 0.2s ease;
+}
+
+.TopSellingWidget-view-top5-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
+}
+
+.TopSellingWidget-medal-icon {
+  color: #d97706;
+  transition: color 0.2s;
+}
+
+.TopSellingWidget-view-top5-btn:hover .TopSellingWidget-medal-icon {
+  color: #fef08a;
+}
+
+.TopSellingWidget-arrow-icon {
+  transition: transform 0.2s ease;
+}
+
+.TopSellingWidget-view-top5-btn:hover .TopSellingWidget-arrow-icon {
+  transform: translateX(3px);
+}
+
+/* Stat Cards */
 .TopSellingWidget-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  align-items: center;
+  gap: 12px;
 }
 
 .TopSellingWidget-stat-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 10px 14px;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.TopSellingWidget-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.TopSellingWidget-stat-card.card-sold:hover {
+  border-color: #93c5fd;
+}
+
+.TopSellingWidget-stat-card.card-sales:hover {
+  border-color: #86efac;
+}
+
+.TopSellingWidget-stat-card.card-invoices:hover {
+  border-color: #fde047;
+}
+
+.TopSellingWidget-stat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.TopSellingWidget-stat-icon-wrap {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.TopSellingWidget-stat-icon-wrap.icon-sold {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.TopSellingWidget-stat-icon-wrap.icon-sales {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.TopSellingWidget-stat-icon-wrap.icon-invoices {
+  background: #fffbeb;
+  color: #d97706;
 }
 
 .TopSellingWidget-stat-label {
   font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  font-weight: 600;
+  letter-spacing: 0.3px;
   color: #64748b;
-  margin-bottom: 2px;
 }
 
 .TopSellingWidget-stat-value {
-  font-size: 1.15rem;
+  font-size: 1.22rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 0;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  white-space: nowrap;
 }
 
 .TopSellingWidget-stat-value.primary {
-  color: #2563eb;
+  color: #1d4ed8;
 }
 
 .TopSellingWidget-stat-value.success {
-  color: #059669;
+  color: #047857;
 }
 
 .TopSellingWidget-stat-value.amber {
-  color: #d97706;
+  color: #b45309;
 }
 
-/* Month Cards Scroller */
+.TopSellingWidget-stat-unit {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-left: 4px;
+}
+
+.TopSellingWidget-stat-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: auto;
+}
+
+/* Empty Month State */
+.TopSellingWidget-empty-month {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 18px 24px;
+  margin-top: 4px;
+}
+
+.TopSellingWidget-empty-icon-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.TopSellingWidget-empty-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 4px 0;
+}
+
+.TopSellingWidget-empty-desc {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Month Cards Container */
 .TopSellingWidget-months-container {
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .TopSellingWidget-months-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.TopSellingWidget-months-header h4 {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--dark-2);
+.TopSellingWidget-months-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0;
 }
 
+.TopSellingWidget-months-hint {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+/* Symmetrical Grid for 12 Months */
 .TopSellingWidget-months-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 10px;
+  /* Default: 12 columns so all 12 months sit symmetrically in 1 row */
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .TopSellingWidget-month-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px 10px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 85px;
+  min-height: 82px;
   position: relative;
+  outline: none;
 }
 
 .TopSellingWidget-month-card:hover {
   border-color: #93c5fd;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
 }
 
 .TopSellingWidget-month-card.active {
-  background: #eff6ff;
-  border-color: var(--main-clr);
-  box-shadow: 0 0 0 2px rgba(59, 88, 152, 0.2);
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  border: 2px solid #2563eb;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.16);
+  padding: 7px 9px; /* adjust for 2px border */
+}
+
+.TopSellingWidget-month-card.active::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 15%;
+  right: 15%;
+  height: 3px;
+  background: #2563eb;
+  border-radius: 0 0 3px 3px;
 }
 
 .TopSellingWidget-month-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .TopSellingWidget-month-name {
@@ -295,44 +582,82 @@
   color: #1e293b;
 }
 
+.TopSellingWidget-month-card.active .TopSellingWidget-month-name {
+  color: #1d4ed8;
+}
+
 .TopSellingWidget-month-badge {
   font-size: 0.65rem;
-  background: #f1f5f9;
-  color: #475569;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #b45309;
   padding: 1px 5px;
   border-radius: 4px;
-  font-weight: 600;
+  border: 1px solid #fde68a;
 }
 
 .TopSellingWidget-month-card.active .TopSellingWidget-month-badge {
-  background: var(--main-clr);
-  color: #fff;
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.TopSellingWidget-month-badge-empty {
+  font-size: 0.65rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.TopSellingWidget-month-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .TopSellingWidget-month-prod {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  margin: 0 0 2px 0;
+  line-height: 1.2;
 }
 
 .TopSellingWidget-month-val {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 700;
   color: #059669;
-  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.TopSellingWidget-month-card.no-data {
+  background: #f8fafc;
+  opacity: 0.75;
 }
 
 .TopSellingWidget-month-empty {
   font-size: 0.72rem;
   color: #94a3b8;
   font-style: italic;
-  margin-top: 6px;
+  margin: 4px 0 0 0;
 }
 
-/* Modal details */
+/* Modal Styling */
+.TopSelling-rank-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .TopSelling-modal-table {
   width: 100%;
   border-collapse: collapse;
@@ -343,25 +668,56 @@
   background-color: #f8fafc;
   color: #475569;
   font-size: 0.78rem;
+  font-weight: 700;
   text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .TopSelling-modal-table td {
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid #f1f5f9;
   font-size: 0.82rem;
   color: #1e293b;
 }
 
-@media screen and (max-width: 900px) {
-  .TopSellingWidget-featured {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+.TopSelling-modal-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Responsive Breakpoints for Symmetrical Months */
+@media screen and (max-width: 1279px) {
   .TopSellingWidget-months-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    /* 6 x 2 grid: Jan-Jun on row 1, Jul-Dec on row 2 */
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
 
+@media screen and (max-width: 960px) {
+  .TopSellingWidget-featured-body {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .TopSellingWidget-months-grid {
+    /* 4 x 3 grid */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .TopSellingWidget-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .TopSellingWidget-months-grid {
+    /* 3 x 4 grid */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .TopSellingWidget-badge-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
