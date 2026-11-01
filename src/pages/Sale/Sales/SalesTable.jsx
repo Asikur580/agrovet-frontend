@@ -325,7 +325,7 @@ const SalesTable = (props) => {
         //   userDesignationSlug == "admin" || userDesignationSlug == "manager"
         //     ? row.invoice_date
         //     : row.sale_date;
-        const searchPath = row.invoice_date;
+        const searchPath = String(row.invoice_date || row.sale_date || "").slice(0, 10);
 
         const saleDate = searchPath;
         const startDate = dateVal.start;

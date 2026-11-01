@@ -1,0 +1,219 @@
+/* SalesCards.css - Option A: Unified Agrovet Emerald & Slate Palette */
+
+.SalesCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.SalesCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 94px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.22s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.SalesCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+/* Card Accents: Emerald for Today, Month & Cash, Slate for All, Amber for Credit */
+.SalesCard.card-today {
+  border-left: 4px solid #059669;
+}
+.SalesCard.card-today.is-active {
+  box-shadow: 0 0 0 2px #059669, 0 6px 14px rgba(5, 150, 105, 0.18);
+  background: #f0fdf4;
+}
+
+.SalesCard.card-month {
+  border-left: 4px solid #047857;
+}
+.SalesCard.card-month.is-active {
+  box-shadow: 0 0 0 2px #047857, 0 6px 14px rgba(4, 120, 87, 0.18);
+  background: #f0fdf4;
+}
+
+.SalesCard.card-all {
+  border-left: 4px solid #334155;
+}
+.SalesCard.card-all.is-active {
+  box-shadow: 0 0 0 2px #334155, 0 6px 14px rgba(51, 65, 85, 0.18);
+  background: #f8fafc;
+}
+
+.SalesCard.card-cash {
+  border-left: 4px solid #059669;
+}
+.SalesCard.card-cash.is-active {
+  box-shadow: 0 0 0 2px #059669, 0 6px 14px rgba(5, 150, 105, 0.18);
+  background: #f0fdf4;
+}
+
+.SalesCard.card-credit {
+  border-left: 4px solid #d97706;
+}
+.SalesCard.card-credit.is-active {
+  box-shadow: 0 0 0 2px #d97706, 0 6px 14px rgba(217, 119, 6, 0.18);
+  background: #fffbeb;
+}
+
+/* Internal Elements */
+.SalesCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.SalesCardTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.SalesCardLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #64748b;
+}
+
+.SalesCardActiveBadge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
+
+.badge-today {
+  background: #dcfce7;
+  color: #15803d;
+}
+.badge-month {
+  background: #dcfce7;
+  color: #15803d;
+}
+.badge-all {
+  background: #f1f5f9;
+  color: #334155;
+}
+.badge-cash {
+  background: #dcfce7;
+  color: #15803d;
+}
+.badge-credit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.SalesCardIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.icon-today {
+  background: #ecfdf5;
+  color: #059669;
+}
+.icon-month {
+  background: #ecfdf5;
+  color: #047857;
+}
+.icon-all {
+  background: #f1f5f9;
+  color: #334155;
+}
+.icon-cash {
+  background: #ecfdf5;
+  color: #059669;
+}
+.icon-credit {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.SalesCardValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+}
+
+.SalesCardValue.value-today {
+  color: #065f46;
+}
+.SalesCardValue.value-month {
+  color: #065f46;
+}
+.SalesCardValue.value-all {
+  color: #0f172a;
+}
+.SalesCardValue.value-cash {
+  color: #065f46;
+}
+.SalesCardValue.value-credit {
+  color: #92400e;
+}
+
+.SalesCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.73rem;
+  color: #64748b;
+}
+
+.SalesCardFooter .filterHint {
+  font-size: 0.67rem;
+  color: #94a3b8;
+  font-style: italic;
+  transition: color 0.15s ease;
+}
+
+.SalesCard:hover .filterHint {
+  color: #059669;
+}
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+  .SalesCardsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .SalesCardsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .SalesCardsGrid {
+    grid-template-columns: 1fr;
+  }
+}

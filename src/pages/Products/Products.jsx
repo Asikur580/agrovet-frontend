@@ -5,8 +5,10 @@ import {
   useEffect,
   useContext,
   useCallback,
+  useMemo,
 } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 import ApiConfig from "../../assets/js/ApiConfig";
 import { AuthContext } from "../../context/AuthContext";
 import useStickyScroll from "../../hooks/useStickyScroll";
@@ -25,6 +27,24 @@ const Products = ({ setLoader }) => {
   const stickyRef = useStickyScroll(67);
   const [reloadTable, setReloadTable] = useState(false);
   const [searchData, setSearchData] = useState("");
+
+  const location = useLocation();
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
+  const [stockFilter, setStockFilter] = useState(
+    queryParams.get("filter") === "low_stock" ? "low_stock" : "all"
+  );
+
+  useEffect(() => {
+    const filter = queryParams.get("filter");
+    if (filter === "low_stock") {
+      setStockFilter("low_stock");
+    } else {
+      setStockFilter("all");
+    }
+  }, [location.search]);
 
   // Input configurations (memoized for performance)
   const inputFields = [
@@ -160,15 +180,43 @@ const Products = ({ setLoader }) => {
         <h1 className="page-title">Products</h1>
         <div
           ref={stickyRef}
-          className="sticky top-[67px] z-50 flex justify-between mb-2"
+          className="sticky top-[67px] z-50 flex justify-between items-center mb-2 gap-3 max-[768px]:flex-col max-[768px]:items-start"
         >
-          <div className="searchInput">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="searchInput">
             <input
               type="text"
               placeholder="Search product"
               value={searchData}
               onChange={handleSearch}
             />
+          </div>
+
+            {/* Quick stock status filter toggle */}
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setStockFilter("all")}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  stockFilter === "all"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                All Products
+              </button>
+              <button
+                type="button"
+                onClick={() => setStockFilter("low_stock")}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer flex items-center gap-1 ${
+                  stockFilter === "low_stock"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "text-amber-800 hover:bg-amber-100"
+                }`}
+              >
+                <span>⚠️ Low Stock (≤ 10)</span>
+              </button>
+          </div>
           </div>
           <div className="flex justify-end gap-5">
             {["Developer", "Product-print"].some((r) =>
@@ -208,8 +256,23 @@ const Products = ({ setLoader }) => {
           </div>
         </div>
 
+        {stockFilter === "low_stock" && (
+          <div className="mb-2 p-2 px-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-md flex items-center justify-between">
+            <span>
+              <strong>Low Stock Filter:</strong> Showing only products with quantity &le; 10 units.
+            </span>
+            <button
+              onClick={() => setStockFilter("all")}
+              className="text-amber-900 underline font-semibold hover:text-black ml-2 cursor-pointer"
+            >
+              Show All Products
+            </button>
+          </div>
+        )}
+
         <Suspense fallback={<p>Loading...</p>}>
           <ProductsTable
+            stockFilter={stockFilter}
             headers={headers}
             userRole={userRole}
             userDesignationSlug={userDesignationSlug}

@@ -25,7 +25,19 @@ const Orders = ({ setLoader }) => {
   const stickyRef = useStickyScroll(67);
   const [searchData, setSearchData] = useState("");
   const [relodeTable, setRelodeTable] = useState(false);
-  const [selectedEmpID, setSelectedEmpID] = useState(employeeID);
+  const [selectedEmpID, setSelectedEmpID] = useState(
+    userDesignationSlug == "admin" || userDesignationSlug == "super_admin" || userDesignationSlug == "developer"
+      ? "0"
+      : employeeID || "0"
+  );
+
+  useEffect(() => {
+    if (userDesignationSlug == "admin" || userDesignationSlug == "super_admin" || userDesignationSlug == "developer") {
+      setSelectedEmpID("0");
+    } else if (employeeID) {
+      setSelectedEmpID(employeeID);
+    }
+  }, [userDesignationSlug, employeeID]);
 
   // const [customers, setCustomers] = useState();
   const getCustomerApi = useMemo(() => {

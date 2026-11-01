@@ -36,6 +36,7 @@ const ProductsTable = ({
   toggledClearRows,
   searchData,
   identifier,
+  stockFilter = "all",
 }) => {
   const customStyles = useMemo(() => TableStyles(), []);
   const [apiData, setApiData] = useState([]);
@@ -57,10 +58,16 @@ const ProductsTable = ({
 
   // Optimized filtering with useMemo
   const filteredApiData = useMemo(() => {
-    if (!searchData.trim()) return apiData;
+    let result = apiData;
+
+    if (stockFilter === "low_stock") {
+      result = result.filter((item) => Number(item.quantity || 0) <= 10);
+    }
+
+    if (!searchData.trim()) return result;
     const lower = searchData.toLowerCase();
-    return apiData.filter((item) => item.name.toLowerCase().includes(lower));
-  }, [apiData, searchData]);
+    return result.filter((item) => item.name.toLowerCase().includes(lower));
+  }, [apiData, searchData, stockFilter]);
 
   const handleTabelSelectChange = ({ selectedRows }) => {
     setSelectedRows(selectedRows);
@@ -74,7 +81,21 @@ const ProductsTable = ({
       { name: "Product name", grow: 5, selector: (row) => row.name },
       { name: "Category", selector: (row) => row.category?.name || "-" },
       { name: "Brand", selector: (row) => row.brand?.name || "-" },
-      { name: "Quantity", selector: (row) => row.quantity },
+      {
+        name: "Quantity",
+        selector: (row) => row.quantity,
+        cell: (row) => (
+          <span
+            className={
+              Number(row.quantity || 0) <= 10
+                ? "text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200"
+                : "font-medium"
+            }
+          >
+            {row.quantity}
+          </span>
+        ),
+      },
       { name: "Pack size", selector: (row) => row.pack_size },
       userDesignationSlug == "admin"
         ? { name: "Buy price", selector: (row) => row.buy_price }

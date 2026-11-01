@@ -1,43 +1,222 @@
-.Summery {
+/* Summery.css - Option A: Unified Agrovet Emerald & Slate Palette */
+
+.SummeryWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Primary KPI Grid */
+.SummeryGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.SummeryCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.22s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.SummeryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.07);
+  border-color: #cbd5e1;
+}
+
+/* Unified Option A Borders: Emerald for Sales/Orders, Slate for Due, Amber only for Low Stock */
+.SummeryCard.card-today {
+  border-left: 4px solid #059669;
+}
+.SummeryCard.card-month {
+  border-left: 4px solid #059669;
+}
+.SummeryCard.card-due {
+  border-left: 4px solid #334155;
+}
+.SummeryCard.card-orders {
+  border-left: 4px solid #059669;
+}
+.SummeryCard.card-stock {
+  border-left: 4px solid #d97706; /* Functional status alert */
+}
+
+.SummeryCardHeader {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
-.Summery .card {
-  flex-basis: 20%;
-  min-width: 200px;
-  border: var(--table-border);
-  border-radius: 0.5rem;
+
+.SummeryLabel {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #64748b;
+}
+
+/* Unified Tonal Icon Wrappers */
+.SummeryIconWrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 15px;
-}
-.Summery .icon {
-  background: var(--gradient_1);
-  color: #fff;
-  padding: 8px;
-  border-radius: 0.5rem;
-  margin-right: 25px;
-  width: 50px;
-  height: 50px;
-  text-align: center;
-}
-.Summery .summeryTitle {
-  font-size: 1rem;
-  color: var(--dark-2);
-}
-.Summery .amount {
-  font-size: 1.6rem;
-  color: rgb(126 130 251);
-  font-weight: bold;
 }
 
-/*==> Responsive  */
-@media screen and (max-width: 470px) {
-  .Summery .card {
-    flex-basis: 80%;
+.SummeryIconWrap.icon-today {
+  background: #ecfdf5;
+  color: #059669;
+}
+.SummeryIconWrap.icon-month {
+  background: #ecfdf5;
+  color: #059669;
+}
+.SummeryIconWrap.icon-due {
+  background: #f1f5f9;
+  color: #334155;
+}
+.SummeryIconWrap.icon-orders {
+  background: #ecfdf5;
+  color: #059669;
+}
+.SummeryIconWrap.icon-stock {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+/* Clear, High-Contrast Typography */
+.SummeryValue {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.SummeryValue.value-today {
+  color: #065f46;
+}
+.SummeryValue.value-month {
+  color: #065f46;
+}
+.SummeryValue.value-due {
+  color: #0f172a;
+}
+.SummeryValue.value-orders {
+  color: #0f172a;
+}
+.SummeryValue.value-stock {
+  color: #92400e;
+}
+
+.SummeryFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.SummeryFooter .arrow {
+  opacity: 0;
+  transition: all 0.2s ease;
+  transform: translateX(-3px);
+  color: #059669;
+}
+
+.SummeryCard:hover .SummeryFooter .arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.SummeryCard.card-stock:hover .SummeryFooter .arrow {
+  color: #d97706;
+}
+
+/* Secondary Pills Row */
+.SummeryPillsBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+
+.SummeryPillsLabel {
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.3px;
+  margin-right: 4px;
+}
+
+.SummeryPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+.SummeryPill:hover {
+  border-color: #059669;
+  background: #ecfdf5;
+  color: #047857;
+  transform: translateY(-1px);
+}
+
+.SummeryPill strong {
+  color: #0f172a;
+}
+
+/* Responsive Breakpoints */
+@media screen and (max-width: 1200px) {
+  .SummeryGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .SummeryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .SummeryGrid {
+    grid-template-columns: 1fr;
+  }
+  .SummeryPillsBar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

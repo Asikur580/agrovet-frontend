@@ -69,8 +69,9 @@ const OrdersTable = (props) => {
           setApiData(filtered);
           setFilteredApiData(filtered);
         } else {
-          setApiData(allInvoices);
-          setFilteredApiData(allInvoices);
+          setApiData(datas);
+          setFilteredApiData(datas);
+
         }
         //=>>> Filter order for selected employee
       });
@@ -113,7 +114,7 @@ const OrdersTable = (props) => {
       setFilteredApiData(allOrders);
     }
     // console.log(selectedEmpID);
-  }, [selectedEmpID]);
+  }, [selectedEmpID, allOrders]);
   //=>>> Filter order for selected employee
 
   const approveOrder = async (idParam, statusParam) => {
@@ -361,12 +362,12 @@ const OrdersTable = (props) => {
   //=>>> Searching function
   useEffect(() => {
     const result = apiData.filter((filteredApiData) => {
-      return filteredApiData.customer_name
+      return (filteredApiData.customer_name || "")
         .toLowerCase()
         .match(searchData.toLowerCase());
     });
     setFilteredApiData(result);
-  }, [searchData]);
+  }, [searchData, apiData]);
 
   return (
     <>

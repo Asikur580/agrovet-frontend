@@ -7,6 +7,8 @@ import {
 } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import { DatePicker, Space, Table } from "antd";
+import { useLocation } from "react-router-dom";
+import dayjs from "dayjs";
 
 // Utilities
 import ApiConfig from "../../../assets/js/ApiConfig";
@@ -21,7 +23,38 @@ const SalesReport = ({ setLoader }) => {
   const { RangePicker } = DatePicker;
 
   const [apiData, setApiData] = useState([]);
-  const [dateVal, setDateVal] = useState({ start: "", end: "" });
+  const location = useLocation();
+
+  // Read date filters from URL query parameters (e.g. ?filter=month or ?startDate=...&endDate=...)
+  const initialDates = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const filter = params.get("filter");
+    const s = params.get("startDate") || params.get("start_date") || params.get("from_date");
+    const e = params.get("endDate") || params.get("end_date") || params.get("to_date");
+
+    if (filter === "month" || filter === "this_month") {
+      return {
+        start: dayjs().startOf("month").format("YYYY-MM-DD"),
+        end: dayjs().endOf("month").format("YYYY-MM-DD"),
+      };
+    }
+    if (filter === "today") {
+      const today = dayjs().format("YYYY-MM-DD");
+      return { start: today, end: today };
+    }
+    if (s && e) {
+      return { start: s, end: e };
+    }
+    return { start: "", end: "" };
+  }, [location.search]);
+
+  const [dateVal, setDateVal] = useState(initialDates);
+
+  useEffect(() => {
+    if (initialDates.start && initialDates.end) {
+      setDateVal(initialDates);
+    }
+  }, [initialDates]);
   const [employeeId, setEmployeeId] = useState("");
   const [employees, setEmployees] = useState([]);
 
@@ -218,6 +251,11 @@ const SalesReport = ({ setLoader }) => {
               <Space direction="vertical" size={12}>
                 <RangePicker
                   format="YYYY-MM-DD"
+                  value={
+                    dateVal.start && dateVal.end
+                      ? [dayjs(dateVal.start), dayjs(dateVal.end)]
+                      : null
+                  }
                   onChange={(evt, dateString) => {
                     if (!evt) {
                       setDateVal({ start: "", end: "" });

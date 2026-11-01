@@ -1,44 +1,50 @@
-import React, { lazy, Suspense, useContext, useState } from "react";
+import React, { lazy, Suspense, useContext, useMemo } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import dayjs from "dayjs";
+import {
+  FaPlus,
+  FaCartPlus,
+  FaUsers,
+  FaFileInvoiceDollar,
+  FaChartPie,
+  FaMoneyBillTrendUp,
+  FaTriangleExclamation,
+} from "react-icons/fa6";
 
-//=>>> Css
+// Css
 import "./Home.css";
 
-//=>>> Components
+// Components
 import Spinner from "../../components/Loader/Spinner";
-const CashCreditSales = lazy(() => import("./HomeComponents/CashCreditSales"));
-const ProfitLoss = lazy(() => import("./HomeComponents/ProfitLoss"));
-// const ProfitLossChart = lazy(() =>
-//   import("../../components/Charts/ProfitLossChart")
-// );
-const DueInvoice = lazy(() => import("./HomeComponents/DueInvoice"));
-const CustomerWiseSales = lazy(() =>
-  import("./HomeComponents/CustomerWiseSales")
-);
-const ProductWiseSales = lazy(() =>
-  import("./HomeComponents/ProductWiseSales")
-);
-const CategoryWiseSales = lazy(() =>
-  import("./HomeComponents/CategoryWiseSales")
-);
-const CreditLimitList = lazy(() => import("./HomeComponents/CreditLimitList"));
-const LowStockAlerts = lazy(() => import("./HomeComponents/LowStockAlerts"));
 const Summery = lazy(() => import("./HomeComponents/Summery/Summery"));
-const TopSellingProducts = lazy(() =>
-  import("./HomeComponents/TopSellingProducts")
-);
+const TopSellingProducts = lazy(() => import("./HomeComponents/TopSellingProducts"));
+const ProfitLoss = lazy(() => import("./HomeComponents/ProfitLoss"));
+const CashCreditSales = lazy(() => import("./HomeComponents/CashCreditSales"));
+const ReceivablesHub = lazy(() => import("./HomeComponents/ReceivablesHub"));
+const PerformanceHub = lazy(() => import("./HomeComponents/PerformanceHub"));
+const LowStockAlerts = lazy(() => import("./HomeComponents/LowStockAlerts"));
 
-//=>>> Utility
+// Utility
 import { AuthContext } from "../../context/AuthContext";
 
 const Home = ({ setLoader }) => {
   const { userDesignationSlug } = useContext(AuthContext);
 
+  const isAdminOrDev = useMemo(() => {
+    if (!Array.isArray(userDesignationSlug)) return userDesignationSlug === "admin";
+    return userDesignationSlug.some((r) =>
+      ["admin", "super_admin", "developer"].includes(r)
+    );
+  }, [userDesignationSlug]);
+
+  const currentDateDisplay = dayjs().format("dddd, MMM DD, YYYY");
+
   return (
     <HelmetProvider>
       <Helmet>
-        <title>Dashboard</title>
-        <meta name="description" content="Agrovet software" />
+        <title>Dashboard - Radiant Agrovet</title>
+        <meta name="description" content="Radiant Agrovet ERP Dashboard" />
       </Helmet>
 
       {/* Hidden input for auto-focus */}
@@ -49,150 +55,129 @@ const Home = ({ setLoader }) => {
       />
 
       <div className="Home content animated fadeInDown">
-        {userDesignationSlug == "admin" ? (
-          <>
-            <h1 className="page-title">Dashboard</h1>
-            {/* Top Boxes */}
-            <div className="mb-5">
-              <Summery />
-            </div>
+        {/* Welcome & Quick Action Header */}
+        <div className="Home-top-bar">
+          <div className="Home-welcome-meta">
+            <h1 className="Home-heading m-0">Radiant Agrovet Dashboard</h1>
+            <p className="Home-subheading m-0">
+              <span>📅 {currentDateDisplay}</span>
+              <span className="bullet">•</span>
+              <span>Real-time business performance & operational monitoring</span>
+            </p>
+          </div>
 
-            {/* Top Selling Products - Monthly Overview */}
-            <div className="mb-5">
-              <Suspense fallback={<Spinner />}>
-                <TopSellingProducts setLoader={setLoader} />
+          {/* Quick Action Buttons Bar */}
+          <div className="Home-quick-actions">
+            <Link to="/sales-create" className="Home-action-btn btn-primary" title="Create new customer sale">
+              <FaPlus size={11} />
+              <span>New Sale</span>
+            </Link>
+
+            <Link to="/order-create" className="Home-action-btn btn-secondary" title="Place customer order">
+              <FaCartPlus size={12} />
+              <span>New Order</span>
+            </Link>
+
+            <Link to="/customers" className="Home-action-btn btn-outline" title="Manage customers">
+              <FaUsers size={12} />
+              <span>Customers</span>
+            </Link>
+
+            <Link to="/cash-credit-sales-report" className="Home-action-btn btn-accent" title="View unified Cash & Credit report">
+              <FaFileInvoiceDollar size={12} />
+              <span>Cash & Credit</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Section 1: Executive KPI Summary Cards */}
+        <div className="Home-section mb-5">
+          <Suspense fallback={<div className="py-6 flex justify-center"><Spinner /></div>}>
+            <Summery />
+          </Suspense>
+        </div>
+
+        {/* Section 2: Monthly Top Selling Products (Balanced 12 Months Grid) */}
+        <div className="Home-section mb-5">
+          <Suspense fallback={<div className="py-8 flex justify-center"><Spinner /></div>}>
+            <TopSellingProducts setLoader={setLoader} />
+          </Suspense>
+        </div>
+
+        {/* Section 3: Financial & Sales Analytics Row (Balanced 2-Columns) */}
+        <div className="Home-analytics-grid mb-5">
+          {/* Column 1: Profit & Loss (Admin/Dev) or Revenue Overview */}
+          {isAdminOrDev ? (
+            <div className="Home-chart-box">
+              <Suspense fallback={<div className="py-12 flex justify-center"><Spinner /></div>}>
+                <ProfitLoss />
               </Suspense>
             </div>
-
-            {/* Report Box */}
-            <div className="reportBox">
-              <div className="left">
-                {/* Profit/Loss Chart */}
-                <div className="leftBox rounded-lg p-2 flex items-center justify-between flex-col min-h-[300px]">
-                  <Suspense fallback={<Spinner />}>
-                    <ProfitLoss />
-                  </Suspense>
-                  <p></p>
-                </div>
-                {/* Profit/Loss Chart  */}
-
-                <div className="leftBox rounded-lg p-2 flex items-center justify-between flex-col mt-5 min-h-[300px]">
-                  <Suspense fallback={<Spinner />}>
-                    <CashCreditSales />
-                  </Suspense>
-                </div>
-
-                <div className="leftBox leftTxtBox flex justify-between flex-col rounded-lg px-2 mt-5">
-                  <Suspense fallback={<Spinner />}>
-                    <CreditLimitList />
-                  </Suspense>
-                  <p></p>
-                </div>
+          ) : (
+            <div className="Home-chart-box p-6 flex flex-col justify-center items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                <FaMoneyBillTrendUp size={22} />
               </div>
-
-              {/* Right Section - Due Invoice */}
-              <div className="right">
-                <div className="box rounded-lg px-2">
-                  <Suspense fallback={<Spinner />}>
-                    <DueInvoice />
-                  </Suspense>
-                </div>
-                <div className="box rounded-lg px-2">
-                  <Suspense fallback={<Spinner />}>
-                    <CustomerWiseSales />
-                  </Suspense>
-                </div>
-                <div className="box rounded-lg px-2">
-                  <Suspense fallback={<Spinner />}>
-                    <ProductWiseSales />
-                  </Suspense>
-                </div>
-                <div className="box rounded-lg px-2">
-                  <Suspense fallback={<Spinner />}>
-                    <CategoryWiseSales />
-                  </Suspense>
-                </div>
-                {/* <div className="box rounded-lg px-2">
-                      <Suspense fallback={<Spinner />}>
-                        <CreditLimitList />
-                      </Suspense>
-                    </div> */}
-                <div className="box rounded-lg px-2">
-                  <Suspense fallback={<Spinner />}>
-                    <LowStockAlerts setLoader={setLoader} />
-                  </Suspense>
-                </div>
-              </div>
+              <h3 className="text-base font-bold text-slate-800 m-0">Territory Sales Overview</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                Your performance metrics are synchronized in real-time based on your assigned field territory.
+              </p>
+              <Link
+                to="/sales-report"
+                className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition"
+              >
+                <span>View Full Territory Sales Report</span>
+              </Link>
             </div>
-          </>
-        ) : (
-          <h1
-            style={{
-              height: "calc(100vh - 250px)",
-              fontSize: "2rem",
-              opacity: "0.4",
-            }}
-            className="flex items-center justify-center"
-          >
-            Secured content
-          </h1>
-        )}
+          )}
+
+          {/* Column 2: Cash vs Credit Sales Analysis */}
+          <div className="Home-chart-box">
+            <Suspense fallback={<div className="py-12 flex justify-center"><Spinner /></div>}>
+              <CashCreditSales />
+            </Suspense>
+          </div>
+        </div>
+
+        {/* Section 4: Operations & Risk Hubs (Balanced 2-Columns) */}
+        <div className="Home-hubs-grid mb-5">
+          {/* Left Hub: Receivables & Credit Risk */}
+          <div className="Home-hub-column">
+            <Suspense fallback={<div className="py-12 flex justify-center"><Spinner /></div>}>
+              <ReceivablesHub />
+            </Suspense>
+          </div>
+
+          {/* Right Hub: Sales Performance Breakdown */}
+          <div className="Home-hub-column">
+            <Suspense fallback={<div className="py-12 flex justify-center"><Spinner /></div>}>
+              <PerformanceHub />
+            </Suspense>
+          </div>
+        </div>
+
+        {/* Section 5: Inventory & Restock Alerts */}
+        <div className="Home-section mb-6">
+          <div className="Home-inventory-alert-card">
+            <div className="Home-inventory-header">
+              <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+                <FaTriangleExclamation size={15} />
+                <span>Low Stock & Inventory Reorder Alerts</span>
+              </div>
+              <Link to="/products" className="text-xs font-semibold text-blue-600 hover:underline">
+                Manage Inventory & Stock &rarr;
+              </Link>
+            </div>
+            <div className="Home-inventory-body">
+              <Suspense fallback={<div className="py-6 flex justify-center"><Spinner /></div>}>
+                <LowStockAlerts setLoader={setLoader} />
+              </Suspense>
+            </div>
+          </div>
+        </div>
       </div>
     </HelmetProvider>
   );
 };
 
 export default React.memo(Home);
-
-// const profitLossCharOldVersion = () => {
-// const [timePeriodVal, setTimePeriodVal] = useState("year");
-// //==> Memoize time period to avoid recalculating on every render
-// const timePeriod = useMemo(() => {
-//   return {
-//     from_date: DateRange(timePeriodVal).formattedStartDate,
-//     to_date: DateRange(timePeriodVal).formattedEndDate,
-//   };
-// }, [timePeriodVal]);
-
-// //===> Handle time period change
-// const handleTimePeriodChange = useCallback((e) => {
-//   const value = e.target.value;
-//   setTimePeriodVal(value);
-//   setReloader((prev) => !prev);
-// }, []);
-
-//   return (
-//     <div className="leftBox rounded-lg p-2 flex items-center justify-center flex-col">
-//       <h1 className="capitalize font-semibold mb-2">Profit / Loss Report</h1>
-//       <div className="w-full flex items-center justify-end gap-5">
-//         {reloader && <Spinner />}
-//         <select
-//           className="rounded-lg p-1 border border-solid border-border_clr"
-//           value={timePeriodVal}
-//           onChange={handleTimePeriodChange}
-//         >
-//           <option value="0" disabled>
-//             Select time period
-//           </option>
-//           <option value="today">Today</option>
-//           <option value="last-day">Last day</option>
-//           <option value="week">Last Week</option>
-//           <option value="month">Last Month</option>
-//           <option value="year">Last Year</option>
-//           <option value="100-years">Last 100 Years</option>
-//         </select>
-//       </div>
-//       <Suspense fallback={<Spinner />}>
-//         <ProfitLossChart
-//           api="/profit-loss-report"
-//           identifier="profit-loss report"
-//           headers={headers}
-//           timePeriod={timePeriod}
-//           setLoader={setLoader}
-//           reloader={reloader}
-//           setReloader={setReloader}
-//         />
-//       </Suspense>
-//     </div>
-//   );
-// };

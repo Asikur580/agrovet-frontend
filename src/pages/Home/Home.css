@@ -1,105 +1,341 @@
-/*** Top section start ***/
-.Home .top-box .box {
-  flex: 1;
-  padding: 10px 15px;
-  border-radius: 8px;
-  box-shadow: var(--cardShadow);
-  color: #fff;
-  background: var(--gradient-bg);
-  background: var(--gradient_1);
-}
-/*** Top section end ***/
+/* Home.css - Modern Enterprise Agrovet Dashboard (Option A: Emerald & Slate Palette) */
 
-/*** Report section start ***/
-.Home .reportBox {
+.Home {
+  padding-bottom: 30px;
+}
+
+/* Top Bar: Welcome & Quick Actions */
+.Home-top-bar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
-}
-.Home .reportBox .left {
-  width: 60%;
-}
-.Home .reportBox .left .leftBox {
-  border: var(--table-border);
-  max-height: fit-content;
-}
-.Home .reportBox .left .leftTxtBox {
-  min-height: 300px;
-  max-height: 100px;
-  overflow-y: scroll;
-}
-.Home .reportBox .left .leftBox::-webkit-scrollbar {
-  display: none;
+  flex-wrap: wrap;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.Home .reportBox .right {
-  width: 40%;
+.Home-heading {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
 }
-.Home .reportBox .right .box {
-  border: var(--table-border);
-  height: fit-content;
-  max-height: 230px;
-  min-height: 230px;
-  overflow-y: scroll;
+
+.Home-subheading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 3px;
 }
-.Home .reportBox .right .box:not(:last-of-type) {
-  margin-bottom: 20px;
+
+.Home-subheading .bullet {
+  color: #cbd5e1;
 }
-.Home .reportBox .right .box::-webkit-scrollbar {
-  display: none;
+
+.Home-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.Home .reportBox .right .box .message {
-  height: 150px;
-  color: var(--dark-3);
+
+.Home-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.Home-action-btn.btn-primary {
+  background: #059669;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(5, 150, 105, 0.25);
+}
+.Home-action-btn.btn-primary:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.Home-action-btn.btn-secondary {
+  background: #1e293b;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(30, 41, 59, 0.25);
+}
+.Home-action-btn.btn-secondary:hover {
+  background: #0f172a;
+  transform: translateY(-1px);
+}
+
+.Home-action-btn.btn-outline {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+.Home-action-btn.btn-outline:hover {
+  border-color: #059669;
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.Home-action-btn.btn-accent {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+.Home-action-btn.btn-accent:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
+/* Financial & Sales Analytics Row (Balanced 2-Columns) */
+.Home-analytics-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
+}
+
+.Home-chart-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 340px;
+}
+
+/* Operations & Performance Hubs (Balanced 2-Columns) */
+.Home-hubs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.Home-hub-column {
+  min-width: 0;
+}
+
+/* Hub Card Base Styles */
+.HomeHubCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.HomeHubCard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.HomeHubCard-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.HomeHubCard-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/*** Report section end ***/
 
-/*** Due Invoice component start ***/
-.reportBoxMini {
-  border-bottom: var(--border);
-  padding: 5px 0;
+.HomeHubCard-icon-box.icon-perf {
+  background: #ecfdf5;
+  color: #059669;
 }
+
+.HomeHubCard-icon-box.icon-due {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.HomeHubCard-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.HomeHubCard-subtitle {
+  font-size: 0.74rem;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+/* Segmented Tabs inside Hub */
+.HomeHubTabs {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  gap: 3px;
+}
+
+.HomeHubTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.HomeHubTab:hover {
+  color: #0f172a;
+}
+
+.HomeHubTab.active {
+  background: #ffffff;
+  color: #059669;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+}
+
+.HomeHubTab.tab-warning.active {
+  color: #d97706;
+}
+
+.HomeHubCard-body {
+  max-height: 320px;
+  min-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom Slim Scrollbar for Hub Card */
+.HomeHubCard-body::-webkit-scrollbar {
+  width: 5px;
+}
+.HomeHubCard-body::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 4px;
+}
+.HomeHubCard-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.HomeHubCard-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Due Invoice & Report mini items polish */
+.reportBoxMini {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 8px 4px;
+  transition: background 0.15s ease;
+}
+
+.reportBoxMini:hover {
+  background: #f8fafc;
+}
+
 .reportBoxMini:last-of-type {
   border-bottom: none;
 }
-/*** Due Invoice component end ***/
 
-/*** Chart section start ***/
-/* .Home .reportBox .left canvas {
-} */
-/*** Chart section end ***/
+/* Low Stock Inventory Alert Card (Functional Amber Alert) */
+.Home-inventory-alert-card {
+  background: #ffffff;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #d97706;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.06);
+  padding: 14px 18px;
+}
 
-/*==> Responsive <==*/
-@media screen and (max-width: 1000px) {
-  .Home .reportBox {
-    flex-direction: column;
+.Home-inventory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #fef3c7;
+}
+
+.Home-inventory-body {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.Home-inventory-body::-webkit-scrollbar {
+  width: 5px;
+}
+.Home-inventory-body::-webkit-scrollbar-track {
+  background: #fffbeb;
+}
+.Home-inventory-body::-webkit-scrollbar-thumb {
+  background: #fcd34d;
+  border-radius: 4px;
+}
+
+/* Responsive Breakpoints */
+@media screen and (max-width: 1080px) {
+  .Home-analytics-grid {
+    grid-template-columns: 1fr;
   }
-  .Home .reportBox .left,
-  .Home .reportBox .right {
-    width: 100%;
+  .Home-hubs-grid {
+    grid-template-columns: 1fr;
   }
 }
-@media screen and (max-width: 950px) {
-  .Home .reportBox {
-    flex-direction: row;
-  }
-  .Home .reportBox .left {
-    width: 60%;
-  }
-  .Home .reportBox .right {
-    width: 40%;
-  }
-}
-@media screen and (max-width: 750px) {
-  .Home .reportBox {
+
+@media screen and (max-width: 768px) {
+  .Home-top-bar {
     flex-direction: column;
+    align-items: flex-start;
   }
-  .Home .reportBox .left,
-  .Home .reportBox .right {
+  .Home-quick-actions {
     width: 100%;
+  }
+  .Home-action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .HomeHubCard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .HomeHubTabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .HomeHubTab {
+    flex: 1;
+    justify-content: center;
   }
 }

@@ -5,13 +5,17 @@ import {
   Suspense,
   useContext,
   useMemo,
+  useCallback,
 } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import { DatePicker, Space } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 //=>>> Components
 const SalesTable = lazy(() => import("./SalesTable"));
 const ModalTable = lazy(() => import("../../../components/Modal/CommonModal/ModalTable"));
+import SalesCards from "./SalesCards";
 
 //=>>> Utilities
 import ApiConfig from "../../../assets/js/ApiConfig";
@@ -31,7 +35,40 @@ const Sales = ({ setLoader }) => {
   const { RangePicker } = DatePicker;
   const [relodeTable, setRelodeTable] = useState(false);
   const [searchData, setSearchData] = useState("");
-  const [dateVal, setDateVal] = useState({ start: "", end: "" });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const todayStr = dayjs().format("YYYY-MM-DD");
+  const monthStartStr = dayjs().startOf("month").format("YYYY-MM-DD");
+  const monthEndStr = dayjs().endOf("month").format("YYYY-MM-DD");
+
+  // Read date filters from URL query parameters (e.g. ?filter=today or ?startDate=...&endDate=...)
+  const initialDates = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const filter = params.get("filter");
+    const s = params.get("startDate") || params.get("start_date") || params.get("from_date");
+    const e = params.get("endDate") || params.get("end_date") || params.get("to_date");
+
+    if (filter === "today") {
+      const today = dayjs().format("YYYY-MM-DD");
+      return { start: today, end: today };
+    }
+    if (filter === "month" || filter === "this_month") {
+      return {
+        start: dayjs().startOf("month").format("YYYY-MM-DD"),
+        end: dayjs().endOf("month").format("YYYY-MM-DD"),
+      };
+    }
+    if (s && e) {
+      return { start: s, end: e };
+    }
+    return { start: "", end: "" };
+  }, [location.search]);
+
+  const [dateVal, setDateVal] = useState(initialDates);
+
+  useEffect(() => {
+    setDateVal(initialDates);
+  }, [initialDates]);
   const [selectedEmpID, setSelectedEmpID] = useState(
     userDesignationSlug == "admin" ? "0" : employeeID
   );
@@ -122,6 +159,11 @@ const Sales = ({ setLoader }) => {
   useEffect(() => {
     let filtered = allInvoices;
 
+    const params = new URLSearchParams(location.search);
+    if (params.get("filter") === "due") {
+      filtered = filtered.filter((item) => Number(item.due || 0) > 0);
+    }
+
     if (selectedEmpID != "0") {
       filtered = filtered.filter(
         (item) => item.employee_id == selectedEmpID
@@ -137,7 +179,7 @@ const Sales = ({ setLoader }) => {
 
     setApiData(filtered);
     setFilteredApiData(filtered);
-  }, [selectedEmpID, selectedInvoiceType, allInvoices]);
+  }, [selectedEmpID, selectedInvoiceType, allInvoices, location.search]);
   //=>>> Filter invoice for selected employee
 
   //=>>> Input For modal
@@ -150,6 +192,99 @@ const Sales = ({ setLoader }) => {
       isDisabled: true,
     },
   ];
+
+  // Base invoices filtered by selected employee
+  const baseInvoices = useMemo(() => {
+    if (selectedEmpID != "0") {
+      return allInvoices.filter((item) => item.employee_id == selectedEmpID);
+    }
+    return allInvoices;
+  }, [allInvoices, selectedEmpID]);
+
+  // Today metrics
+  const todayMetrics = useMemo(() => {
+    const list = baseInvoices.filter((item) => {
+      const d = String(item.invoice_date || item.sale_date || item.created_at || "").slice(0, 10);
+      return d === todayStr;
+    });
+    const total = list.reduce((sum, item) => sum + Number(item.grand_total || 0), 0);
+    return { total, count: list.length };
+  }, [baseInvoices, todayStr]);
+
+  // Month metrics
+  const monthMetrics = useMemo(() => {
+    const list = baseInvoices.filter((item) => {
+      const d = String(item.invoice_date || item.sale_date || item.created_at || "").slice(0, 10);
+      return d >= monthStartStr && d <= monthEndStr;
+    });
+    const total = list.reduce((sum, item) => sum + Number(item.grand_total || 0), 0);
+    return { total, count: list.length };
+  }, [baseInvoices, monthStartStr, monthEndStr]);
+
+  // Current view metrics (computed over filteredApiData)
+  const currentViewMetrics = useMemo(() => {
+    let totalSales = 0;
+    let cashSales = 0;
+    let creditSales = 0;
+    let cashCount = 0;
+    let creditCount = 0;
+
+    filteredApiData.forEach((item) => {
+      const amt = Number(item.grand_total || 0);
+      totalSales += amt;
+      const type = String(item.sale_type || item.pay_type || "").toLowerCase();
+      if (type === "cash") {
+        cashSales += amt;
+        cashCount++;
+      } else if (type === "credit") {
+        creditSales += amt;
+        creditCount++;
+      }
+    });
+
+    return {
+      totalSales,
+      totalCount: filteredApiData.length,
+      cashSales,
+      cashCount,
+      creditSales,
+      creditCount,
+    };
+  }, [filteredApiData]);
+
+  const handleSelectToday = useCallback(() => {
+    if (dateVal.start === todayStr && dateVal.end === todayStr) {
+      setDateVal({ start: "", end: "" });
+      navigate("/sales", { replace: true });
+    } else {
+      setDateVal({ start: todayStr, end: todayStr });
+      navigate(`/sales?filter=today&startDate=${todayStr}&endDate=${todayStr}`, { replace: true });
+    }
+  }, [dateVal, todayStr, navigate]);
+
+  const handleSelectMonth = useCallback(() => {
+    if (dateVal.start === monthStartStr && dateVal.end === monthEndStr) {
+      setDateVal({ start: "", end: "" });
+      navigate("/sales", { replace: true });
+    } else {
+      setDateVal({ start: monthStartStr, end: monthEndStr });
+      navigate(`/sales?filter=month&startDate=${monthStartStr}&endDate=${monthEndStr}`, { replace: true });
+    }
+  }, [dateVal, monthStartStr, monthEndStr, navigate]);
+
+  const handleSelectAllTime = useCallback(() => {
+    setDateVal({ start: "", end: "" });
+    setSelectedInvoiceType("all");
+    navigate("/sales", { replace: true });
+  }, [navigate]);
+
+  const handleToggleCash = useCallback(() => {
+    setSelectedInvoiceType((prev) => (prev === "cash" ? "all" : "cash"));
+  }, []);
+
+  const handleToggleCredit = useCallback(() => {
+    setSelectedInvoiceType((prev) => (prev === "credit" ? "all" : "credit"));
+  }, []);
 
   const salesSummaryData = useMemo(() => {
     let totalSalesAmt = 0;
@@ -218,6 +353,23 @@ const Sales = ({ setLoader }) => {
 
       <div className="orders content animated fadeInDown">
         <h1 className="page-title">Sales</h1>
+
+        {/* Interactive KPI Summary Cards */}
+        <SalesCards
+          todayMetrics={todayMetrics}
+          monthMetrics={monthMetrics}
+          currentViewMetrics={currentViewMetrics}
+          dateVal={dateVal}
+          selectedInvoiceType={selectedInvoiceType}
+          todayStr={todayStr}
+          monthStartStr={monthStartStr}
+          monthEndStr={monthEndStr}
+          onSelectToday={handleSelectToday}
+          onSelectMonth={handleSelectMonth}
+          onSelectAllTime={handleSelectAllTime}
+          onToggleCash={handleToggleCash}
+          onToggleCredit={handleToggleCredit}
+        />
         <div
           ref={stickyRef}
           className="sticky top-[67px] z-50 flex justify-between items-center mb-2"
@@ -228,6 +380,11 @@ const Sales = ({ setLoader }) => {
                 <Space direction="vertical" size={12}>
                   <RangePicker
                     format="YYYY-MM-DD"
+                    value={
+                      dateVal.start && dateVal.end
+                        ? [dayjs(dateVal.start), dayjs(dateVal.end)]
+                        : null
+                    }
                     onChange={(evt, dateString) => {
                       if (!evt) {
                         setDateVal({ start: "", end: "" });

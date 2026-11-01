@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import { DatePicker, Space, Pagination, Modal, Tooltip, Spin } from "antd";
 import dayjs from "dayjs";
@@ -30,14 +31,41 @@ const CashCreditSalesReport = ({ setLoader }) => {
   const { headers, userDesignationSlug } = useContext(AuthContext);
   const stickyRef = useStickyScroll(67);
 
-  // Default date: First day of current month to today
-  const defaultStartDate = dayjs().startOf("month").format("YYYY-MM-DD");
-  const defaultEndDate = dayjs().format("YYYY-MM-DD");
+  const location = useLocation();
 
-  const [dateRange, setDateRange] = useState({
-    start: defaultStartDate,
-    end: defaultEndDate,
-  });
+  // Read date range from URL query parameters (e.g. ?filter=today or ?startDate=...&endDate=...)
+  const initialDates = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const filter = params.get("filter");
+    const s = params.get("startDate") || params.get("start_date") || params.get("from_date");
+    const e = params.get("endDate") || params.get("end_date") || params.get("to_date");
+
+    if (filter === "today") {
+      const today = dayjs().format("YYYY-MM-DD");
+      return { start: today, end: today };
+    }
+    if (filter === "month" || filter === "this_month") {
+      return {
+        start: dayjs().startOf("month").format("YYYY-MM-DD"),
+        end: dayjs().format("YYYY-MM-DD"),
+      };
+    }
+    if (s && e) {
+      return { start: s, end: e };
+    }
+    return {
+      start: dayjs().startOf("month").format("YYYY-MM-DD"),
+      end: dayjs().format("YYYY-MM-DD"),
+    };
+  }, [location.search]);
+
+  const [dateRange, setDateRange] = useState(initialDates);
+
+  useEffect(() => {
+    if (initialDates.start && initialDates.end) {
+      setDateRange(initialDates);
+    }
+  }, [initialDates]);
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'cash' | 'credit'
   const [employeeId, setEmployeeId] = useState("");
   const [employees, setEmployees] = useState([]);

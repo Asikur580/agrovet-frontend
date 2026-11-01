@@ -7,6 +7,7 @@ import React, {
   useContext,
   useCallback,
 } from "react";
+import { Link } from "react-router-dom";
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 
@@ -64,10 +65,17 @@ const LowStockAlerts = ({ setLoader }) => {
           borderBottom: "var(--border)",
         }}
       >
-        <div className="flex items-center justify-center gap-2 py-2">
+        <div className="flex items-center justify-between px-3 py-2">
           <h1 className="">
             Low stock <span>({apiData.length})</span>
           </h1>
+          <Link
+            to="/products?filter=low_stock"
+            className="text-xs text-emerald-700 hover:underline font-semibold"
+            title="View all low stock products"
+          >
+            View all &rarr;
+          </Link>
         </div>
       </div>
 
@@ -81,7 +89,7 @@ const LowStockAlerts = ({ setLoader }) => {
         apiData.map((item, index) => {
           return (
             <div className="reportBoxMini" key={index}>
-              <div className="w-full d-flex items-center justify-between text-dark_3 py-1 px-2 cursor-pointer hover:bg-light_blue hover:rounded-lg">
+              <div className="w-full d-flex items-center justify-between text-dark_3 py-1 px-2 cursor-pointer hover:bg-emerald-50 hover:rounded-lg">
                 <p>Name : {item.product_name} ({item.pack_size})</p>
                 <p className="text-red-500">Stock : {item.current_stock}</p>
               </div>
