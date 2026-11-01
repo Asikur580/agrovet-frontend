@@ -1,0 +1,367 @@
+.TopSellingWidget {
+  background: var(--light-1);
+  border: var(--border);
+  border-radius: 10px;
+  box-shadow: var(--cardShadow);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.TopSellingWidget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: var(--border);
+  margin-bottom: 16px;
+}
+
+.TopSellingWidget-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.TopSellingWidget-icon {
+  color: #f59e0b;
+  font-size: 22px;
+}
+
+.TopSellingWidget-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--dark-1);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.TopSellingWidget-subtitle {
+  font-size: 0.82rem;
+  color: var(--dark-3);
+  margin: 0;
+}
+
+.TopSellingWidget-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.TopSellingWidget-select {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--dark-1);
+  outline: none;
+  cursor: pointer;
+  transition: var(--trans);
+}
+
+.TopSellingWidget-select:focus {
+  border-color: var(--main-clr);
+}
+
+.TopSellingWidget-toggle {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 2px;
+  border: 1px solid #e2e8f0;
+}
+
+.TopSellingWidget-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--dark-3);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--trans);
+}
+
+.TopSellingWidget-toggle-btn.active {
+  background: var(--main-clr);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.TopSellingWidget-viewall-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: #f8fafc;
+  color: var(--main-clr);
+  border: 1px solid var(--main-clr);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--trans);
+}
+
+.TopSellingWidget-viewall-btn:hover {
+  background-color: var(--main-clr);
+  color: #fff;
+}
+
+/* Featured Month Banner */
+.TopSellingWidget-featured {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 16px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.TopSellingWidget-featured::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(59, 88, 152, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.TopSellingWidget-featured-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.TopSellingWidget-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #fef3c7;
+  color: #b45309;
+  width: fit-content;
+  margin-bottom: 8px;
+}
+
+.TopSellingWidget-product-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.TopSellingWidget-pack {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #334155;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.TopSellingWidget-meta {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.TopSellingWidget-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.TopSellingWidget-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.TopSellingWidget-stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.TopSellingWidget-stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.TopSellingWidget-stat-value.primary {
+  color: #2563eb;
+}
+
+.TopSellingWidget-stat-value.success {
+  color: #059669;
+}
+
+.TopSellingWidget-stat-value.amber {
+  color: #d97706;
+}
+
+/* Month Cards Scroller */
+.TopSellingWidget-months-container {
+  margin-top: 10px;
+}
+
+.TopSellingWidget-months-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.TopSellingWidget-months-header h4 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--dark-2);
+  margin: 0;
+}
+
+.TopSellingWidget-months-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.TopSellingWidget-month-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 85px;
+  position: relative;
+}
+
+.TopSellingWidget-month-card:hover {
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+}
+
+.TopSellingWidget-month-card.active {
+  background: #eff6ff;
+  border-color: var(--main-clr);
+  box-shadow: 0 0 0 2px rgba(59, 88, 152, 0.2);
+}
+
+.TopSellingWidget-month-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.TopSellingWidget-month-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.TopSellingWidget-month-badge {
+  font-size: 0.65rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.TopSellingWidget-month-card.active .TopSellingWidget-month-badge {
+  background: var(--main-clr);
+  color: #fff;
+}
+
+.TopSellingWidget-month-prod {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.TopSellingWidget-month-val {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 600;
+}
+
+.TopSellingWidget-month-empty {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin-top: 6px;
+}
+
+/* Modal details */
+.TopSelling-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.TopSelling-modal-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 0.78rem;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.TopSelling-modal-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.82rem;
+  color: #1e293b;
+}
+
+@media screen and (max-width: 900px) {
+  .TopSellingWidget-featured {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .TopSellingWidget-months-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+}
+

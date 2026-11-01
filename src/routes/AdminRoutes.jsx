@@ -40,6 +40,7 @@ import Sales from "../pages/Sale/Sales/Sales";
 import SalesCreate from "../pages/Sale/SalesCreate/SalesCreate";
 import SalesReport from "../pages/Sale/SalesReport/SalesReport";
 import PaymentHistoryReport from "../pages/Sale/PaymentHistoryReport/PaymentHistoryReport";
+import TopSellingProducts from "../pages/Sale/TopSellingProducts/TopSellingProducts";
 import InvoiceMobile from "../pages/Invoices/InvoiceMobile";
 import InvoicePdf from "../pages/Invoices/InvoicePdf";
 import CostCategories from "../pages/CostCategories/CostCategories";
@@ -523,6 +524,18 @@ const AdminRoutes = ({ userRole, isAuthenticated }) => {
                       isAuthenticated={isAuthenticated}
                     >
                       <PaymentHistoryReport setLoader={setLoader} />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/top-selling-products"
+                  element={
+                    <PrivateRoute
+                      roles={["Developer", "Sale-page", "Dashboard-page"]}
+                      userRole={userRole}
+                      isAuthenticated={isAuthenticated}
+                    >
+                      <TopSellingProducts setLoader={setLoader} />
                     </PrivateRoute>
                   }
                 />
