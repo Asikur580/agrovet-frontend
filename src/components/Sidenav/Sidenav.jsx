@@ -61,6 +61,8 @@ const sidenav = (props) => {
       location.pathname == "/sales-report" ||
       location.pathname == "/payment-history-report" ||
       location.pathname == "/top-selling-products" ||
+      location.pathname == "/cash-credit-sales-report" ||
+      location.pathname == "/cash-credit-sales-report" ||
       (Array.isArray(location.pathname.match("/invoice/")) &&
         location.pathname.match("/invoice/")[0] == "/invoice/")
     ) {
@@ -495,6 +497,14 @@ const sidenav = (props) => {
                 <NavLink to="/top-selling-products" onClick={CloseSideNav}>
                   <FaHandPointRight className="icon" size={16} />
                   <p>Top selling products</p>
+                </NavLink>
+              </li>
+            )}
+            {sales == true && (
+              <li>
+                <NavLink to="/cash-credit-sales-report" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Cash & Credit sales</p>
                 </NavLink>
               </li>
             )}

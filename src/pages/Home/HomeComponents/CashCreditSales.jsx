@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa6";
 import React, {
   useState,
   useEffect,
@@ -136,17 +138,40 @@ const CashCreditSales = () => {
           borderBottom: "var(--border)",
         }}
       >
-        <div className="flex items-center justify-center gap-2 py-1">
-          <h1>Cash/Credit wise sales</h1>
-          <SalesSumrDrpDown
-            countedDays={countedDays}
-            setDateRang={setDateRang}
-            printData={printData}
-            spinnerLoader={spinnerLoader}
-            tableHead={tableHead}
-            slug="Cash/Credit wise sales"
-            identifierForPrintModal="printCashCreditSales"
-          />
+        <div className="flex items-center justify-between gap-2 py-1 px-1 flex-wrap">
+          <h1 className="m-0">Cash/Credit wise sales</h1>
+          <div className="flex items-center gap-2">
+            <SalesSumrDrpDown
+              countedDays={countedDays}
+              setDateRang={setDateRang}
+              printData={printData}
+              spinnerLoader={spinnerLoader}
+              tableHead={tableHead}
+              slug="Cash/Credit wise sales"
+              identifierForPrintModal="printCashCreditSales"
+            />
+            <Link
+              to="/cash-credit-sales-report"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "0.78rem",
+                fontWeight: "600",
+                color: "var(--main-clr, #2563eb)",
+                backgroundColor: "#eff6ff",
+                border: "1px solid #bfdbfe",
+                padding: "3px 8px",
+                borderRadius: "6px",
+                textDecoration: "none",
+                transition: "all 0.2s"
+              }}
+              title="View full cash & credit sales report"
+            >
+              <span>Full Report</span>
+              <FaArrowRight size={10} />
+            </Link>
+          </div>
         </div>
       </div>
 

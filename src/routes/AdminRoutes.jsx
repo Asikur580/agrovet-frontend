@@ -41,6 +41,7 @@ import SalesCreate from "../pages/Sale/SalesCreate/SalesCreate";
 import SalesReport from "../pages/Sale/SalesReport/SalesReport";
 import PaymentHistoryReport from "../pages/Sale/PaymentHistoryReport/PaymentHistoryReport";
 import TopSellingProducts from "../pages/Sale/TopSellingProducts/TopSellingProducts";
+import CashCreditSalesReport from "../pages/Sale/CashCreditSalesReport/CashCreditSalesReport";
 import InvoiceMobile from "../pages/Invoices/InvoiceMobile";
 import InvoicePdf from "../pages/Invoices/InvoicePdf";
 import CostCategories from "../pages/CostCategories/CostCategories";
@@ -536,6 +537,18 @@ const AdminRoutes = ({ userRole, isAuthenticated }) => {
                       isAuthenticated={isAuthenticated}
                     >
                       <TopSellingProducts setLoader={setLoader} />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/cash-credit-sales-report"
+                  element={
+                    <PrivateRoute
+                      roles={["Developer", "Sale-page", "Dashboard-page"]}
+                      userRole={userRole}
+                      isAuthenticated={isAuthenticated}
+                    >
+                      <CashCreditSalesReport setLoader={setLoader} />
                     </PrivateRoute>
                   }
                 />
