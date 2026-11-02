@@ -31,6 +31,22 @@ const SaleCartModal = lazy(() =>
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { DataContext } from "../../../context/DataContext";
 import { TableStyles, rowPerPage } from "../../../assets/js/Utility";
+import dayjs from "dayjs";
+
+const parseStandardDate = (dateStr) => {
+  if (!dateStr) return "";
+  const str = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return str.slice(0, 10);
+  }
+  const parts = str.split(/[-/]/);
+  if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+    return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+  }
+  const d = dayjs(str);
+  return d.isValid() ? d.format("YYYY-MM-DD") : str.slice(0, 10);
+};
+
 
 const OrdersTable = (props) => {
   const {
@@ -42,6 +58,10 @@ const OrdersTable = (props) => {
     setLoader,
     searchData,
     selectedEmpID,
+    dateVal,
+    selectedStatus = "all",
+    onOrdersLoaded,
+    allOrders: propOrders,
   } = props;
   const customStyles = TableStyles();
   const { setEmployeeDataContext } = useContext(DataContext);
@@ -59,20 +79,13 @@ const OrdersTable = (props) => {
   const getApiData = async () => {
     try {
       await ApiConfig.get("/orders", { headers }).then((response) => {
-        const datas = response.data.data;
+        const datas = response.data.data || [];
         setAllOrders(datas);
-        //=>>> Filter order for selected employee
-        if (selectedEmpID != "0") {
-          const filtered = datas.filter(
-            (item) => item.employee_id == selectedEmpID
-          );
-          setApiData(filtered);
-          setFilteredApiData(filtered);
-        } else {
-          setApiData(datas);
-          setFilteredApiData(datas);
-
+        if (onOrdersLoaded) {
+          onOrdersLoaded(datas);
         }
+        setApiData(datas);
+        setFilteredApiData(datas);
         //=>>> Filter order for selected employee
       });
     } catch (error) {
@@ -81,8 +94,12 @@ const OrdersTable = (props) => {
     }
   };
   useEffect(() => {
-    getApiData();
-  }, [relodeTable]);
+    if (propOrders && propOrders.length) {
+      setAllOrders(propOrders);
+    } else if (headers && headers.Authorization) {
+      getApiData();
+    }
+  }, [propOrders, headers, relodeTable]);
 
   //=>>> Seperation employee from order
   useEffect(() => {
@@ -101,24 +118,56 @@ const OrdersTable = (props) => {
   }, [allOrders]);
   //=>>> Seperation employee from order
 
-  //=>>> Filter order for selected employee
+  //=>>> Filter order for selected employee, date range, and status
   useEffect(() => {
-    if (selectedEmpID != "0") {
-      const filtered = allOrders.filter(
-        (item) => item.employee_id == selectedEmpID
+    let filtered = allOrders;
+
+    // Filter by employee
+    if (selectedEmpID && selectedEmpID != "0") {
+      filtered = filtered.filter(
+        (item) => String(item.employee_id) === String(selectedEmpID)
       );
-      setApiData(filtered);
-      setFilteredApiData(filtered);
-    } else {
-      setApiData(allOrders);
-      setFilteredApiData(allOrders);
     }
-    // console.log(selectedEmpID);
-  }, [selectedEmpID, allOrders]);
-  //=>>> Filter order for selected employee
+
+    // Filter by date range
+    if (dateVal && dateVal.start && dateVal.end) {
+      filtered = filtered.filter((item) => {
+        const d = parseStandardDate(item.order_date || item.created_at);
+        return d >= dateVal.start && d <= dateVal.end;
+      });
+    }
+
+    // Filter by status (pending, active, inactive)
+    if (selectedStatus && selectedStatus !== "all") {
+      filtered = filtered.filter(
+        (item) => String(item.status || "").toLowerCase() === selectedStatus.toLowerCase()
+      );
+    }
+
+    setApiData(filtered);
+    setFilteredApiData(filtered);
+  }, [selectedEmpID, dateVal, selectedStatus, allOrders]);
+  //=>>> Filter order for selected employee, date range, and status
+
+  const canManageOrderStatus = useMemo(() => {
+    if (Array.isArray(userDesignationSlug)) {
+      return userDesignationSlug.some((s) =>
+        ["manager", "admin", "super_admin", "developer", "rsm"].includes(
+          String(s).toLowerCase()
+        )
+      );
+    }
+    return [
+      "manager",
+      "admin",
+      "super_admin",
+      "developer",
+      "rsm",
+    ].includes(String(userDesignationSlug).toLowerCase());
+  }, [userDesignationSlug]);
 
   const approveOrder = async (idParam, statusParam) => {
-    if (userDesignationSlug == "manager" || userDesignationSlug == "admin") {
+    if (canManageOrderStatus) {
       const payload = {};
       await ApiConfig.post(
         `orders/${idParam}/status?status=${
@@ -215,11 +264,7 @@ const OrdersTable = (props) => {
         <div>
           <button
             onClick={() => approveOrder(row.id, row.status)}
-            disabled={
-              userDesignationSlug == "manager" || userDesignationSlug == "admin"
-                ? false
-                : true
-            }
+            disabled={!canManageOrderStatus}
             style={{
               backgroundColor:
                 row.status === "active"
@@ -361,10 +406,18 @@ const OrdersTable = (props) => {
 
   //=>>> Searching function
   useEffect(() => {
-    const result = apiData.filter((filteredApiData) => {
-      return (filteredApiData.customer_name || "")
-        .toLowerCase()
-        .match(searchData.toLowerCase());
+    if (!searchData || !searchData.trim()) {
+      setFilteredApiData(apiData);
+      return;
+    }
+    const q = searchData.toLowerCase().trim();
+    const result = apiData.filter((item) => {
+      const matchCustomer = (item.customer_name || "").toLowerCase().includes(q);
+      const matchEmployee = (item.employee_name || "").toLowerCase().includes(q);
+      const matchProduct = Array.isArray(item.products) && item.products.some((p) =>
+        (p.product_name || "").toLowerCase().includes(q)
+      );
+      return matchCustomer || matchEmployee || matchProduct;
     });
     setFilteredApiData(result);
   }, [searchData, apiData]);

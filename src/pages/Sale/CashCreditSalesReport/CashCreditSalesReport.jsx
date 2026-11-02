@@ -573,7 +573,7 @@ const CashCreditSalesReport = ({ setLoader }) => {
                 <FaMoneyBillWave size={16} />
               </div>
             </div>
-            <div className="CashCreditReport-kpi-value text-blue-900">
+            <div className="CashCreditReport-kpi-value text-[#3b5898]">
               {formatCurrency(summary?.total_sales)}
             </div>
             <div className="CashCreditReport-kpi-footer">
@@ -982,11 +982,11 @@ const CashCreditSalesReport = ({ setLoader }) => {
                     </td>
                   </tr>
                 )}
-                <tr className="bg-blue-50 font-bold text-slate-900">
+                <tr className="bg-[#edf2fc] font-bold text-slate-900">
                   <td colSpan={6} style={{ textAlign: "right" }}>
                     Grand Total:
                   </td>
-                  <td style={{ textAlign: "right" }} className="text-blue-900">
+                  <td style={{ textAlign: "right" }} className="text-[#3b5898]">
                     {formatCurrency(selectedInvoice.grand_total)}
                   </td>
                 </tr>

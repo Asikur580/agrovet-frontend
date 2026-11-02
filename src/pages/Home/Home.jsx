@@ -115,7 +115,7 @@ const Home = ({ setLoader }) => {
             </div>
           ) : (
             <div className="Home-chart-box p-6 flex flex-col justify-center items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+              <div className="w-12 h-12 rounded-full bg-[#edf2fc] text-[#3b5898] flex items-center justify-center mb-3">
                 <FaMoneyBillTrendUp size={22} />
               </div>
               <h3 className="text-base font-bold text-slate-800 m-0">Territory Sales Overview</h3>
@@ -124,7 +124,7 @@ const Home = ({ setLoader }) => {
               </p>
               <Link
                 to="/sales-report"
-                className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition"
+                className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-[#3b5898] bg-[#edf2fc] hover:bg-[#dfe8f8] px-3 py-1.5 rounded-lg transition"
               >
                 <span>View Full Territory Sales Report</span>
               </Link>

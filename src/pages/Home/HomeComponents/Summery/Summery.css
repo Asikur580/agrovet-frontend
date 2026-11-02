@@ -1,4 +1,4 @@
-/* Summery.css - Option A: Unified Agrovet Emerald & Slate Palette */
+/* Summery.css - Primary Color: #3b5898 (Table Head / System Brand Color) */
 
 .SummeryWrapper {
   display: flex;
@@ -30,25 +30,25 @@
 
 .SummeryCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 6px 14px rgba(59, 88, 152, 0.1);
   border-color: #cbd5e1;
 }
 
-/* Unified Option A Borders: Emerald for Sales/Orders, Slate for Due, Amber only for Low Stock */
+/* Borders: #3b5898 for Sales & Orders, Slate for Due, Amber for Low Stock Alert */
 .SummeryCard.card-today {
-  border-left: 4px solid #059669;
+  border-left: 4px solid var(--main-clr, #3b5898);
 }
 .SummeryCard.card-month {
-  border-left: 4px solid #059669;
+  border-left: 4px solid var(--main-clr, #3b5898);
 }
 .SummeryCard.card-due {
   border-left: 4px solid #334155;
 }
 .SummeryCard.card-orders {
-  border-left: 4px solid #059669;
+  border-left: 4px solid var(--main-clr, #3b5898);
 }
 .SummeryCard.card-stock {
-  border-left: 4px solid #d97706; /* Functional status alert */
+  border-left: 4px solid #d97706; /* Functional warning alert */
 }
 
 .SummeryCardHeader {
@@ -66,7 +66,7 @@
   color: #64748b;
 }
 
-/* Unified Tonal Icon Wrappers */
+/* Tonal Icon Wrappers */
 .SummeryIconWrap {
   width: 34px;
   height: 34px;
@@ -77,27 +77,27 @@
 }
 
 .SummeryIconWrap.icon-today {
-  background: #ecfdf5;
-  color: #059669;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 .SummeryIconWrap.icon-month {
-  background: #ecfdf5;
-  color: #059669;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 .SummeryIconWrap.icon-due {
   background: #f1f5f9;
   color: #334155;
 }
 .SummeryIconWrap.icon-orders {
-  background: #ecfdf5;
-  color: #059669;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 .SummeryIconWrap.icon-stock {
   background: #fffbeb;
   color: #d97706;
 }
 
-/* Clear, High-Contrast Typography */
+/* Typography */
 .SummeryValue {
   font-size: 1.35rem;
   font-weight: 800;
@@ -111,10 +111,10 @@
 }
 
 .SummeryValue.value-today {
-  color: #065f46;
+  color: #1e2d4f;
 }
 .SummeryValue.value-month {
-  color: #065f46;
+  color: #1e2d4f;
 }
 .SummeryValue.value-due {
   color: #0f172a;
@@ -140,7 +140,7 @@
   opacity: 0;
   transition: all 0.2s ease;
   transform: translateX(-3px);
-  color: #059669;
+  color: var(--main-clr, #3b5898);
 }
 
 .SummeryCard:hover .SummeryFooter .arrow {
@@ -188,9 +188,9 @@
 }
 
 .SummeryPill:hover {
-  border-color: #059669;
-  background: #ecfdf5;
-  color: #047857;
+  border-color: var(--main-clr, #3b5898);
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
   transform: translateY(-1px);
 }
 

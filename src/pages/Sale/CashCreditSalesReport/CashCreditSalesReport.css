@@ -15,12 +15,12 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  color: #2563eb;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 2px 4px rgba(59, 88, 152, 0.15);
 }
 
 /* Sticky Filter Bar */
@@ -78,7 +78,7 @@
 }
 
 .CashCreditReport-select:focus {
-  border-color: #2563eb;
+  border-color: var(--main-clr, #3b5898);
 }
 
 .CashCreditReport-search-box {
@@ -107,8 +107,8 @@
 }
 
 .CashCreditReport-search-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+  border-color: var(--main-clr, #3b5898);
+  box-shadow: 0 0 0 2px rgba(59, 88, 152, 0.15);
 }
 
 .CashCreditReport-btn-reset {
@@ -145,19 +145,20 @@
   gap: 6px;
   height: 34px;
   padding: 0 14px;
-  background: #059669;
+  background: var(--main-clr, #3b5898);
   color: #ffffff;
-  border: none;
+  border: 1px solid var(--main-clr, #3b5898);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.2);
+  box-shadow: 0 1px 2px rgba(59, 88, 152, 0.2);
 }
 
 .CashCreditReport-btn-excel:hover:not(:disabled) {
-  background: #047857;
+  background: #2d4373;
+  border-color: #2d4373;
   transform: translateY(-1px);
 }
 
@@ -172,19 +173,19 @@
   gap: 6px;
   height: 34px;
   padding: 0 14px;
-  background: #2563eb;
-  color: #ffffff;
-  border: none;
+  background: #ffffff;
+  color: var(--main-clr, #3b5898);
+  border: 1px solid var(--main-clr, #3b5898);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
 }
 
 .CashCreditReport-btn-print:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--main-clr, #3b5898);
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
@@ -218,7 +219,7 @@
 }
 
 .CashCreditReport-kpi-card.card-total {
-  border-left: 4px solid #2563eb;
+  border-left: 4px solid var(--main-clr, #3b5898);
 }
 
 .CashCreditReport-kpi-card.card-cash {
@@ -230,7 +231,7 @@
 }
 
 .CashCreditReport-kpi-card.card-ratio {
-  border-left: 4px solid #6366f1;
+  border-left: 4px solid var(--main-clr, #3b5898);
 }
 
 .CashCreditReport-kpi-header {
@@ -258,8 +259,8 @@
 }
 
 .CashCreditReport-kpi-icon-wrap.icon-total {
-  background: #eff6ff;
-  color: #2563eb;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .CashCreditReport-kpi-icon-wrap.icon-cash {
@@ -377,7 +378,7 @@
 
 .CashCreditReport-tab.active {
   background: #ffffff;
-  color: #0f172a;
+  color: var(--main-clr, #3b5898);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -399,8 +400,8 @@
 }
 
 .CashCreditReport-tab.active .CashCreditReport-tab-badge {
-  background: #eff6ff;
-  color: #2563eb;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .CashCreditReport-tab-badge.badge-cash {
@@ -439,12 +440,12 @@
 }
 
 .CashCreditReport-table th {
-  background: #f8fafc;
-  color: #475569;
+  background: var(--main-clr, #3b5898);
+  color: #ffffff;
   font-weight: 700;
   text-align: left;
   padding: 10px 12px;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #2d4373;
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -464,7 +465,7 @@
 .CashCreditReport-inv-link {
   background: transparent;
   border: none;
-  color: #2563eb;
+  color: var(--main-clr, #3b5898);
   font-weight: 700;
   font-size: 0.82rem;
   cursor: pointer;
@@ -474,7 +475,7 @@
 }
 
 .CashCreditReport-inv-link:hover {
-  color: #1d4ed8;
+  color: #2d4373;
 }
 
 /* Badges */
@@ -506,9 +507,9 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
+  border: 1px solid #c5d3ea;
   padding: 3px 8px;
   border-radius: 6px;
   font-size: 0.74rem;
@@ -518,8 +519,9 @@
 }
 
 .CashCreditReport-btn-view:hover {
-  background: #2563eb;
+  background: var(--main-clr, #3b5898);
   color: #ffffff;
+  border-color: var(--main-clr, #3b5898);
 }
 
 /* Footer Total Row */
@@ -559,11 +561,11 @@
 }
 
 .CashCreditReport-modal-table th {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--main-clr, #3b5898);
+  color: #ffffff;
   padding: 8px 10px;
   font-weight: 700;
-  border-bottom: 1px solid #cbd5e1;
+  border-bottom: 1px solid #2d4373;
   text-align: left;
 }
 

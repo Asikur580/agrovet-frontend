@@ -107,3 +107,38 @@
     flex-wrap: wrap;
   }
 }
+
+
+/* ===== Common Report Ant Design Table Header styling (Matches Sales Table) ===== */
+.report-antd-table .ant-table-thead > tr > th,
+.report-antd-table .ant-table-thead th {
+  background: var(--main-clr, #3b5898) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid #2d4373 !important;
+  white-space: nowrap !important;
+}
+
+.report-antd-table .ant-table-thead > tr > th::before {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.report-antd-table .ant-pagination .ant-pagination-item-active,
+.ant-pagination .ant-pagination-item-active {
+  border-color: var(--main-clr, #3b5898) !important;
+}
+
+.report-antd-table .ant-pagination .ant-pagination-item-active a,
+.ant-pagination .ant-pagination-item-active a {
+  color: var(--main-clr, #3b5898) !important;
+}
+
+.report-antd-table .ant-pagination .ant-pagination-item:hover,
+.ant-pagination .ant-pagination-item:hover {
+  border-color: var(--main-clr, #3b5898) !important;
+}
+
+.report-antd-table .ant-pagination .ant-pagination-item:hover a,
+.ant-pagination .ant-pagination-item:hover a {
+  color: var(--main-clr, #3b5898) !important;
+}

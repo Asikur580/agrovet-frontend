@@ -92,9 +92,9 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: #059669;
+  background-color: var(--main-clr, #3b5898);
   color: #fff;
-  border: none;
+  border: 1px solid var(--main-clr, #3b5898);
   border-radius: 6px;
   font-size: 0.88rem;
   font-weight: 600;
@@ -103,7 +103,8 @@
 }
 
 .TopSellingPage-btn-excel:hover {
-  background-color: #047857;
+  background-color: #2d4373;
+  border-color: #2d4373;
 }
 
 .TopSellingPage-btn-print {
@@ -160,12 +161,19 @@
 .TopSellingPage-kpi-card {
   background: var(--light-1);
   border: var(--border);
+  border-left: 4px solid var(--main-clr, #3b5898);
   border-radius: 10px;
   padding: 16px 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.TopSellingPage-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
 }
 
 .TopSellingPage-kpi-icon {
@@ -185,18 +193,18 @@
 }
 
 .TopSellingPage-kpi-icon.boxes {
-  background: #dbeafe;
-  color: #2563eb;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .TopSellingPage-kpi-icon.revenue {
-  background: #d1fae5;
-  color: #059669;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .TopSellingPage-kpi-icon.orders {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .TopSellingPage-kpi-content h3 {
@@ -263,7 +271,7 @@
 
 .TopSellingPage-month-card.has-data {
   background: #fff;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--main-clr, #3b5898);
 }
 
 .TopSellingPage-month-card-header {
@@ -327,11 +335,11 @@
 }
 
 .TopSellingPage-detail-val.blue {
-  color: #2563eb;
+  color: var(--main-clr, #3b5898);
 }
 
 .TopSellingPage-detail-val.green {
-  color: #059669;
+  color: var(--main-clr, #3b5898);
 }
 
 /* Table Section */
@@ -368,12 +376,12 @@
 }
 
 .TopSellingPage-table th {
-  background-color: #f1f5f9;
-  color: #334155;
+  background-color: var(--main-clr, #3b5898);
+  color: #ffffff;
   font-weight: 700;
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 2px solid #cbd5e1;
+  border-bottom: 2px solid #2d4373;
   white-space: nowrap;
 }
 

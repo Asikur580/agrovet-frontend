@@ -21,6 +21,7 @@ import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 
 // Styles
+import "../../../assets/css/ReportCommon.css";
 import "./TopSellingProducts.css";
 
 const monthNames = [
@@ -532,34 +533,18 @@ const TopSellingProducts = ({ setLoader }) => {
       <div className="TopSellingPage content animated fadeInDown">
         {/* Page Header */}
         <div className="TopSellingPage-header">
-          <div className="TopSellingPage-title-area">
-            <h1>
-              <FaTrophy color="#f59e0b" /> Top Selling Products Report
-            </h1>
-            <p>
-              Comprehensive monthly sales performance and top selling product rankings
-            </p>
-          </div>
-
-          <div className="TopSellingPage-actions">
-            <button
-              type="button"
-              className="TopSellingPage-btn-excel"
-              onClick={handleExportExcel}
-              title="Export report to Excel"
-            >
-              <FaFileExcel size={15} />
-              Export Excel
-            </button>
-            <button
-              type="button"
-              className="TopSellingPage-btn-print"
-              onClick={handlePrint}
-              title="Print report"
-            >
-              <FaPrint size={15} />
-              Print
-            </button>
+          <div className="flex items-center gap-3">
+            <div className="ReportPage-header-icon">
+              <FaTrophy size={22} />
+            </div>
+            <div>
+              <h1 className="page-title text-xl font-bold text-slate-800 m-0">
+                Top Selling Products Report
+              </h1>
+              <p className="text-xs text-slate-500 m-0 mt-0.5">
+                Comprehensive monthly sales performance and top selling product rankings
+              </p>
+            </div>
           </div>
         </div>
 
@@ -646,9 +631,30 @@ const TopSellingProducts = ({ setLoader }) => {
                 title="Reset all filters to default"
               >
                 <FaArrowRotateLeft size={13} />
-                <span>Reset Filter</span>
+                <span>Reset</span>
               </button>
             </div>
+          </div>
+
+          <div className="TopSellingPage-actions">
+            <button
+              type="button"
+              className="TopSellingPage-btn-excel"
+              onClick={handleExportExcel}
+              title="Export report to Excel"
+            >
+              <FaFileExcel size={14} />
+              Export Excel
+            </button>
+            <button
+              type="button"
+              className="TopSellingPage-btn-print"
+              onClick={handlePrint}
+              title="Print report"
+            >
+              <FaPrint size={14} />
+              Print
+            </button>
           </div>
         </div>
 
