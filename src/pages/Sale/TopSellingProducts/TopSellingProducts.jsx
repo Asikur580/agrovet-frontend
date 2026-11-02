@@ -674,7 +674,7 @@ const TopSellingProducts = ({ setLoader }) => {
 
             {/* Reset Filter Button */}
             <div className="TopSellingPage-filter-item">
-              <label style={{ visibility: "hidden" }}>Reset</label>
+              <label className="hidden-reset-label" style={{ visibility: "hidden" }}>Reset</label>
               <button
                 type="button"
                 className="TopSellingPage-btn-reset"
