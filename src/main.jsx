@@ -3,6 +3,22 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./assets/css/App.css";
 
+// Automatically unregister stale service workers and clear cache in development mode
+if (import.meta.env.DEV && "serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister();
+    }
+  });
+  if ("caches" in window) {
+    caches.keys().then((names) => {
+      for (const name of names) {
+        caches.delete(name);
+      }
+    });
+  }
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />
