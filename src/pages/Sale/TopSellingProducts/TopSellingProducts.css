@@ -72,6 +72,7 @@
   font-weight: 500;
   color: var(--dark-1);
   min-width: 140px;
+  height: 35px;
   outline: none;
   cursor: pointer;
   transition: var(--trans);
@@ -79,6 +80,18 @@
 
 .TopSellingPage-select:focus {
   border-color: var(--main-clr);
+}
+
+.TopSellingPage .ReportPage-rangepicker {
+  height: 35px;
+  border-radius: 6px;
+  border-color: #cbd5e1;
+  min-width: 230px;
+}
+
+.TopSellingPage .ReportPage-rangepicker:hover,
+.TopSellingPage .ReportPage-rangepicker.ant-picker-focused {
+  border-color: var(--main-clr, #3b5898);
 }
 
 .TopSellingPage-actions {
@@ -557,7 +570,14 @@
 
   .TopSellingPage-print-container {
     display: block !important;
+    visibility: visible !important;
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 100% !important;
+  }
+  .TopSellingPage-print-container * {
+    visibility: visible !important;
   }
 
   .content_parent,

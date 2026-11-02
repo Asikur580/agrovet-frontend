@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useContext, useMemo, useCallback, useRef } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
-import { Pagination, Spin } from "antd";
-import { useReactToPrint } from "react-to-print";
+import { Pagination, Spin, DatePicker } from "antd";
+import dayjs from "dayjs";
+
 import {
   FaCrown,
   FaTrophy,
@@ -14,6 +15,7 @@ import {
   FaPrint,
   FaFilter,
   FaArrowRotateLeft,
+  FaCalendarDays,
 } from "react-icons/fa6";
 
 // Utilities
@@ -23,6 +25,8 @@ import { AuthContext } from "../../../context/AuthContext";
 // Styles
 import "../../../assets/css/ReportCommon.css";
 import "./TopSellingProducts.css";
+
+const { RangePicker } = DatePicker;
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
@@ -34,6 +38,7 @@ const TopSellingProducts = ({ setLoader }) => {
   const currentRealYear = new Date().getFullYear();
   const currentRealMonth = new Date().getMonth() + 1;
 
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [selectedYear, setSelectedYear] = useState(currentRealYear);
   const [selectedMonth, setSelectedMonth] = useState(String(currentRealMonth));
   const [sortBy, setSortBy] = useState("quantity"); // 'quantity' | 'amount'
@@ -73,7 +78,7 @@ const TopSellingProducts = ({ setLoader }) => {
   // Reset pagination to page 1 whenever any filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedYear, selectedMonth, sortBy, employeeId, searchTerm]);
+  }, [dateRange, selectedYear, selectedMonth, sortBy, employeeId, searchTerm]);
 
   // Fetch report data
   const fetchReport = useCallback(async () => {
@@ -81,9 +86,14 @@ const TopSellingProducts = ({ setLoader }) => {
       setLoading(true);
       if (setLoader) setLoader(true);
 
-      let url = `/top-selling-products?year=${selectedYear}&sort_by=${sortBy}&limit=10`;
-      if (selectedMonth) {
-        url += `&month=${selectedMonth}`;
+      let url = `/top-selling-products?sort_by=${sortBy}&limit=10`;
+      if (dateRange.start && dateRange.end) {
+        url += `&from_date=${dateRange.start}&to_date=${dateRange.end}`;
+      } else {
+        url += `&year=${selectedYear}`;
+        if (selectedMonth) {
+          url += `&month=${selectedMonth}`;
+        }
       }
       if (employeeId) {
         url += `&employee_id=${employeeId}`;
@@ -99,28 +109,44 @@ const TopSellingProducts = ({ setLoader }) => {
       setLoading(false);
       if (setLoader) setLoader(false);
     }
-  }, [headers, selectedYear, selectedMonth, sortBy, employeeId, setLoader]);
+  }, [headers, dateRange, selectedYear, selectedMonth, sortBy, employeeId, setLoader]);
 
   useEffect(() => {
     fetchReport();
   }, [fetchReport]);
 
+  const hasDateRange = Boolean(dateRange.start && dateRange.end);
+
+  const periodLabel = useMemo(() => {
+    if (hasDateRange) {
+      return `${dateRange.start} to ${dateRange.end}`;
+    }
+    if (selectedMonth) {
+      return `${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`;
+    }
+    return `Year ${selectedYear}`;
+  }, [hasDateRange, dateRange.start, dateRange.end, selectedMonth, selectedYear]);
+
   // Flatten products for the table
   const tableRows = useMemo(() => {
-    if (!apiData.monthly_data) return [];
-    const rows = [];
+    let rows = [];
 
-    apiData.monthly_data.forEach((monthItem) => {
-      if (monthItem.has_sales && monthItem.all_products) {
-        monthItem.all_products.forEach((prod) => {
-          rows.push({
-            ...prod,
-            month_name: monthItem.month_name,
-            month_number: monthItem.month_number,
+    // If custom date range is active, use all_products directly from apiData
+    if (hasDateRange) {
+      rows = apiData.all_products || apiData.monthly_data?.[0]?.all_products || [];
+    } else if (apiData.monthly_data) {
+      apiData.monthly_data.forEach((monthItem) => {
+        if (monthItem.has_sales && monthItem.all_products) {
+          monthItem.all_products.forEach((prod) => {
+            rows.push({
+              ...prod,
+              month_name: monthItem.month_name,
+              month_number: monthItem.month_number,
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
 
     if (!searchTerm.trim()) return rows;
 
@@ -132,7 +158,7 @@ const TopSellingProducts = ({ setLoader }) => {
         r.brand_name?.toLowerCase().includes(lower) ||
         r.month_name?.toLowerCase().includes(lower)
     );
-  }, [apiData.monthly_data, searchTerm]);
+  }, [apiData, hasDateRange, searchTerm]);
 
   // Filtered Totals for footer
   const filteredTotals = useMemo(() => {
@@ -168,6 +194,16 @@ const TopSellingProducts = ({ setLoader }) => {
 
   // Overall statistics for KPI cards
   const kpiStats = useMemo(() => {
+    if (hasDateRange) {
+      const topProd = apiData.top_product || apiData.all_products?.[0] || null;
+      return {
+        overallTop: topProd,
+        totalQty: Number(apiData.total_quantity || 0),
+        totalAmount: Number(apiData.total_sales || 0),
+        totalInvoices: Number(apiData.total_invoices || 0),
+      };
+    }
+
     const monthTop = apiData.monthly_data?.[0]?.top_product || null;
     const overallTop = selectedMonth
       ? monthTop
@@ -188,7 +224,7 @@ const TopSellingProducts = ({ setLoader }) => {
       totalAmount,
       totalInvoices,
     };
-  }, [apiData, selectedMonth]);
+  }, [apiData, hasDateRange, selectedMonth]);
 
   // Format helpers
   const formatNumber = (num) => Number(num || 0).toLocaleString("en-IN");
@@ -222,20 +258,24 @@ const TopSellingProducts = ({ setLoader }) => {
         minute: "2-digit",
       });
 
+      const periodText = hasDateRange
+        ? `Date Range: ${dateRange.start} to ${dateRange.end}`
+        : `Year: ${selectedYear}   |   Month: ${
+            selectedMonth ? monthNames[Number(selectedMonth) - 1] : "All Months"
+          }`;
+
       // Build Array of Arrays
       const aoa = [
         ["RADIANT AGROVET"],
         ["TOP SELLING PRODUCTS REPORT"],
         [
-          `Year: ${selectedYear}   |   Month: ${
-            selectedMonth ? monthNames[Number(selectedMonth) - 1] : "All Months"
-          }   |   Rank Criteria: ${
+          `${periodText}   |   Rank Criteria: ${
             sortBy === "amount" ? "Highest Revenue" : "Most Quantity Sold"
           }   |   Employee: ${employeeName}   |   Exported: ${formattedDate}`,
         ],
         [],
         [
-          "Month",
+          hasDateRange ? "Period" : "Month",
           "Rank",
           "Product Name",
           "Pack Size",
@@ -476,7 +516,9 @@ const TopSellingProducts = ({ setLoader }) => {
       XLSX.utils.book_append_sheet(workbook, ws, "Top Selling Products");
 
       // File name with genuine .xlsx extension
-      const fileName = `top_selling_products_${selectedYear}_${sortBy}.xlsx`;
+      const fileName = hasDateRange
+        ? `top_selling_products_${dateRange.start}_to_${dateRange.end}_${sortBy}.xlsx`
+        : `top_selling_products_${selectedYear}_${sortBy}.xlsx`;
       XLSX.writeFile(workbook, fileName);
     } catch (err) {
       console.error("Error exporting to Excel:", err);
@@ -484,37 +526,12 @@ const TopSellingProducts = ({ setLoader }) => {
     }
   };
 
-  const printComponentRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({
-    contentRef: printComponentRef,
-    documentTitle: `Top_Selling_Products_${selectedYear}`,
-    pageStyle: `
-      @page {
-        size: A4 landscape;
-        margin: 8mm 6mm;
-      }
-      @media all {
-        .TopSellingPage-print-container {
-          display: block !important;
-        }
-      }
-      tfoot {
-        display: table-row-group !important;
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-      }
-    `,
-  });
-
   const handlePrint = () => {
-    if (reactToPrintFn) {
-      reactToPrintFn();
-    } else {
-      window.print();
-    }
+    window.print();
   };
 
   const handleResetFilters = () => {
+    setDateRange({ start: "", end: "" });
     setSelectedYear(currentRealYear);
     setSelectedMonth(String(currentRealMonth));
     setSortBy("quantity");
@@ -556,20 +573,28 @@ const TopSellingProducts = ({ setLoader }) => {
               <span>Filters:</span>
             </div>
 
-            {/* Year */}
+            {/* Date Range */}
             <div className="TopSellingPage-filter-item">
-              <label>Year</label>
-              <select
-                className="TopSellingPage-select"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(Number(e.target.value))}
-              >
-                {apiData.available_years?.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
+              <label>Date Range</label>
+              <RangePicker
+                format="YYYY-MM-DD"
+                value={
+                  dateRange.start && dateRange.end
+                    ? [dayjs(dateRange.start), dayjs(dateRange.end)]
+                    : null
+                }
+                onChange={(dates, dateStrings) => {
+                  if (!dates) {
+                    setDateRange({ start: "", end: "" });
+                  } else {
+                    setDateRange({ start: dateStrings[0], end: dateStrings[1] });
+                  }
+                }}
+                inputReadOnly
+                className="ReportPage-rangepicker"
+                placeholder={["From Date", "To Date"]}
+                allowClear
+              />
             </div>
 
             {/* Month */}
@@ -577,13 +602,39 @@ const TopSellingProducts = ({ setLoader }) => {
               <label>Month</label>
               <select
                 className="TopSellingPage-select"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
+                value={hasDateRange ? "" : selectedMonth}
+                onChange={(e) => {
+                  setSelectedMonth(e.target.value);
+                  if (dateRange.start) {
+                    setDateRange({ start: "", end: "" });
+                  }
+                }}
               >
-                <option value="">All Months</option>
+                <option value="">{hasDateRange ? "Custom Range Active" : "All Months"}</option>
                 {monthNames.map((m, idx) => (
                   <option key={idx + 1} value={String(idx + 1)}>
                     {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Year */}
+            <div className="TopSellingPage-filter-item">
+              <label>Year</label>
+              <select
+                className="TopSellingPage-select"
+                value={selectedYear}
+                onChange={(e) => {
+                  setSelectedYear(Number(e.target.value));
+                  if (dateRange.start) {
+                    setDateRange({ start: "", end: "" });
+                  }
+                }}
+              >
+                {apiData.available_years?.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
                   </option>
                 ))}
               </select>
@@ -671,11 +722,7 @@ const TopSellingProducts = ({ setLoader }) => {
                   <FaCrown />
                 </div>
                 <div className="TopSellingPage-kpi-content">
-                  <h3>
-                    {selectedMonth
-                      ? `Top Seller of ${monthNames[Number(selectedMonth) - 1]}`
-                      : `Top Seller of ${selectedYear}`}
-                  </h3>
+                  <h3>Top Seller ({periodLabel})</h3>
                   <p>{kpiStats.overallTop?.product_name || "N/A"}</p>
                   <span className="kpi-sub">
                     {kpiStats.overallTop
@@ -719,75 +766,143 @@ const TopSellingProducts = ({ setLoader }) => {
               </div>
             </div>
 
-            {/* Monthly Best Sellers */}
-            <div className="TopSellingPage-section">
-              <h3 className="TopSellingPage-section-title">
-                <FaMedal color="#3b5898" />
-                {selectedMonth
-                  ? `Top Selling Product of ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`
-                  : `Monthly #1 Best Selling Products (${selectedYear})`}
-              </h3>
+            {/* Monthly Best Sellers / Period Top Sellers */}
+            {hasDateRange ? (
+              <div className="TopSellingPage-section">
+                <h3 className="TopSellingPage-section-title">
+                  <FaMedal color="#3b5898" />
+                  Top Best Selling Products ({periodLabel})
+                </h3>
 
-              <div className="TopSellingPage-months-grid">
-                {apiData.monthly_data?.map((m) => {
-                  const topProd = m.top_product;
-
-                  return (
+                <div className="TopSellingPage-months-grid">
+                  {(apiData.top_products || []).slice(0, 6).map((prod) => (
                     <div
-                      key={m.month_key}
-                      className={`TopSellingPage-month-card ${
-                        m.has_sales ? "has-data" : ""
-                      }`}
+                      key={`top-${prod.product_id}`}
+                      className="TopSellingPage-month-card has-data"
                     >
                       <div className="TopSellingPage-month-card-header">
                         <span className="TopSellingPage-month-title">
-                          {m.month_name}
+                          {prod.rank === 1
+                            ? "🏆 #1 Best Seller"
+                            : prod.rank === 2
+                            ? "🥈 #2 Best Seller"
+                            : prod.rank === 3
+                            ? "🥉 #3 Best Seller"
+                            : `Rank #${prod.rank}`}
                         </span>
-                        {topProd && (
-                          <span className="TopSellingPage-month-badge">
-                            🏆 #1 Best Seller
-                          </span>
-                        )}
+                        <span
+                          className={`TopSellingPage-rank-badge ${
+                            prod.rank <= 3 ? `rank-${prod.rank}` : "rank-other"
+                          }`}
+                        >
+                          #{prod.rank}
+                        </span>
                       </div>
 
-                      {topProd ? (
-                        <>
-                          <h4 className="TopSellingPage-month-product-name">
-                            {topProd.product_name}
-                          </h4>
-                          <div className="text-xs text-gray-500 mb-2">
-                            {topProd.pack_size ? `Pack: ${topProd.pack_size}` : ""}
-                            {topProd.category_name ? ` • ${topProd.category_name}` : ""}
-                          </div>
+                      <h4 className="TopSellingPage-month-product-name">
+                        {prod.product_name}
+                      </h4>
+                      <div className="text-xs text-gray-500 mb-2">
+                        {prod.pack_size ? `Pack: ${prod.pack_size}` : ""}
+                        {prod.category_name ? ` • ${prod.category_name}` : ""}
+                      </div>
 
-                          <div className="TopSellingPage-month-details">
-                            <div className="TopSellingPage-detail-item">
-                              <span className="TopSellingPage-detail-label">Quantity</span>
-                              <div className="TopSellingPage-detail-val blue">
-                                {formatNumber(topProd.total_quantity)} pcs
-                              </div>
-                            </div>
-                            <div className="TopSellingPage-detail-item">
-                              <span className="TopSellingPage-detail-label">Total Amount</span>
-                              <div className="TopSellingPage-detail-val green">
-                                {formatCurrency(topProd.total_amount)}
-                              </div>
-                            </div>
+                      <div className="TopSellingPage-month-details">
+                        <div className="TopSellingPage-detail-item">
+                          <span className="TopSellingPage-detail-label">Quantity</span>
+                          <div className="TopSellingPage-detail-val blue">
+                            {formatNumber(prod.total_quantity)} pcs
                           </div>
-                          <div className="mt-2 text-right text-[11px] text-gray-500">
-                            Invoices: {topProd.total_invoices}
+                        </div>
+                        <div className="TopSellingPage-detail-item">
+                          <span className="TopSellingPage-detail-label">Total Amount</span>
+                          <div className="TopSellingPage-detail-val green">
+                            {formatCurrency(prod.total_amount)}
                           </div>
-                        </>
-                      ) : (
-                        <p className="text-gray-400 text-xs italic py-4 text-center">
-                          No sales recorded for this month
-                        </p>
-                      )}
+                        </div>
+                      </div>
+                      <div className="mt-2 text-right text-[11px] text-gray-500">
+                        Invoices: {prod.total_invoices}
+                      </div>
                     </div>
-                  );
-                })}
+                  ))}
+                  {(!apiData.top_products || apiData.top_products.length === 0) && (
+                    <p className="text-gray-400 text-xs italic py-4 text-center col-span-full">
+                      No product sales found for this date range
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="TopSellingPage-section">
+                <h3 className="TopSellingPage-section-title">
+                  <FaMedal color="#3b5898" />
+                  {selectedMonth
+                    ? `Top Selling Product of ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`
+                    : `Monthly #1 Best Selling Products (${selectedYear})`}
+                </h3>
+
+                <div className="TopSellingPage-months-grid">
+                  {apiData.monthly_data?.map((m) => {
+                    const topProd = m.top_product;
+
+                    return (
+                      <div
+                        key={m.month_key}
+                        className={`TopSellingPage-month-card ${
+                          m.has_sales ? "has-data" : ""
+                        }`}
+                      >
+                        <div className="TopSellingPage-month-card-header">
+                          <span className="TopSellingPage-month-title">
+                            {m.month_name}
+                          </span>
+                          {topProd && (
+                            <span className="TopSellingPage-month-badge">
+                              🏆 #1 Best Seller
+                            </span>
+                          )}
+                        </div>
+
+                        {topProd ? (
+                          <>
+                            <h4 className="TopSellingPage-month-product-name">
+                              {topProd.product_name}
+                            </h4>
+                            <div className="text-xs text-gray-500 mb-2">
+                              {topProd.pack_size ? `Pack: ${topProd.pack_size}` : ""}
+                              {topProd.category_name ? ` • ${topProd.category_name}` : ""}
+                            </div>
+
+                            <div className="TopSellingPage-month-details">
+                              <div className="TopSellingPage-detail-item">
+                                <span className="TopSellingPage-detail-label">Quantity</span>
+                                <div className="TopSellingPage-detail-val blue">
+                                  {formatNumber(topProd.total_quantity)} pcs
+                                </div>
+                              </div>
+                              <div className="TopSellingPage-detail-item">
+                                <span className="TopSellingPage-detail-label">Total Amount</span>
+                                <div className="TopSellingPage-detail-val green">
+                                  {formatCurrency(topProd.total_amount)}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mt-2 text-right text-[11px] text-gray-500">
+                              Invoices: {topProd.total_invoices}
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-gray-400 text-xs italic py-4 text-center">
+                            No sales recorded for this month
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Detailed Table Section (Screen View) */}
             <div className="TopSellingPage-section TopSellingPage-screen-container">
@@ -800,7 +915,7 @@ const TopSellingProducts = ({ setLoader }) => {
                 <input
                   type="text"
                   className="TopSellingPage-search-input"
-                  placeholder="Search by product, category, month..."
+                  placeholder="Search by product, category, brand..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -810,7 +925,7 @@ const TopSellingProducts = ({ setLoader }) => {
                 <table className="TopSellingPage-table">
                   <thead>
                     <tr>
-                      <th style={{ width: "95px" }}>Month</th>
+                      {!hasDateRange && <th style={{ width: "95px" }}>Month</th>}
                       <th style={{ width: "45px", textAlign: "center" }}>Rank</th>
                       <th>Product Name</th>
                       <th style={{ width: "85px" }}>Pack Size</th>
@@ -826,10 +941,12 @@ const TopSellingProducts = ({ setLoader }) => {
                   <tbody>
                     {paginatedRows.length > 0 ? (
                       paginatedRows.map((item, idx) => (
-                        <tr key={`${item.month_key}-${item.product_id}-${(currentPage - 1) * pageSize + idx}`}>
-                          <td className="font-semibold text-slate-700">
-                            {item.month_name}
-                          </td>
+                        <tr key={hasDateRange ? `range-${item.product_id}-${idx}` : `${item.month_key}-${item.product_id}-${(currentPage - 1) * pageSize + idx}`}>
+                          {!hasDateRange && (
+                            <td className="font-semibold text-slate-700">
+                              {item.month_name}
+                            </td>
+                          )}
                           <td style={{ textAlign: "center" }}>
                             <span
                               className={`TopSellingPage-rank-badge ${
@@ -878,7 +995,7 @@ const TopSellingProducts = ({ setLoader }) => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="11" className="text-center py-8 text-gray-500">
+                        <td colSpan={hasDateRange ? 10 : 11} className="text-center py-8 text-gray-500">
                           No product sales found matching the selected criteria.
                         </td>
                       </tr>
@@ -888,7 +1005,7 @@ const TopSellingProducts = ({ setLoader }) => {
                   {currentPage === totalPages && tableRows.length > 0 && (
                     <tfoot>
                       <tr>
-                        <td colSpan="6" style={{ textAlign: "right", fontWeight: 700, paddingRight: "14px", whiteSpace: "nowrap" }}>
+                        <td colSpan={hasDateRange ? 5 : 6} style={{ textAlign: "right", fontWeight: 700, paddingRight: "14px", whiteSpace: "nowrap" }}>
                           Total of Filtered Items:
                         </td>
                         <td style={{ textAlign: "right", fontWeight: 700, whiteSpace: "nowrap" }}>
@@ -945,14 +1062,22 @@ const TopSellingProducts = ({ setLoader }) => {
             </div>
 
             {/* Dedicated Printable Area (Hidden on screen, prints ALL items in 7 columns only) */}
-            <div ref={printComponentRef} className="TopSellingPage-print-container">
+            <div className="ReportPage-print-only TopSellingPage-print-container">
               {/* Print Header */}
-              <div className="TopSellingPage-print-header">
+              <div className="print-header TopSellingPage-print-header">
                 <h2>Radiant Agrovet</h2>
                 <h3>Top Selling Products Report</h3>
                 <p>
-                  <strong>Year:</strong> {selectedYear} &nbsp;|&nbsp;
-                  <strong>Month:</strong> {selectedMonth ? monthNames[Number(selectedMonth) - 1] : "All Months"} &nbsp;|&nbsp;
+                  {hasDateRange ? (
+                    <>
+                      <strong>Date Range:</strong> {dateRange.start} to {dateRange.end} &nbsp;|&nbsp;
+                    </>
+                  ) : (
+                    <>
+                      <strong>Year:</strong> {selectedYear} &nbsp;|&nbsp;
+                      <strong>Month:</strong> {selectedMonth ? monthNames[Number(selectedMonth) - 1] : "All Months"} &nbsp;|&nbsp;
+                    </>
+                  )}
                   <strong>Rank Criteria:</strong> {sortBy === "amount" ? "Highest Revenue" : "Most Quantity Sold"}
                   {employeeId && employees.length > 0 && (
                     <> &nbsp;|&nbsp; <strong>Employee:</strong> {employees.find((e) => String(e.id) === String(employeeId))?.name || employeeId}</>

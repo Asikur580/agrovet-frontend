@@ -343,16 +343,19 @@
   }
 
   .ReportPage-print-only,
-  .ReportPage-print-only * {
-    visibility: visible;
+  .ReportPage-print-only *,
+  .TopSellingPage-print-container,
+  .TopSellingPage-print-container * {
+    visibility: visible !important;
   }
 
-  .ReportPage-print-only {
+  .ReportPage-print-only,
+  .TopSellingPage-print-container {
     display: block !important;
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 100% !important;
     color: #000;
     background: #fff;
     padding: 10px;

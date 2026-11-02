@@ -10,105 +10,165 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Tooltip from "@mui/material/Tooltip";
 import DataTable from "react-data-table-component";
-import "../../assets/css/DataTable.css";
-import { FaEdit, FaEye } from "react-icons/fa";
 import { Switch } from "antd";
+import { FaEdit, FaEye } from "react-icons/fa";
 import { IoTrashBinSharp } from "react-icons/io5";
+
+// Utilities
 import ApiConfig from "../../assets/js/ApiConfig";
 import { TableStyles, rowPerPage } from "../../assets/js/Utility";
 
+// CSS
+import "../../assets/css/DataTable.css";
+
+// Components
 const CommonModal = lazy(() =>
   import("../../components/Modal/CommonModal/CommonModal")
 );
 
 const CustomerTable = ({
   headers,
-  userRole,
+  userRole = [],
   uid,
   userDesignationSlug,
   relodeTable,
   setRelodeTable,
   setLoader,
   inputFields,
-  officersData,
+  officersData = [],
+  selectedRows = [],
   setSelectedRows,
   toggledClearRows,
-  searchData,
-  selectedOfficerId,
+  searchData = "",
+  selectedOfficerId = "",
+  selectedDueStatus = "all",
+  selectedSmsStatus = "all",
+  propCustomers,
+  onCustomersLoaded,
 }) => {
   const [apiData, setApiData] = useState([]);
   const [filteredApiData, setFilteredApiData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const customStyles = useMemo(() => TableStyles(), []);
 
-  // Debounce Search
+  const isOfficer = useMemo(() => {
+    if (Array.isArray(userDesignationSlug)) {
+      return userDesignationSlug.includes("officer");
+    }
+    return userDesignationSlug === "officer";
+  }, [userDesignationSlug]);
+
+  // Sync propCustomers from parent or fetch internally
+  const getApiData = useCallback(async () => {
+    try {
+      if (setLoader) setLoader(true);
+      const api = isOfficer ? `customerByEmployee/${uid}` : "/customers";
+
+      const response = await ApiConfig.get(api, { headers });
+      const data = response.data?.data || [];
+      setApiData(data);
+      setFilteredApiData(data);
+      if (onCustomersLoaded) {
+        onCustomersLoaded(data);
+      }
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+    } finally {
+      if (setLoader) setLoader(false);
+    }
+  }, [headers, uid, isOfficer, setLoader, onCustomersLoaded]);
+
+  useEffect(() => {
+    if (propCustomers && Array.isArray(propCustomers)) {
+      setApiData(propCustomers);
+      setFilteredApiData(propCustomers);
+    } else if (headers && headers.Authorization) {
+      getApiData();
+    }
+  }, [propCustomers, headers, relodeTable, getApiData]);
+
+  // Multi-field search and dropdown filtering
   useEffect(() => {
     const timer = setTimeout(() => {
       let result = apiData;
 
+      // 1. Live text search
       if (searchData && searchData.trim() !== "") {
-        const lower = searchData.toLowerCase();
+        const lower = searchData.toLowerCase().trim();
         result = result.filter(
           (item) =>
             (item.customer_name?.toLowerCase() || "").includes(lower) ||
-            (item.phone?.toLowerCase() || "").includes(lower)
+            (item.phone?.toLowerCase() || "").includes(lower) ||
+            (item.proprietor_name?.toLowerCase() || "").includes(lower) ||
+            String(item.customer_id || "").toLowerCase().includes(lower) ||
+            (item.address?.toLowerCase() || "").includes(lower)
         );
       }
 
+      // 2. Sales Officer filter
       if (selectedOfficerId && selectedOfficerId !== "") {
-        result = result.filter((item) => item.employee_id == selectedOfficerId);
+        result = result.filter(
+          (item) => String(item.employee_id) === String(selectedOfficerId)
+        );
+      }
+
+      // 3. Due status filter
+      if (selectedDueStatus === "due") {
+        result = result.filter((item) => Number(item.due || 0) > 0);
+      } else if (selectedDueStatus === "clear") {
+        result = result.filter((item) => Number(item.due || 0) <= 0);
+      }
+
+      // 4. SMS status filter
+      if (selectedSmsStatus === "enabled") {
+        result = result.filter((item) => Boolean(item.sms_enabled));
+      } else if (selectedSmsStatus === "disabled") {
+        result = result.filter((item) => !item.sms_enabled);
       }
 
       setFilteredApiData(result);
-    }, 250);
+      setCurrentPage(1);
+    }, 200);
+
     return () => clearTimeout(timer);
-  }, [searchData, apiData, selectedOfficerId]);
-
-  const getApiData = useCallback(async () => {
-    try {
-      setLoader(true);
-      const api =
-        userDesignationSlug === "officer"
-          ? `customerByEmployee/${uid}`
-          : "/customers";
-
-      const response = await ApiConfig.get(api, { headers });
-      const data = response.data.data || [];
-      setApiData(data);
-      setFilteredApiData(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoader(false);
-    }
-  }, [headers, uid, userDesignationSlug, setLoader]);
-
-  useEffect(() => {
-    getApiData();
-  }, [getApiData, relodeTable]);
+  }, [
+    searchData,
+    apiData,
+    selectedOfficerId,
+    selectedDueStatus,
+    selectedSmsStatus,
+  ]);
 
   const handleTabelSelectChange = useCallback(
-    ({ selectedRows }) => {
-      setSelectedRows(selectedRows);
-      sessionStorage.setItem("printCustomer", JSON.stringify(selectedRows));
+    ({ selectedRows: selRows }) => {
+      if (setSelectedRows) {
+        setSelectedRows(selRows);
+      }
+      sessionStorage.setItem("printCustomer", JSON.stringify(selRows));
     },
     [setSelectedRows]
   );
 
   const handleSmsToggle = async (checked, customerId) => {
     try {
-      setLoader(true);
-      const response = await ApiConfig.post(`/customerToggleSms/${customerId}`, {}, { headers });
-      if (response.data.status) {
-        toast.success(response.data.message);
-        setRelodeTable((prev) => !prev);
+      if (setLoader) setLoader(true);
+      const response = await ApiConfig.post(
+        `/customerToggleSms/${customerId}`,
+        {},
+        { headers }
+      );
+      if (response.data?.status) {
+        toast.success(response.data.message || "SMS status updated");
+        if (setRelodeTable) setRelodeTable((prev) => !prev);
       } else {
-        toast.error(response.data.message || "Failed to toggle SMS status");
+        toast.error(response.data?.message || "Failed to toggle SMS status");
       }
     } catch (error) {
       console.error(error);
       toast.error("An error occurred while toggling SMS status");
     } finally {
-      setLoader(false);
+      if (setLoader) setLoader(false);
     }
   };
 
@@ -116,25 +176,96 @@ const CustomerTable = ({
     () => [
       {
         name: "Sl No",
-        width: "72px",
-        selector: (_, index) => index + 1,
+        width: "68px",
+        selector: (_, index) => (currentPage - 1) * perPage + (index + 1),
       },
-      { name: "Cust id", selector: (row) => row.customer_id },
-      { name: "Customer name", selector: (row) => row.customer_name },
-      { name: "Phone", selector: (row) => row.phone },
-      { name: "Proprietor name", selector: (row) => row.proprietor_name },
-      { name: "Address", selector: (row) => row.address },
-      { name: "Credit Limit", selector: (row) => row.credit_limit || 0 },
+      {
+        name: "Cust ID",
+        width: "95px",
+        sortable: true,
+        selector: (row) => row.customer_id,
+        cell: (row) => (
+          <span className="font-semibold text-slate-700">
+            {row.customer_id}
+          </span>
+        ),
+      },
+      {
+        name: "Customer Name",
+        grow: 2,
+        sortable: true,
+        selector: (row) => row.customer_name,
+        cell: (row) => (
+          <span className="font-bold text-slate-900">
+            {row.customer_name}
+          </span>
+        ),
+      },
+      {
+        name: "Proprietor",
+        grow: 1.5,
+        sortable: true,
+        selector: (row) => row.proprietor_name || "-",
+      },
+      {
+        name: "Phone",
+        width: "125px",
+        selector: (row) => row.phone,
+      },
+      {
+        name: "Address",
+        grow: 2,
+        selector: (row) => row.address || "-",
+      },
+      {
+        name: "Credit Limit",
+        width: "125px",
+        sortable: true,
+        selector: (row) => Number(row.credit_limit || 0),
+        cell: (row) => {
+          const num = Number(row.credit_limit || 0);
+          return (
+            <span>
+              {num > 0
+                ? "Tk " +
+                  num.toLocaleString("en-IN", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })
+                : "Tk 0"}
+            </span>
+          );
+        },
+      },
       {
         name: "Due",
-        selector: (row) => row.due ? parseFloat(row.due).toFixed(2) : "0.00",
+        width: "135px",
+        sortable: true,
+        selector: (row) => Number(row.due || 0),
+        cell: (row) => {
+          const num = Number(row.due || 0);
+          return (
+            <span
+              style={{
+                fontWeight: "700",
+                color: num > 0 ? "#dc2626" : "#16a34a",
+              }}
+            >
+              Tk{" "}
+              {num.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+          );
+        },
       },
       {
         name: "SMS",
-        width: "90px",
+        width: "85px",
         cell: (row) => (
           <Switch
-            checked={row.sms_enabled}
+            checked={Boolean(row.sms_enabled)}
             onChange={(checked) => handleSmsToggle(checked, row.id)}
             checkedChildren="On"
             unCheckedChildren="Off"
@@ -143,9 +274,9 @@ const CustomerTable = ({
       },
       {
         name: "Action",
-        width: "150px",
+        width: "135px",
         cell: (row) => (
-          <div className="d-flex gap-4">
+          <div className="d-flex align-items-center gap-3">
             {["Developer", "Customer-edit"].some((r) =>
               userRole.includes(r)
             ) && (
@@ -171,35 +302,38 @@ const CustomerTable = ({
               userRole.includes(r)
             ) && (
               <Tooltip title={`Delete ${row.customer_name}`}>
-                <button>
-                  <IoTrashBinSharp
-                    className="deleteIcon cursor-pointer"
-                    size={20}
-                    onClick={async () => {
-                      if (confirm(`Delete ${row.customer_name}?`)) {
-                        try {
-                          setLoader(true);
-                          const payload = new FormData();
-                          payload.append("id", row.id);
-                          const response = await ApiConfig.post(
-                            `/customerDelete/${row.id}`,
-                            payload,
-                            { headers }
-                          );
-                          if (response.data.status) {
-                            toast.success(response.data.message);
-                            setRelodeTable((prev) => !prev);
-                          } else {
-                            toast.error(response.data.error);
-                          }
-                        } catch (err) {
-                          console.error(err);
-                          toast.error("Something went wrong!");
-                        } finally {
-                          setLoader(false);
+                <button
+                  type="button"
+                  className="bg-transparent border-0 p-0 cursor-pointer"
+                  onClick={async () => {
+                    if (confirm(`Delete ${row.customer_name}?`)) {
+                      try {
+                        if (setLoader) setLoader(true);
+                        const payload = new FormData();
+                        payload.append("id", row.id);
+                        const response = await ApiConfig.post(
+                          `/customerDelete/${row.id}`,
+                          payload,
+                          { headers }
+                        );
+                        if (response.data?.status) {
+                          toast.success(response.data.message);
+                          if (setRelodeTable) setRelodeTable((prev) => !prev);
+                        } else {
+                          toast.error(response.data?.error || "Delete failed");
                         }
+                      } catch (err) {
+                        console.error(err);
+                        toast.error("Something went wrong!");
+                      } finally {
+                        if (setLoader) setLoader(false);
                       }
-                    }}
+                    }
+                  }}
+                >
+                  <IoTrashBinSharp
+                    className="deleteIcon cursor-pointer text-red-500 hover:text-red-700"
+                    size={18}
                   />
                 </button>
               </Tooltip>
@@ -209,8 +343,11 @@ const CustomerTable = ({
               userRole.includes(r)
             ) && (
               <Tooltip title={`View ${row.customer_name}`}>
-                <Link to={`/customers/view-details/${row.id}`}>
-                  <FaEye className="text-blue-600 text-lg" />
+                <Link
+                  to={`/customers/view-details/${row.id}`}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <FaEye size={17} />
                 </Link>
               </Tooltip>
             )}
@@ -218,7 +355,16 @@ const CustomerTable = ({
         ),
       },
     ],
-    [userRole, inputFields, officersData, setRelodeTable, setLoader]
+    [
+      currentPage,
+      perPage,
+      userRole,
+      inputFields,
+      officersData,
+      setRelodeTable,
+      setLoader,
+      headers,
+    ]
   );
 
   return (
@@ -228,250 +374,17 @@ const CustomerTable = ({
       customStyles={customStyles}
       pagination
       paginationRowsPerPageOptions={rowPerPage}
+      onChangePage={(page) => setCurrentPage(page)}
+      onChangeRowsPerPage={(newPerPage, page) => {
+        setPerPage(newPerPage);
+        setCurrentPage(page);
+      }}
       selectableRows
       onSelectedRowsChange={handleTabelSelectChange}
       clearSelectedRows={toggledClearRows}
+      persistTableHead
     />
   );
 };
 
 export default CustomerTable;
-
-// import { useEffect, useState, lazy, Suspense } from "react";
-// import { Link } from "react-router-dom";
-// import { toast } from "react-toastify";
-// import Tooltip from "@mui/material/Tooltip";
-// import DataTable from "react-data-table-component";
-
-// //=>>> Css
-// import "../../assets/css/DataTable.css";
-
-// //=>>> Icons
-// import { FaEdit, FaEye, FaImage } from "react-icons/fa";
-// import { IoTrashBinSharp } from "react-icons/io5";
-
-// //=>>> Components
-// const CommonModal = lazy(() =>
-//   import("../../components/Modal/CommonModal/CommonModal")
-// );
-// const ImageLazyLoad = lazy(() =>
-//   import("../../components/ImageLazyLoad/ImageLazyLoad")
-// );
-
-// //=>>> Additional utilities
-// import ApiConfig, { imgUrl } from "../../assets/js/ApiConfig";
-// import { TableStyles, rowPerPage } from "../../assets/js/Utility";
-
-// const CustomerTable = (props) => {
-//   const {
-//     headers,
-//     userRole,
-//     uid,
-//     userDesignationSlug,
-//     relodeTable,
-//     setRelodeTable,
-//     setLoader,
-//     inputFields,
-//     officersData,
-//     setSelectedRows,
-//     toggledClearRows,
-//     searchData,
-//   } = props;
-//   const customStyles = TableStyles();
-
-//   const handleTabelSelectChange = ({ selectedRows }) => {
-//     setSelectedRows(selectedRows);
-//     sessionStorage.setItem("printCustomer", JSON.stringify(selectedRows));
-//   };
-
-//   // States
-//   const [apiData, setApiData] = useState([]);
-//   const [filteredApiData, setFilteredApiData] = useState([]);
-
-//   const getApiData = async () => {
-//     try {
-//       const api =
-//         userDesignationSlug == "officer"
-//           ? `customerByEmployee/${uid}`
-//           : "/customers";
-
-//       setLoader(true);
-//       await ApiConfig.get("/customers", { headers }).then((response) => {
-//         setApiData(response.data.data);
-//         setFilteredApiData(response.data.data);
-//         // console.log(response.data.data);
-//         // console.clear();
-//         setLoader(false);
-//       });
-//     } catch (error) {
-//       setLoader(false);
-//       console.log(error);
-//     }
-//   };
-//   useEffect(() => {
-//     getApiData();
-//   }, [relodeTable]);
-
-//   //=>>> Column for datatable start
-//   const columns = [
-//     {
-//       name: "Sl No",
-//       field: "SlNo",
-//       width: "80px",
-//       selector: (row, index) => index + 1,
-//     },
-//     {
-//       name: "Customer name",
-//       field: "Customer name",
-//       selector: (row) => row.customer_name,
-//     },
-//     {
-//       name: "Phone",
-//       field: "phone",
-//       selector: (row) => row.phone,
-//     },
-//     {
-//       name: "Proprietor name",
-//       field: "proprietor_name",
-//       selector: (row) => row.proprietor_name,
-//     },
-//     {
-//       name: "Address",
-//       field: "address",
-//       selector: (row) => row.address,
-//     },
-//     {
-//       name: "Image",
-//       field: "Image",
-//       cell: (row) =>
-//         row.image ? (
-//           <Suspense fallback="">
-//             <ImageLazyLoad
-//               height="55px"
-//               width="50px"
-//               alt="Img-from-table"
-//               src={`${imgUrl}${row.image}`}
-//             />
-//           </Suspense>
-//         ) : (
-//           <FaImage size={30} style={{ opacity: 0.3 }} />
-//         ),
-//     },
-//     {
-//       name: "Action",
-//       width: "150px",
-//       cell: (row) => (
-//         <div className="d-flex" style={{ gap: "20px" }}>
-//           {["Developer", "Customer-edit"].some((item) =>
-//             userRole.includes(item)
-//           ) && (
-//             <div className="shortModalBtn">
-//               <Suspense fallback="...">
-//                 <CommonModal
-//                   id={row.id}
-//                   slug={`Edit customer`}
-//                   inputFields={inputFields}
-//                   ModalOpenBtnTitle={<FaEdit />}
-//                   className="editBtn"
-//                   identifier="customerUpdate"
-//                   api={`/customerUpdate/${row.id}`}
-//                   data={officersData}
-//                   getSpecificDataApi="/customerShow"
-//                   setRelodeTable={setRelodeTable}
-//                   setLoader={setLoader}
-//                   toolTip={`Edit ${row.customer_name}`}
-//                 />
-//               </Suspense>
-//             </div>
-//           )}
-//           {["Developer", "Customer-delete"].some((item) =>
-//             userRole.includes(item)
-//           ) && (
-//             <Tooltip title={`Delete ${row.customer_name}`} placement="bottom">
-//               <button>
-//                 <IoTrashBinSharp
-//                   className="deleteIcon c-pointer"
-//                   size={20}
-//                   onClick={async () => {
-//                     const confirmation = confirm(
-//                       "Do you want to delete this customer?"
-//                     );
-//                     if (confirmation) {
-//                       const payload = new FormData();
-//                       payload.append("id", row.id);
-
-//                       setLoader(true);
-//                       await ApiConfig.post(
-//                         `/customerDelete/${row.id}`,
-//                         payload,
-//                         {
-//                           headers,
-//                         }
-//                       )
-//                         .then((response) => {
-//                           if (response.data.status == true) {
-//                             setRelodeTable((prev) => !prev);
-//                             console.clear();
-//                             setLoader(false);
-//                             toast.success(response.data.message);
-//                           } else {
-//                             setLoader(false);
-//                             toast.error(response.data.error);
-//                           }
-//                         })
-//                         .catch((e) => {
-//                           console.log(`Error = ${e}`);
-//                         });
-//                     } else {
-//                       return;
-//                     }
-//                   }}
-//                 />
-//               </button>
-//             </Tooltip>
-//           )}
-//           {["Developer", "Customer-details-page"].some((item) =>
-//             userRole.includes(item)
-//           ) && (
-//             <Tooltip title={`View ${row.customer_name}`} placement="bottom">
-//               <Link to={`/customers/view-details/${row.id}`}>
-//                 <FaEye style={{ color: "#0a57f7", fontSize: "1.12rem" }} />
-//               </Link>
-//             </Tooltip>
-//           )}
-//         </div>
-//       ),
-//     },
-//   ];
-//   //=>>> Column for datatable end ____//
-
-//   //=>>> Searching function
-//   useEffect(() => {
-//     const result = apiData.filter((filteredApiData) => {
-//       return (
-//         filteredApiData.customer_name
-//           .toLowerCase()
-//           .match(searchData.toLowerCase()) ||
-//         filteredApiData.phone.toLowerCase().match(searchData.toLowerCase())
-//       );
-//     });
-//     setFilteredApiData(result);
-//   }, [searchData]);
-
-//   return (
-//     <>
-//       <DataTable
-//         columns={columns}
-//         data={filteredApiData}
-//         customStyles={customStyles}
-//         pagination
-//         paginationRowsPerPageOptions={rowPerPage}
-//         selectableRows
-//         onSelectedRowsChange={handleTabelSelectChange}
-//         clearSelectedRows={toggledClearRows}
-//       />
-//     </>
-//   );
-// };
-
-// export default CustomerTable;
