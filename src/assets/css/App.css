@@ -12,6 +12,11 @@
   src: url(../../assets/fonts/tt0511m.ttf);
 }
 
+@font-face {
+  font-family: Kalpurush;
+  src: url(../../assets/fonts/kalpurush.ttf);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

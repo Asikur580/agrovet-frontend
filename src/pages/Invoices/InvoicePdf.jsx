@@ -19,14 +19,17 @@ import { AuthContext } from "../../context/AuthContext";
 import BlippoBlack from "../../assets/fonts/tt0511m.ttf";
 import DMSansRegular from "../../assets/fonts/DM_Sans/DMSans-Regular.ttf";
 import DMSansSemiBold from "../../assets/fonts/DM_Sans/DMSans-SemiBold.ttf";
+import Kalpurush from "../../assets/fonts/kalpurush.ttf";
+
 Font.register({ family: "BlippoBlack", src: BlippoBlack });
 Font.register({ family: "DMSansRegular", src: DMSansRegular });
 Font.register({ family: "DMSansSemiBold", src: DMSansSemiBold });
+Font.register({ family: "Kalpurush", src: Kalpurush });
 
 //=>>> Styles
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "DMSansSemiBold",
+    fontFamily: "Kalpurush",
     color: "#000",
     backgroundColor: "#fff",
     padding: "100px",
@@ -61,7 +64,7 @@ const styles = StyleSheet.create({
   },
   customerDetailsLeft: { width: "65%" },
   customerDetailsRight: { width: "35%" },
-  customerDetailsVal: { fontFamily: "DMSansRegular" },
+  customerDetailsVal: { fontFamily: "Kalpurush" },
   //=>>> Customer details end
 
   //=>>> Table start
