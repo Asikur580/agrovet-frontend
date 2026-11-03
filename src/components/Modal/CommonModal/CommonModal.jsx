@@ -139,6 +139,7 @@ const CommonModal = (props) => {
     basic_salary: "",
     pack_size: "",
     payment_method: "",
+    payment_type: "both",
     old_due: "",
   });
   const [isRequired, setIsRequired] = useState({});
@@ -202,6 +203,7 @@ const CommonModal = (props) => {
               address: response.data.data.address,
               old_due: response.data.data.old_due,
               credit_limit: response.data.data.credit_limit,
+              payment_type: response.data.data.payment_type || "both",
             });
           } else if (identifier == "productUpdate") {
             setInputValue({
@@ -489,6 +491,7 @@ const CommonModal = (props) => {
         payload.append("address", inputValue.address);
         payload.append("old_due", inputValue.old_due || 0);
         payload.append("credit_limit", inputValue.credit_limit || 0);
+        payload.append("payment_type", inputValue.payment_type || "both");
         payload.append("image", img);
 
         setLoader(true);
@@ -502,6 +505,7 @@ const CommonModal = (props) => {
                 address: "",
                 old_due: "",
                 credit_limit: "",
+                payment_type: "both",
               });
               handleCancel();
               setRelodeTable((prev) => !prev);
@@ -975,6 +979,28 @@ const CommonModal = (props) => {
               ""
             )}
             {/* ___ Employee Selection End ___ */}
+
+            {/* ___ Payment Type Selection for Customer Start ___ */}
+            {identifier == "customerStore" || identifier == "customerUpdate" ? (
+              <div className="select-from-modal">
+                <label>
+                  Allowed Payment / Order Type<span className="text-red-500 ml-1">*</span>
+                </label>
+                <select
+                  className="select"
+                  name="payment_type"
+                  value={inputValue.payment_type || "both"}
+                  onChange={handleInputValue}
+                >
+                  <option value="both">Both (Cash & Credit)</option>
+                  <option value="credit">Credit Only</option>
+                  <option value="cash">Cash Only</option>
+                </select>
+              </div>
+            ) : (
+              ""
+            )}
+            {/* ___ Payment Type Selection for Customer End ___ */}
 
             {/* ___ Category Selection Start  ___ */}
             {identifier == "productStore" || identifier == "productUpdate" ? (

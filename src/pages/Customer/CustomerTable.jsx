@@ -126,6 +126,33 @@ const CustomerTable = ({
       { name: "Address", selector: (row) => row.address },
       { name: "Credit Limit", selector: (row) => row.credit_limit || 0 },
       {
+        name: "Allowed Type",
+        width: "120px",
+        selector: (row) => row.payment_type || "both",
+        cell: (row) => {
+          const type = row.payment_type || "both";
+          const badgeClass =
+            type === "cash"
+              ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+              : type === "credit"
+              ? "bg-amber-100 text-amber-800 border-amber-300"
+              : "bg-blue-100 text-blue-800 border-blue-300";
+          const label =
+            type === "cash"
+              ? "Cash Only"
+              : type === "credit"
+              ? "Credit Only"
+              : "Cash & Credit";
+          return (
+            <span
+              className={`px-2 py-0.5 text-xs font-medium rounded-full border ${badgeClass}`}
+            >
+              {label}
+            </span>
+          );
+        },
+      },
+      {
         name: "Due",
         selector: (row) => row.due ? parseFloat(row.due).toFixed(2) : "0.00",
       },

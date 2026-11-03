@@ -393,7 +393,17 @@ const OrderCartModal = (props) => {
                   optionFilterProp="children"
                   value={inputValues.customer_id === "0" || inputValues.customer_id === 0 ? undefined : inputValues.customer_id}
                   onChange={(value) => {
-                    setInputValues({ ...inputValues, customer_id: value });
+                    const selectedCust = Array.isArray(customerDataContext)
+                      ? customerDataContext.find((c) => c.id == value)
+                      : null;
+                    const custPaymentType = selectedCust?.payment_type || "both";
+                    let newPayType = inputValues.pay_type;
+                    if (custPaymentType === "cash") {
+                      newPayType = "cash";
+                    } else if (custPaymentType === "credit") {
+                      newPayType = "credit";
+                    }
+                    setInputValues({ ...inputValues, customer_id: value, pay_type: newPayType });
                   }}
                   filterOption={(input, option) =>
                     (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
@@ -538,23 +548,49 @@ const OrderCartModal = (props) => {
             {/* ___ Date Section End  ___ */}
 
             {/* ___ Pay type Section Start  ___ */}
-            {data.length !== 0 && (
-              <div className="select-from-cart-modal">
-                <label>
-                  Payment method <span className="text-red-500 ml-1">*</span>
-                </label>
-                <select
-                  className="select"
-                  name="pay_type"
-                  value={inputValues.pay_type}
-                  onChange={handleInputValue}
-                >
-                  <option value="0">Select payment method</option>
-                  <option value="cash">Cash</option>
-                  <option value="credit">Credit</option>
-                </select>
-              </div>
-            )}
+            {data.length !== 0 && (() => {
+              const selectedCustomer = Array.isArray(customerDataContext)
+                ? customerDataContext.find((c) => c.id == inputValues.customer_id)
+                : null;
+              const allowedType = selectedCustomer?.payment_type || "both";
+
+              return (
+                <div className="select-from-cart-modal">
+                  <label>
+                    Payment method <span className="text-red-500 ml-1">*</span>
+                    {allowedType === "cash" && (
+                      <span className="text-xs text-emerald-600 font-semibold ml-2">
+                        (Only Cash allowed)
+                      </span>
+                    )}
+                    {allowedType === "credit" && (
+                      <span className="text-xs text-amber-600 font-semibold ml-2">
+                        (Only Credit allowed)
+                      </span>
+                    )}
+                  </label>
+                  <select
+                    className="select"
+                    name="pay_type"
+                    value={inputValues.pay_type}
+                    onChange={handleInputValue}
+                    disabled={allowedType === "cash" || allowedType === "credit"}
+                  >
+                    {allowedType === "cash" ? (
+                      <option value="cash">Cash</option>
+                    ) : allowedType === "credit" ? (
+                      <option value="credit">Credit</option>
+                    ) : (
+                      <>
+                        <option value="0">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="credit">Credit</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              );
+            })()}
             {/* ___ Pay type Section End  ___ */}
 
             {/* ___ Offer Section Start  ___ */}
