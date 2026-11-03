@@ -17,6 +17,7 @@ const PriceCalculator = lazy(() => import("../Calculator/PriceCalculator"));
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 import { DateFormater } from "../../../assets/js/DateFormater";
+import { compressImage } from "../../../assets/js/imageCompressor";
 
 const CommonModal = (props) => {
   const { headers, uid } = useContext(AuthContext);
@@ -49,6 +50,14 @@ const CommonModal = (props) => {
   const draggleRef = useRef(null);
   const showModal = () => {
     setOpen(true);
+    setTradeLicense(null);
+    setNid(null);
+    setTradeLicenseName("");
+    setNidName("");
+    setRemoveImage(false);
+    setRemoveTradeLicense(false);
+    setRemoveNid(false);
+    setExistingImage(null);
 
     const initialIsRequired = {};
     inputFields.map((item, index) => {
@@ -82,6 +91,14 @@ const CommonModal = (props) => {
   const handleCancel = (e) => {
     setOpen(false);
     setImg(null);
+    setTradeLicense(null);
+    setNid(null);
+    setTradeLicenseName("");
+    setNidName("");
+    setRemoveImage(false);
+    setRemoveTradeLicense(false);
+    setRemoveNid(false);
+    setExistingImage(null);
   };
   const onStart = (_event, uiData) => {
     const { clientWidth, clientHeight } = window.document.documentElement;
@@ -104,6 +121,42 @@ const CommonModal = (props) => {
   const [month, setMonth] = useState("YYYY-MM");
 
   const [img, setImg] = useState(null);
+  const [tradeLicense, setTradeLicense] = useState(null);
+  const [nid, setNid] = useState(null);
+  const [tradeLicenseName, setTradeLicenseName] = useState("");
+  const [nidName, setNidName] = useState("");
+  const [existingImage, setExistingImage] = useState(null);
+  const [removeImage, setRemoveImage] = useState(false);
+  const [removeTradeLicense, setRemoveTradeLicense] = useState(false);
+  const [removeNid, setRemoveNid] = useState(false);
+
+  const handleTradeLicenseChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setRemoveTradeLicense(false);
+      setTradeLicenseName(file.name);
+      if (file.type && file.type.startsWith("image/")) {
+        const compressed = await compressImage(file, { maxWidth: 1200, quality: 0.75 });
+        setTradeLicense(compressed);
+      } else {
+        setTradeLicense(file);
+      }
+    }
+  };
+
+  const handleNidChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setRemoveNid(false);
+      setNidName(file.name);
+      if (file.type && file.type.startsWith("image/")) {
+        const compressed = await compressImage(file, { maxWidth: 1200, quality: 0.75 });
+        setNid(compressed);
+      } else {
+        setNid(file);
+      }
+    }
+  };
   const [inputValue, setInputValue] = useState({
     name: "",
     phone: "",
@@ -205,6 +258,21 @@ const CommonModal = (props) => {
               credit_limit: response.data.data.credit_limit,
               payment_type: response.data.data.payment_type || "both",
             });
+            if (response.data.data.image) {
+              setExistingImage(response.data.data.image);
+            } else {
+              setExistingImage(null);
+            }
+            if (response.data.data.trade_license) {
+              setTradeLicenseName("Uploaded: " + response.data.data.trade_license.split("/").pop());
+            } else {
+              setTradeLicenseName("");
+            }
+            if (response.data.data.nid) {
+              setNidName("Uploaded: " + response.data.data.nid.split("/").pop());
+            } else {
+              setNidName("");
+            }
           } else if (identifier == "productUpdate") {
             setInputValue({
               ...inputValue,
@@ -492,7 +560,12 @@ const CommonModal = (props) => {
         payload.append("old_due", inputValue.old_due || 0);
         payload.append("credit_limit", inputValue.credit_limit || 0);
         payload.append("payment_type", inputValue.payment_type || "both");
-        payload.append("image", img);
+        if (img) payload.append("image", img);
+        if (tradeLicense) payload.append("trade_license", tradeLicense);
+        if (nid) payload.append("nid", nid);
+        if (removeImage) payload.append("remove_image", 1);
+        if (removeTradeLicense) payload.append("remove_trade_license", 1);
+        if (removeNid) payload.append("remove_nid", 1);
 
         setLoader(true);
         await ApiConfig.post(api, payload, { headers })
@@ -507,6 +580,14 @@ const CommonModal = (props) => {
                 credit_limit: "",
                 payment_type: "both",
               });
+              setTradeLicense(null);
+              setNid(null);
+              setTradeLicenseName("");
+              setNidName("");
+              setRemoveImage(false);
+              setRemoveTradeLicense(false);
+              setRemoveNid(false);
+              setExistingImage(null);
               handleCancel();
               setRelodeTable((prev) => !prev);
               console.clear();
@@ -1285,18 +1366,128 @@ const CommonModal = (props) => {
             identifier == "productStore" ||
             identifier == "productUpdate" ? (
               <div className="w-full mt-5">
-                <p className="cursor-default text-center">Upload image</p>
+                <p className="cursor-default text-center">
+                  {identifier == "customerStore" || identifier == "customerUpdate"
+                    ? "Customer Photo (Optional)"
+                    : "Upload image"}
+                </p>
                 <ImageUploader
                   img={img}
                   setImg={setImg}
                   width="60px"
                   height="60px"
                 />
+                {identifier == "customerUpdate" && existingImage && !img && !removeImage && (
+                  <div className="text-center mt-2">
+                    <span className="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded">Photo uploaded</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImg(null);
+                        setExistingImage(null);
+                        setRemoveImage(true);
+                      }}
+                      className="text-red-600 hover:text-red-800 text-xs font-semibold ml-2 underline cursor-pointer"
+                    >
+                      Delete photo
+                    </button>
+                  </div>
+                )}
+                {identifier == "customerUpdate" && removeImage && (
+                  <p className="text-center text-xs text-red-500 mt-1 font-semibold">
+                    (Photo will be deleted on save)
+                  </p>
+                )}
               </div>
             ) : (
               ""
             )}
             {/* ___ Image Section End  ___*/}
+
+            {/* ___ Customer Documents Section Start (Trade License & NID) ___ */}
+            {(identifier == "customerStore" || identifier == "customerUpdate") && (
+              <div className="w-full mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <p className="font-semibold text-gray-700 text-sm mb-3">
+                  Customer Documents (Optional)
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  {/* Trade License */}
+                  <div className="p-2 border border-dashed border-gray-300 rounded bg-white">
+                    <label className="block font-medium text-gray-700 mb-1">
+                      Trade License (Image / PDF)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={handleTradeLicenseChange}
+                      className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
+                    {tradeLicenseName && (
+                      <div className="mt-1 flex items-center justify-between text-blue-600 font-medium">
+                        <span className="truncate max-w-[180px]" title={tradeLicenseName}>
+                          {tradeLicenseName}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTradeLicense(null);
+                            setTradeLicenseName("");
+                            setRemoveTradeLicense(true);
+                          }}
+                          className="text-red-500 hover:text-red-700 font-bold ml-1 text-sm"
+                          title="Delete trade license"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                    {removeTradeLicense && (
+                      <p className="text-red-500 text-[11px] mt-1 font-medium">
+                        (Trade license will be deleted on save)
+                      </p>
+                    )}
+                  </div>
+
+                  {/* NID Card */}
+                  <div className="p-2 border border-dashed border-gray-300 rounded bg-white">
+                    <label className="block font-medium text-gray-700 mb-1">
+                      NID Card (Image / PDF)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={handleNidChange}
+                      className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
+                    {nidName && (
+                      <div className="mt-1 flex items-center justify-between text-blue-600 font-medium">
+                        <span className="truncate max-w-[180px]" title={nidName}>
+                          {nidName}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNid(null);
+                            setNidName("");
+                            setRemoveNid(true);
+                          }}
+                          className="text-red-500 hover:text-red-700 font-bold ml-1 text-sm"
+                          title="Delete NID card"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                    {removeNid && (
+                      <p className="text-red-500 text-[11px] mt-1 font-medium">
+                        (NID card will be deleted on save)
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* ___ Customer Documents Section End ___ */}
 
             <div>
               <button type="submit" className="button">
