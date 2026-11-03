@@ -58,7 +58,7 @@
   cursor: pointer;
 }
 .header .right .notification .header_dropdown {
-  width: 250px;
+  width: 290px;
 }
 .header .right .notification.activeNotification .header_dropdown {
   display: block;
@@ -69,7 +69,7 @@
   .header_dropdown
   .header_dropdown_content {
   /* height: 246px; */
-  max-height: 250px;
+  max-height: 360px;
   overflow-y: scroll;
 }
 .header .right .notification .header_dropdown li a {
@@ -151,6 +151,9 @@
   background: var(--dark-2);
   display: none;
   transition: var(--trans);
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
 }
 .header_dropdown li a {
   color: var(--light-2);

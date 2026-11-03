@@ -51,6 +51,13 @@ const OrdersTable = (props) => {
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get("id");
 
+  //=>>> Auto mark notification as read if accessed with ?id=
+  useEffect(() => {
+    if (id) {
+      ApiConfig.post("/notifications/read-by-entity", { order_id: id }, { headers }).catch(() => {});
+    }
+  }, [id, headers]);
+
   // States
   const [allOrders, setAllOrders] = useState([]);
   const [apiData, setApiData] = useState([]);

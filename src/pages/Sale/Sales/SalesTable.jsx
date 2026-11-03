@@ -56,6 +56,13 @@ const SalesTable = (props) => {
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get("id");
 
+  //=>>> Auto mark notification as read if accessed with ?id=
+  useEffect(() => {
+    if (id) {
+      ApiConfig.post("/notifications/read-by-entity", { invoice_id: id }, { headers }).catch(() => {});
+    }
+  }, [id, headers]);
+
   //=>>> Column for datatable start
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 10; // Item per page

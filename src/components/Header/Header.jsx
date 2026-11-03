@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "antd";
+import { toast } from "react-toastify";
 // import Skeleton from "@mui/material/Skeleton";
 
 //=>>> Icons
@@ -86,8 +87,9 @@ const Header = (props) => {
   //=>>> Notification system start
   const [notifications, setNotifications] = useState([]);
   const [notifiSliceCount, setNotifiSliceCount] = useState(5);
-  const slicedNotifications = notifications.slice(0, notifiSliceCount);
   const [unReadNotifications, setUnReadNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const slicedNotifications = unReadNotifications.slice(0, notifiSliceCount);
   const prevDataRef = useRef(null);
 
   // Notification sound preload
@@ -103,8 +105,12 @@ const Header = (props) => {
 
   const GetNotification = useCallback(async () => {
     try {
-      const response = await ApiConfig.get("/notifications", { headers });
+      const response = await ApiConfig.get("/notifications?unread=1", { headers });
       const newData = response.data?.data || [];
+      const totalUnread =
+        response.data?.unread_count !== undefined
+          ? response.data.unread_count
+          : newData.filter((item) => item.read_at == null).length;
 
       // compare with previous data
       if (JSON.stringify(newData) !== JSON.stringify(prevDataRef.current)) {
@@ -119,6 +125,7 @@ const Header = (props) => {
           }, 5000);
         }
 
+        setUnreadCount(totalUnread);
         setNotifications(newData);
         setUnReadNotifications(newData.filter((item) => item.read_at == null));
         localStorage.setItem("Notifications", JSON.stringify(newData));
@@ -148,14 +155,38 @@ const Header = (props) => {
   }, [GetNotification]);
 
   const ClickNotification = (notificationId) => {
+    // Immediately remove from unread notifications
+    setNotifications((prev) => prev.filter((item) => item.id !== notificationId));
+    setUnReadNotifications((prev) =>
+      prev.filter((item) => item.id !== notificationId)
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+
     ApiConfig.post(`notifications/${notificationId}/read`, {}, { headers })
-      .then((response) => {
-        // console.log(response);
-      })
       .catch((err) => {
-        console.log(err);
+        console.error("Mark notification read error:", err);
       });
-    setNotifyDropVal((prev) => !prev);
+    setNotifyDropVal(false);
+  };
+
+  const handleMarkAllAsRead = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setUnreadCount(0);
+    setNotifications([]);
+    setUnReadNotifications([]);
+    localStorage.removeItem("Notifications");
+    toast.success("All notifications marked as read");
+
+    try {
+      await ApiConfig.post("/notifications/read-all", {}, { headers });
+    } catch (err) {
+      console.error("Mark all as read error:", err);
+      toast.error(err?.response?.data?.message || "Failed to mark all as read");
+      GetNotification();
+    }
   };
   //=>>> Notification system end
 
@@ -208,7 +239,7 @@ const Header = (props) => {
             notifyDropVal == true ? "activeNotification" : ""
           }`}
         >
-          <Badge count={unReadNotifications.length} overflowCount={999}>
+          <Badge count={unreadCount || unReadNotifications.length} overflowCount={999}>
             <IoNotificationsSharp
               className="notification_icon"
               onClick={() => {
@@ -220,11 +251,29 @@ const Header = (props) => {
           </Badge>
           <ul className="header_dropdown">
             <div className="corner"></div>
+            <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-900 text-white rounded-t">
+              <span className="font-semibold text-xs tracking-wide">
+                Unread Notifications {(unreadCount || unReadNotifications.length) > 0 && `(${unreadCount || unReadNotifications.length})`}
+              </span>
+              {(unreadCount > 0 || unReadNotifications.length > 0) && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllAsRead}
+                  className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold hover:underline bg-transparent border-0 cursor-pointer p-0"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
             <div className="header_dropdown_content">
-              {Array.isArray(slicedNotifications) &&
+              {unReadNotifications.length === 0 ? (
+                <div className="p-4 text-center text-xs text-gray-400">
+                  No unread notifications
+                </div>
+              ) : (
                 slicedNotifications.map((item, index) => {
                   return (
-                    <li key={index} onClick={() => ClickNotification(item.id)}>
+                    <li key={item.id || index} onClick={() => ClickNotification(item.id)}>
                       <Link
                         to={
                           item.data.order_id
@@ -237,11 +286,7 @@ const Header = (props) => {
                         <div>
                           <div className="flex items-center gap-3">
                             <p>{item.data.message}</p>
-                            <span
-                              className={`marker ${
-                                item.read_at == null ? "visible" : "invisible"
-                              }`}
-                            ></span>
+                            <span className="marker visible"></span>
                           </div>
                           <p className="text-end text-[0.75rem] mt-3">
                             {item.data.order_id
@@ -255,16 +300,19 @@ const Header = (props) => {
                       </Link>
                     </li>
                   );
-                })}
-              <div className="seeMoreNotifi">
-                <button
-                  onClick={() => {
-                    setNotifiSliceCount((prev) => prev * 2);
-                  }}
-                >
-                  See more notifications
-                </button>
-              </div>
+                })
+              )}
+              {unReadNotifications.length > slicedNotifications.length && (
+                <div className="seeMoreNotifi">
+                  <button
+                    onClick={() => {
+                      setNotifiSliceCount((prev) => prev * 2);
+                    }}
+                  >
+                    See more notifications
+                  </button>
+                </div>
+              )}
             </div>
           </ul>
         </li>
