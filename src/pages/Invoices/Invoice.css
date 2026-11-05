@@ -1,6 +1,4 @@
 .invoice-container {
-  font-family: Kalpurush, "DM Sans", sans-serif;
-  max-width: 794px;
   margin: 0 auto 0 auto;
   background: var(--light-1);
   padding: 20px;
@@ -9,7 +7,10 @@
   display: flex;
   flex-direction: column;
   color: #000;
-  position: relative;
+  animation: none !important;
+  -webkit-animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
   /* background-color: rgba(102, 51, 153, 0.308); */
 }
 .invoice-header {
@@ -127,30 +128,28 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  padding: 8px 20px;
-  background: var(--main-clr, #1677ff);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.2s;
-}
-.printBtn:hover {
-  opacity: 0.85;
+  padding: 5px 10px;
 }
 
 @media print {
+  * {
+    animation: none !important;
+    -webkit-animation: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .no-print,
+  .printBtn {
+    display: none !important;
+  }
   @page {
     size: A4 portrait;
-    margin: 70px 40px;
+    margin: 15mm 10mm;
     padding: 0;
   }
   @page :first {
     size: A4 portrait;
-    margin: 50px 40px;
+    margin: 15mm 10mm;
     padding: 0;
   }
   @page {
@@ -166,14 +165,22 @@
 
   body {
     print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    background: #fff !important;
+    color: #000 !important;
   }
   .invoice-container {
-    border: none;
-    padding: 0;
-    min-height: 100vh;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
   .invoice-footer {
-    margin-top: auto;
+    margin-top: 30px;
   }
 }
 /*___ Print end ___*/
