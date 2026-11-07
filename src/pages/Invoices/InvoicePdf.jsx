@@ -32,7 +32,10 @@ const styles = StyleSheet.create({
     fontFamily: "Kalpurush",
     color: "#000",
     backgroundColor: "#fff",
-    padding: "100px",
+    paddingTop: 30,
+    paddingBottom: 25,
+    paddingLeft: 30,
+    paddingRight: 30,
   },
 
   //=>>> Header start
@@ -70,7 +73,7 @@ const styles = StyleSheet.create({
   //=>>> Table start
   table: {
     display: "table",
-    width: "auto",
+    width: "100%",
     borderStyle: "solid",
     borderColor: "#000",
     borderWidth: 1,
@@ -81,27 +84,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tableColHeader: {
-    fontSize: "0.6rem",
-    width: "100%",
+    fontSize: 12,
     borderStyle: "solid",
     borderColor: "#000",
     borderWidth: 1,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    paddingVertical: "10px",
-    paddingHorizontal: "10px",
+    paddingVertical: 5,
+    paddingHorizontal: 2,
     backgroundColor: "#ebebeb",
   },
   tableCol: {
-    fontSize: "0.6rem",
+    fontSize: 12,
     borderStyle: "solid",
     borderColor: "#000",
     borderWidth: 1,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    width: "100%",
-    paddingVertical: "10px",
-    paddingHorizontal: "10px",
+    paddingVertical: 4,
+    paddingHorizontal: 2,
   },
   tableCellHeader: {
     fontWeight: "bold",
@@ -110,11 +111,16 @@ const styles = StyleSheet.create({
   tableCell: {
     textAlign: "center",
   },
-  tableSlNo: { width: "60%" },
-  tableProdName: { width: "170%" },
-  tableNetAmmount: { width: "130%" },
-  tableQty: { width: "45%" },
-  tableBonusQty: { width: "110%" },
+  tableSlNo: { width: "5%" },
+  tableProdName: { width: "24%" },
+  tablePackSize: { width: "9%" },
+  tableTpFlat: { width: "9%" },
+  tableQty: { width: "6%" },
+  tableDueQty: { width: "8%" },
+  tableTotalTp: { width: "10%" },
+  tableBonusQty: { width: "10%" },
+  tableNetQty: { width: "8%" },
+  tableNetAmmount: { width: "11%" },
   //=>>> Table end
 
   //=>>> Total section start
@@ -289,34 +295,34 @@ const InvoicePdf = ({ setLoader }) => {
               {/* Table header */}
               <View style={styles.tableRow}>
                 <View style={[styles.tableColHeader, styles.tableSlNo]}>
-                  <Text style={styles.tableCellHeader}>Sl No</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Sl No</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableProdName]}>
-                  <Text style={styles.tableCellHeader}>Product Name</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Product Name</Text>
                 </View>
-                <View style={styles.tableColHeader}>
-                  <Text style={styles.tableCellHeader}>Pack Size</Text>
+                <View style={[styles.tableColHeader, styles.tablePackSize]}>
+                  <Text style={styles.tableCellHeader} wrap={false}>Pack Size</Text>
                 </View>
-                <View style={styles.tableColHeader}>
-                  <Text style={styles.tableCellHeader}>TP/Flat</Text>
+                <View style={[styles.tableColHeader, styles.tableTpFlat]}>
+                  <Text style={styles.tableCellHeader} wrap={false}>TP/Flat</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableQty]}>
-                  <Text style={styles.tableCellHeader}>Qty</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Qty</Text>
                 </View>
-                <View style={styles.tableColHeader}>
-                  <Text style={styles.tableCellHeader}>Due qty</Text>
+                <View style={[styles.tableColHeader, styles.tableDueQty]}>
+                  <Text style={styles.tableCellHeader} wrap={false}>Due qty</Text>
                 </View>
-                <View style={styles.tableColHeader}>
-                  <Text style={styles.tableCellHeader}>Total TP</Text>
+                <View style={[styles.tableColHeader, styles.tableTotalTp]}>
+                  <Text style={styles.tableCellHeader} wrap={false}>Total TP</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableBonusQty]}>
-                  <Text style={styles.tableCellHeader}>Bonus Qty</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Bonus Qty</Text>
                 </View>
-                <View style={styles.tableColHeader}>
-                  <Text style={styles.tableCellHeader}>Net Qty</Text>
+                <View style={[styles.tableColHeader, styles.tableNetQty]}>
+                  <Text style={styles.tableCellHeader} wrap={false}>Net Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableNetAmmount]}>
-                  <Text style={styles.tableCellHeader}>Net Amount</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Net Amount</Text>
                 </View>
               </View>
 
@@ -333,15 +339,15 @@ const InvoicePdf = ({ setLoader }) => {
                           {item.product.name}
                         </Text>
                       </View>
-                      <View style={styles.tableCol}>
+                      <View style={[styles.tableCol, styles.tablePackSize]}>
                         <Text style={styles.tableCell}>
                           {item.product.pack_size}
                         </Text>
                       </View>
-                      <View style={styles.tableCol}>
+                      <View style={[styles.tableCol, styles.tableTpFlat]}>
                         <Text style={styles.tableCell}>
                           {item.unit_price}/-
-                          <Text style={{ fontSize: "0.5rem" }}>
+                          <Text style={{ fontSize: 12 }}>
                             ({item.price_type})
                           </Text>
                         </Text>
@@ -349,12 +355,12 @@ const InvoicePdf = ({ setLoader }) => {
                       <View style={[styles.tableCol, styles.tableQty]}>
                         <Text style={styles.tableCell}>{item.quantity}</Text>
                       </View>
-                      <View style={styles.tableCol}>
+                      <View style={[styles.tableCol, styles.tableDueQty]}>
                         <Text style={styles.tableCell}>
                           {item.due_quantity}
                         </Text>
                       </View>
-                      <View style={styles.tableCol}>
+                      <View style={[styles.tableCol, styles.tableTotalTp]}>
                         <Text style={styles.tableCell}>
                           {item.quantity * item.unit_price}/-
                         </Text>
@@ -362,7 +368,7 @@ const InvoicePdf = ({ setLoader }) => {
                       <View style={[styles.tableCol, styles.tableBonusQty]}>
                         <Text style={styles.tableCell}>{item.bonus_qty}</Text>
                       </View>
-                      <View style={styles.tableCol}>
+                      <View style={[styles.tableCol, styles.tableNetQty]}>
                         <Text style={styles.tableCell}>
                           {item.quantity + item.bonus_qty}
                         </Text>
@@ -456,7 +462,7 @@ const InvoicePdf = ({ setLoader }) => {
               </View>
 
               <Text style={styles.note}>
-                PRODUCT SOLD ARE NOT RETURNABLE OR RETRUDABLE
+                PRODUCT SOLD ARE NOT RETURNABLE OR REFUNDABLE
               </Text>
             </View>
             {/* //=>>> Footer end */}

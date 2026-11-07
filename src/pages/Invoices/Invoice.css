@@ -66,6 +66,7 @@
 .invoice-container .product-table tr th {
   background-color: #ebebeb !important;
   font-weight: 900 !important;
+  white-space: nowrap;
 }
 .invoice-container .product-table tr th,
 .invoice-container .product-table tr td {
