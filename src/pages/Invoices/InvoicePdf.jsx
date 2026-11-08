@@ -347,7 +347,7 @@ const InvoicePdf = ({ setLoader }) => {
                       <View style={[styles.tableCol, styles.tableTpFlat]}>
                         <Text style={styles.tableCell}>
                           {item.unit_price}/-
-                          <Text style={{ fontSize: 12 }}>
+                          <Text style={{ fontSize: 10 }}>
                             ({item.price_type})
                           </Text>
                         </Text>
