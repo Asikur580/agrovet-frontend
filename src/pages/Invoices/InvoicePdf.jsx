@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   //=>>> Table start
   table: {
     display: "table",
-    width: "auto",
+    width: "100%",
     borderStyle: "solid",
     borderColor: "#000",
     borderWidth: 1.3,
@@ -300,10 +300,10 @@ const InvoicePdf = ({ setLoader }) => {
               {/* Table header */}
               <View style={styles.tableRow}>
                 <View style={[styles.tableColHeader, styles.tableSlNo]}>
-                  <Text style={styles.tableCellHeader}>Sl No</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Sl No</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableProdName]}>
-                  <Text style={styles.tableCellHeader}>Product Name</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Product Name</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tablePackSize]}>
                   <Text style={styles.tableCellHeader}>Pack Size</Text>
@@ -312,7 +312,7 @@ const InvoicePdf = ({ setLoader }) => {
                   <Text style={styles.tableCellHeader}>TP/Flat</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableQty]}>
-                  <Text style={styles.tableCellHeader}>Qty</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableDueQty]}>
                   <Text style={styles.tableCellHeader}>Due qty</Text>
@@ -321,13 +321,13 @@ const InvoicePdf = ({ setLoader }) => {
                   <Text style={styles.tableCellHeader}>Total TP</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableBonusQty]}>
-                  <Text style={styles.tableCellHeader}>Bonus Qty</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Bonus Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableNetQty]}>
                   <Text style={styles.tableCellHeader}>Net Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableNetAmmount]}>
-                  <Text style={styles.tableCellHeader}>Net Amount</Text>
+                  <Text style={styles.tableCellHeader} wrap={false}>Net Amount</Text>
                 </View>
               </View>
 
@@ -467,7 +467,7 @@ const InvoicePdf = ({ setLoader }) => {
               </View>
 
               <Text style={styles.note}>
-                PRODUCT SOLD ARE NOT RETURNABLE OR RETRUDABLE
+                PRODUCT SOLD ARE NOT RETURNABLE OR REFUNDABLE
               </Text>
             </View>
             {/* //=>>> Footer end */}
