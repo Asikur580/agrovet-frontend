@@ -1,6 +1,22 @@
 /* Home.css - Primary Color: #3b5898 (Table Head / System Brand Color) */
 
 .Home {
+  /* Dashboard tokens: change here, or override under a future dark theme */
+  --home-surface: #ffffff;
+  --home-surface-2: #f8fafc;
+  --home-border: #e2e8f0;
+  --home-border-soft: #f1f5f9;
+  --home-text: #0f172a;
+  --home-text-2: #334155;
+  --home-muted: #64748b;
+  --home-brand: var(--main-clr, #3b5898);
+  --home-brand-soft: #edf2fc;
+  --home-ok: #15803d;
+  --home-ok-bg: #dcfce7;
+  --home-warn: #b45309;
+  --home-warn-bg: #fef3c7;
+  --home-danger: #b91c1c;
+  --home-danger-bg: #fee2e2;
   padding-bottom: 30px;
 }
 
@@ -289,7 +305,7 @@
 }
 
 .Home-inventory-body {
-  max-height: 260px;
+  max-height: 360px;
   overflow-y: auto;
 }
 

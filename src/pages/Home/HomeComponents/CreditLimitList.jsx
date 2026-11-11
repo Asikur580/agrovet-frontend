@@ -5,15 +5,17 @@ import React, {
   Suspense,
   useContext,
   useCallback,
+  useMemo,
 } from "react";
 
 //=>> Utility
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
-import { daysPrevToToday } from "../../../assets/js/DateFormater";
-import { DateFormater } from "../../../assets/js/DateFormater";
+import { daysPrevToToday, DateFormater } from "../../../assets/js/DateFormater";
+import { formatCurrency, readCache } from "../dashboardUtils";
 
 //=>> Components
+import { WidgetSkeleton, WidgetEmpty, StaleBadge } from "./WidgetStates";
 const ModalTable = lazy(() =>
   import("../../../components/Modal/CommonModal/ModalTable")
 );
@@ -21,59 +23,81 @@ const SalesSumrDrpDown = lazy(() =>
   import("../../../components/Dropdown/SalesSumrDrpDown")
 );
 
-const CreditLimitList = () => {
+// Usage % at which an officer is flagged
+const WARN_PCT = 75;
+const DANGER_PCT = 90;
+
+const usagePct = (item) => {
+  const limit = Number(item.credit_limit) || 0;
+  const used = Number(item.credit_use) || 0;
+  if (limit <= 0) return used > 0 ? 100 : 0;
+  return (used / limit) * 100;
+};
+
+const usageClass = (pct) =>
+  pct >= DANGER_PCT ? "usage-danger" : pct >= WARN_PCT ? "usage-warn" : "usage-ok";
+
+const CreditLimitList = ({ onCount }) => {
   const { headers } = useContext(AuthContext);
   const [btnStatus, setBtnStatus] = useState({});
   const [apiData, setApiData] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [spinnerLoader, setSpinnerLoader] = useState(false);
-  const [printData, setPrintData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
   const countedDays = 30;
-  const [dateRang, setDateRang] = useState(daysPrevToToday(countedDays));
+  // Fix: dropdown sets { startDate, endDate }, so keep an object here
+  // (a plain string previously produced "from_date=[object Object]")
+  const [dateRang, setDateRang] = useState({
+    startDate: daysPrevToToday(countedDays),
+    endDate: DateFormater(new Date()),
+  });
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
-      setSpinnerLoader(true);
-      const api = `/employees/credit-report?from_date=${dateRang}&to_date=${DateFormater(
-        new Date()
-      )}`;
+      setLoading(true);
+      const from = dateRang?.startDate || daysPrevToToday(countedDays);
+      const to = dateRang?.endDate || DateFormater(new Date());
+      const api = `/employees/credit-report?from_date=${from}&to_date=${to}`;
       const response = await ApiConfig.get(api, { headers });
-      if (response.data.status) {
-        const datas = Object.values(response.data.data);
-
-        if (dateRang != 0) {
-          setApiData(datas);
-          //=>>> For Print
-          sessionStorage.setItem("printCreditLimitList", JSON.stringify(datas));
-          setPrintData(datas);
-        } else {
-          setApiData([]);
-          //=>>> For Print
-          sessionStorage.setItem("printCreditLimitList", JSON.stringify([]));
-          setPrintData([]);
-          setMsg("Opps! Data not found.");
-        }
-
-        //==> For offline use
-        localStorage.setItem("CreditLimitList", JSON.stringify(datas));
-      }
+      const datas = response.data.status ? Object.values(response.data.data || {}) : [];
+      setApiData(datas);
+      setIsStale(false);
+      //=>>> For Print
+      sessionStorage.setItem("printCreditLimitList", JSON.stringify(datas));
+      //==> For offline use
+      localStorage.setItem("CreditLimitList", JSON.stringify(datas));
     } catch (error) {
       console.error(error);
-      setMsg(error.message);
       //==> For offline use
-      const cachedData = localStorage.getItem("CreditLimitList");
+      const cachedData = readCache("CreditLimitList");
       if (cachedData) {
-        setApiData(JSON.parse(cachedData));
+        setApiData(cachedData);
+        setIsStale(true);
       }
     } finally {
-      setSpinnerLoader(false);
+      setLoading(false);
     }
   }, [headers, dateRang]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  //=>>> Highest usage first
+  const sortedData = useMemo(
+    () => [...apiData].sort((a, b) => usagePct(b) - usagePct(a)),
+    [apiData]
+  );
+
+  // Hub tab badge counts only officers at or above the warning level
+  const warningCount = useMemo(
+    () => sortedData.filter((i) => usagePct(i) >= WARN_PCT).length,
+    [sortedData]
+  );
+
+  useEffect(() => {
+    onCount?.(warningCount);
+  }, [warningCount, onCount]);
 
   //=>>> For print modal
   const tableHead = [
@@ -87,68 +111,87 @@ const CreditLimitList = () => {
     "Credit due",
   ];
 
-  //==> Render individual invoice item
-  const renderInvoiceItem = (item, index) => (
-    <div className="reportBoxMini" key={item.id}>
-      <Suspense fallback="...">
-        <ModalTable
-          id={item.id}
-          slug="Credit limit list"
-          inputFields={[]}
-          ModalOpenBtnTitle={
-            <div className="w-full d-flex items-center justify-between text-dark_3">
-              <p>
-                <span>{index + 1}</span>.{" "}
-                {item.employee_name.length >= 20
-                  ? item.employee_name.slice(0, 20) + "..."
-                  : item.employee_name}
-              </p>
-              <p className="text-red-500">Credit due : {item.credit_due}</p>
-            </div>
-          }
-          className="modalTableOpenBtn"
-          identifier="CreditLimitList"
-          data={apiData.filter((filter) => filter.id === item.id)}
-          btnStatus={btnStatus}
-          setBtnStatus={setBtnStatus}
-          width="100%"
-          toolTip={``}
-        />
-      </Suspense>
-    </div>
-  );
+  //==> Render individual officer row
+  const renderItem = (item) => {
+    const pct = usagePct(item);
+    const name = item.employee_name || "-";
+    return (
+      <div className="reportBoxMini" key={item.id}>
+        <Suspense fallback={<div className="HomeSkeleton-row" />}>
+          <ModalTable
+            id={item.id}
+            slug="Credit limit list"
+            inputFields={[]}
+            ModalOpenBtnTitle={
+              <div className="HomeRow is-stacked">
+                <div className="HomeRow-line">
+                  <p className="HomeRow-title" title={name}>
+                    {name}
+                  </p>
+                  <p className={`HomeRow-pct ${usageClass(pct)}`}>{pct.toFixed(0)}% used</p>
+                </div>
+                <div
+                  className="HomeUsage"
+                  role="progressbar"
+                  aria-valuenow={Math.round(pct)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${name} credit usage`}
+                >
+                  <div
+                    className={`HomeUsage-fill ${usageClass(pct)}`}
+                    style={{ width: `${Math.min(pct, 100)}%` }}
+                  />
+                </div>
+                <p className="HomeRow-sub">
+                  Used {formatCurrency(item.credit_use)} of {formatCurrency(item.credit_limit)}
+                  {" • "}Remaining {formatCurrency(item.credit_due)}
+                </p>
+              </div>
+            }
+            className="modalTableOpenBtn"
+            identifier="CreditLimitList"
+            data={[item]}
+            btnStatus={btnStatus}
+            setBtnStatus={setBtnStatus}
+            width="100%"
+            toolTip={``}
+          />
+        </Suspense>
+      </div>
+    );
+  };
 
   return (
     <>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: "10",
-          background: "var(--light-1)",
-          borderBottom: "var(--border)",
-        }}
-      >
-        <div className="flex items-center justify-center gap-2 py-1">
-          <h1 className="">
-            Credit limit list <span>({apiData.length})</span>
-          </h1>
-          <SalesSumrDrpDown
-            countedDays={countedDays}
-            setDateRang={setDateRang}
-            printData={printData}
-            spinnerLoader={spinnerLoader}
-            tableHead={tableHead}
-            slug="Credit limit list"
-            identifierForPrintModal="printCreditLimitList"
-          />
+      <div className="HomeWidget-head is-sticky">
+        <div className="HomeWidget-title-wrap">
+          <h3 className="HomeWidget-title">
+            Officer Credit Usage <span className="HomeWidget-count">({apiData.length})</span>
+          </h3>
+          <StaleBadge show={isStale} />
+        </div>
+        <div className="HomeWidget-actions">
+          <Suspense fallback={null}>
+            <SalesSumrDrpDown
+              range={dateRang}
+              setDateRang={setDateRang}
+              printData={sortedData}
+              spinnerLoader={loading}
+              tableHead={tableHead}
+              slug="Credit limit list"
+              identifierForPrintModal="printCreditLimitList"
+            />
+          </Suspense>
         </div>
       </div>
 
-      {apiData.length > 0 ? (
-        apiData.map(renderInvoiceItem)
+      {loading && apiData.length === 0 ? (
+        <WidgetSkeleton rows={5} />
+      ) : sortedData.length > 0 ? (
+        sortedData.map(renderItem)
       ) : (
-        <p className="message text-center">{msg}</p>
+        <WidgetEmpty title="No credit data" hint="No officers have a credit limit set." />
       )}
     </>
   );

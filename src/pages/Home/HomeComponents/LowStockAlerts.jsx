@@ -1,107 +1,114 @@
-//====>>>> Optimized code
-import React, {
-  useState,
-  useEffect,
-  lazy,
-  Suspense,
-  useContext,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { FaTriangleExclamation } from "react-icons/fa6";
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
+import { formatNumber, readCache } from "../dashboardUtils";
 
 //=>>> Components
-import Spinner from "../../../components/Loader/Spinner";
-// const ModalTable = lazy(() =>
-//   import("../../../components/Modal/CommonModal/ModalTable")
-// );
+import { WidgetSkeleton, WidgetEmpty, StaleBadge } from "./WidgetStates";
 
-const LowStockAlerts = ({ setLoader }) => {
+const VISIBLE_LIMIT = 10;
+
+const LowStockAlerts = ({ canManageProducts = true }) => {
   const { headers } = useContext(AuthContext);
   const [apiData, setApiData] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [spinnerLoader, setSpinnerLoader] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
 
   //==> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
-      setSpinnerLoader(true);
+      setLoading(true);
       const response = await ApiConfig.get("/low_stock_alerts", { headers });
-      if (response.data.status) {
-        const datas = response.data.low_stock_alerts;
-        setApiData(datas);
-
-        //==> For offline use
-        localStorage.setItem("LowStockAlerts", JSON.stringify(datas));
-      } else {
-        setMsg(response.data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching due invoices:", error);
-      // setMsg("Failed to fetch due invoices. Please try again later.");
+      const datas = response.data.status ? response.data.low_stock_alerts || [] : [];
+      setApiData(datas);
+      setIsStale(false);
       //==> For offline use
-      const cachedData = localStorage.getItem("LowStockAlerts");
+      localStorage.setItem("LowStockAlerts", JSON.stringify(datas));
+    } catch (error) {
+      console.error("Error fetching low stock alerts:", error);
+      //==> For offline use
+      const cachedData = readCache("LowStockAlerts");
       if (cachedData) {
-        setApiData(JSON.parse(cachedData));
+        setApiData(cachedData);
+        setIsStale(true);
       }
     } finally {
-      setSpinnerLoader(false);
+      setLoading(false);
     }
-  }, [headers, setLoader]);
+  }, [headers]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  //=>>> Out of stock first, then lowest stock
+  const sorted = useMemo(
+    () => [...apiData].sort((a, b) => (Number(a.current_stock) || 0) - (Number(b.current_stock) || 0)),
+    [apiData]
+  );
+  const outOfStock = sorted.filter((i) => Number(i.current_stock) <= 0).length;
+
   return (
-    <>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: "10",
-          background: "var(--light-1)",
-          borderBottom: "var(--border)",
-        }}
-      >
-        <div className="flex items-center justify-between px-3 py-2">
-          <h1 className="">
-            Low stock <span>({apiData.length})</span>
-          </h1>
+    <div className="Home-inventory-alert-card">
+      <div className="Home-inventory-header">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+            <FaTriangleExclamation size={15} />
+            <span>Low Stock Alerts ({sorted.length})</span>
+          </span>
+          {outOfStock > 0 && (
+            <span className="HomeStock-pill stock-out">{outOfStock} out of stock</span>
+          )}
+          <StaleBadge show={isStale} />
+        </div>
+        {canManageProducts && (
           <Link
             to="/products?filter=low_stock"
-            className="text-xs text-[#3b5898] hover:underline font-semibold"
+            className="HomeWidget-link"
             title="View all low stock products"
           >
             View all &rarr;
           </Link>
-        </div>
+        )}
       </div>
 
-      {spinnerLoader && (
-        <div className="flex justify-center items-center mt-7">
-          <Spinner />
-        </div>
-      )}
-
-      {apiData.length > 0 ? (
-        apiData.map((item, index) => {
-          return (
-            <div className="reportBoxMini" key={index}>
-              <div className="w-full d-flex items-center justify-between text-dark_3 py-1 px-2 cursor-pointer hover:bg-[#edf2fc] hover:rounded-lg">
-                <p>Name : {item.product_name} ({item.pack_size})</p>
-                <p className="text-red-500">Stock : {item.current_stock}</p>
-              </div>
+      <div className="Home-inventory-body">
+        {loading && apiData.length === 0 ? (
+          <WidgetSkeleton rows={4} />
+        ) : sorted.length > 0 ? (
+          <>
+            <div className="HomeStock-grid">
+              {sorted.slice(0, VISIBLE_LIMIT).map((item, index) => {
+                const stock = Number(item.current_stock) || 0;
+                const isOut = stock <= 0;
+                const name = item.pack_size
+                  ? `${item.product_name} (${item.pack_size})`
+                  : item.product_name;
+                return (
+                  <div className="HomeStock-row" key={`${item.product_name}-${index}`}>
+                    <p className="HomeRow-title" title={name}>
+                      {name}
+                    </p>
+                    <span className={`HomeStock-pill ${isOut ? "stock-out" : "stock-low"}`}>
+                      {isOut ? "Out of stock" : `${formatNumber(stock)} left`}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          );
-        })
-      ) : (
-        <p className="text-gray-400 text-justify p-2">
-          {msg || "No due invoices found."}
-        </p>
-      )}
-    </>
+            {sorted.length > VISIBLE_LIMIT && canManageProducts && (
+              <Link to="/products?filter=low_stock" className="HomeWidget-viewall">
+                View all {sorted.length} low stock products &rarr;
+              </Link>
+            )}
+          </>
+        ) : (
+          <WidgetEmpty title="All products sufficiently stocked" />
+        )}
+      </div>
+    </div>
   );
 };
 

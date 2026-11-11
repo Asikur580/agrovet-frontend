@@ -7,11 +7,13 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import { Link } from "react-router-dom";
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
-import { daysPrevToToday } from "../../../assets/js/DateFormater";
+import { formatCurrency, readCache } from "../dashboardUtils";
 
 //=>> Components
+import { WidgetSkeleton, WidgetEmpty, StaleBadge } from "./WidgetStates";
 const ModalTable = lazy(() =>
   import("../../../components/Modal/CommonModal/ModalTable")
 );
@@ -19,52 +21,45 @@ const DueInvoiceDrpDown = lazy(() =>
   import("../../../components/Dropdown/DueInvoiceDrpDown")
 );
 
-const DueInvoice = () => {
+const VISIBLE_LIMIT = 10;
+
+//=>>> Aging bucket for collection priority
+const agingClass = (days) => {
+  const d = Number(days) || 0;
+  if (d > 60) return "aging-danger";
+  if (d > 30) return "aging-warn";
+  return "aging-ok";
+};
+
+const DueInvoice = ({ onCount, canViewAll = true }) => {
   const { headers } = useContext(AuthContext);
   const [btnStatus, setBtnStatus] = useState({});
   const [apiData, setApiData] = useState([]);
-  const [filteredApiData, setFilteredApiData] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [spinnerLoader, setSpinnerLoader] = useState(false);
-  const [printData, setPrintData] = useState({});
-  const [dateRang, setDateRang] = useState({
-    startDate: daysPrevToToday(30),
-    endDate: daysPrevToToday(0),
-  });
+  const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
+  // Default: all dues (older dues matter most, so no date cut-off)
+  const [dateRang, setDateRang] = useState(null);
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
-      setSpinnerLoader(true);
+      setLoading(true);
       const response = await ApiConfig.get("/dueInvoice", { headers });
-      if (response.data.status) {
-        const datas = Object.values(response.data.data);
-        setApiData(datas);
-        const filtering = datas.filter((item) => {
-          let isValid = true;
-          if (dateRang?.startDate) isValid = isValid && item.sale_date >= dateRang.startDate;
-          if (dateRang?.endDate) isValid = isValid && item.sale_date <= dateRang.endDate;
-          return isValid;
-        });
-        setFilteredApiData(filtering);
-        //=>>> For Print
-        sessionStorage.setItem("printDueInvoice", JSON.stringify(filtering));
-        setPrintData(filtering);
-
-        //==> For offline use
-        localStorage.setItem("DueInvoice", JSON.stringify(datas));
-      }
+      const datas = response.data.status ? Object.values(response.data.data || {}) : [];
+      setApiData(datas);
+      setIsStale(false);
+      //==> For offline use
+      localStorage.setItem("DueInvoice", JSON.stringify(datas));
     } catch (error) {
       console.error(error);
-      setMsg(error.message);
       //==> For offline use
-      const cachedData = localStorage.getItem("DueInvoice");
+      const cachedData = readCache("DueInvoice");
       if (cachedData) {
-        setApiData(JSON.parse(cachedData));
-        // setFilteredApiData(JSON.parse(cachedData)); ***
+        setApiData(cachedData);
+        setIsStale(true);
       }
     } finally {
-      setSpinnerLoader(false);
+      setLoading(false);
     }
   }, [headers]);
 
@@ -72,101 +67,116 @@ const DueInvoice = () => {
     fetchData();
   }, [fetchData]);
 
-  //=>>> Filtering for day wise query start
-  const filteringByDate = useMemo(() => {
-    if (!dateRang || dateRang === "0" || dateRang === 0) return [];
-    return apiData.filter((item) => {
-      let isValid = true;
-      if (dateRang?.startDate) isValid = isValid && item.sale_date >= dateRang.startDate;
-      if (dateRang?.endDate) isValid = isValid && item.sale_date <= dateRang.endDate;
-      return isValid;
+  //=>>> Optional date filter, then oldest (highest risk) first
+  const filteredData = useMemo(() => {
+    const list = apiData.filter((item) => {
+      const saleDate = String(item.sale_date || "").slice(0, 10);
+      if (dateRang?.startDate && saleDate < dateRang.startDate) return false;
+      if (dateRang?.endDate && saleDate > dateRang.endDate) return false;
+      return true;
     });
-  }, [dateRang, apiData]);
+    return [...list].sort(
+      (a, b) =>
+        (Number(b.days_since_sale) || 0) - (Number(a.days_since_sale) || 0) ||
+        (Number(b.due) || 0) - (Number(a.due) || 0)
+    );
+  }, [apiData, dateRang]);
 
+  //=>>> Print data + count for the hub tab badge
   useEffect(() => {
-    if (dateRang !== "0" && dateRang !== 0) {
-      setSpinnerLoader(true);
-      setFilteredApiData(filteringByDate);
-      setPrintData(filteringByDate);
-      sessionStorage.setItem(
-        "printDueInvoice",
-        JSON.stringify(filteringByDate)
-      );
-      setTimeout(() => {
-        setSpinnerLoader(false);
-      }, [100]);
-    } else {
-      setFilteredApiData([]);
-      setPrintData([]);
-      sessionStorage.setItem("printDueInvoice", JSON.stringify([]));
-      setMsg("Opps! Data not found.");
-    }
-  }, [filteringByDate]);
-  //=>>> Filtering for day wise query end
+    sessionStorage.setItem("printDueInvoice", JSON.stringify(filteredData));
+    onCount?.(filteredData.length);
+  }, [filteredData, onCount]);
+
+  const totalDue = useMemo(
+    () => filteredData.reduce((sum, i) => sum + (Number(i.due) || 0), 0),
+    [filteredData]
+  );
 
   //==> Render individual invoice item
-  const renderInvoiceItem = (item, index) => (
-    <div className="reportBoxMini" key={item.id}>
-      <Suspense fallback="...">
-        <ModalTable
-          id={item.id}
-          slug="Due invoice"
-          inputFields={[]}
-          ModalOpenBtnTitle={
-            <div className="w-full d-flex items-center justify-between text-dark_3">
-              <p>
-                <span>{index + 1}</span>. Id : {item.invoiceId}
-              </p>
-              <p className="text-red-500">Due : {item.due}/-</p>
-            </div>
-          }
-          className="modalTableOpenBtn"
-          identifier="dueInvoice"
-          data={apiData.filter((filter) => filter.id === item.id)}
-          btnStatus={btnStatus}
-          setBtnStatus={setBtnStatus}
-          width="100%"
-          toolTip={``}
-        />
-      </Suspense>
-    </div>
-  );
+  const renderInvoiceItem = (item) => {
+    const customerName = item.customer?.customer_name || "Unknown customer";
+    const days = Number(item.days_since_sale) || 0;
+    return (
+      <div className="reportBoxMini" key={item.id}>
+        <Suspense fallback={<div className="HomeSkeleton-row" />}>
+          <ModalTable
+            id={item.id}
+            slug="Due invoice"
+            inputFields={[]}
+            ModalOpenBtnTitle={
+              <div className="HomeRow">
+                <div className="HomeRow-main">
+                  <p className="HomeRow-title" title={customerName}>
+                    {customerName}
+                  </p>
+                  <p className="HomeRow-sub">
+                    #{item.invoiceId}
+                    {item.employee?.name ? ` • ${item.employee.name}` : ""}
+                  </p>
+                </div>
+                <div className="HomeRow-side">
+                  <p className="HomeRow-amount text-red-600">{formatCurrency(item.due)}</p>
+                  <span className={`HomeAging ${agingClass(days)}`}>
+                    {days} days
+                  </span>
+                </div>
+              </div>
+            }
+            className="modalTableOpenBtn"
+            identifier="dueInvoice"
+            data={[item]}
+            btnStatus={btnStatus}
+            setBtnStatus={setBtnStatus}
+            width="100%"
+            toolTip={``}
+          />
+        </Suspense>
+      </div>
+    );
+  };
 
   return (
     <>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: "10",
-          background: "var(--light-1)",
-          borderBottom: "var(--border)",
-        }}
-      >
-        <div className="flex items-center justify-center gap-2 py-1">
-          <h1 className="">
-            Due Invoices <span>({filteredApiData.length})</span>
-          </h1>
-          <DueInvoiceDrpDown
-            countedDays={30}
-            dateRang={dateRang}
-            setDateRang={setDateRang}
-            printData={printData}
-            spinnerLoader={spinnerLoader}
-          />
+      <div className="HomeWidget-head is-sticky">
+        <div className="HomeWidget-title-wrap">
+          <h3 className="HomeWidget-title">
+            Due Invoices <span className="HomeWidget-count">({filteredData.length})</span>
+          </h3>
+          <StaleBadge show={isStale} />
+        </div>
+        <div className="HomeWidget-actions">
+          <span className="HomeWidget-total">{formatCurrency(totalDue)}</span>
+          <Suspense fallback={null}>
+            <DueInvoiceDrpDown
+              dateRang={dateRang}
+              setDateRang={setDateRang}
+              printData={filteredData}
+              spinnerLoader={loading}
+            />
+          </Suspense>
         </div>
       </div>
 
-      {/* {spinnerLoader && (
-        <div className="flex justify-center items-center mt-7">
-          <Spinner />
-        </div>
-      )} */}
+      <div className="HomeAging-legend">
+        <span className="HomeAging aging-ok">0-30 days</span>
+        <span className="HomeAging aging-warn">31-60 days</span>
+        <span className="HomeAging aging-danger">60+ days</span>
+      </div>
 
-      {filteredApiData.length > 0 ? (
-        filteredApiData.map(renderInvoiceItem)
+      {loading && apiData.length === 0 ? (
+        <WidgetSkeleton rows={5} />
+      ) : filteredData.length > 0 ? (
+        <>
+          {filteredData.slice(0, VISIBLE_LIMIT).map(renderInvoiceItem)}
+          {filteredData.length > VISIBLE_LIMIT && canViewAll && (
+            <Link to="/sales?filter=due" className="HomeWidget-viewall">
+              View all {filteredData.length} due invoices &rarr;
+            </Link>
+          )}
+        </>
       ) : (
-        <p className="message">{msg}</p>
+        <WidgetEmpty title="No due invoices" hint="All customer invoices are paid." />
       )}
     </>
   );

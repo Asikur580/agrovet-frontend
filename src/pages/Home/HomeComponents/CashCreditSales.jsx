@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa6";
 import React, {
   useState,
   useEffect,
@@ -8,68 +6,70 @@ import React, {
   useContext,
   useCallback,
 } from "react";
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa6";
 
 //=>> Utility
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
-import { daysPrevToToday } from "../../../assets/js/DateFormater";
-import { DateFormater } from "../../../assets/js/DateFormater";
+import {
+  getPresetRange,
+  DEFAULT_PRESET,
+  formatCurrency,
+  formatCompactCurrency,
+  readCache,
+} from "../dashboardUtils";
 
 //=>> Components
-import PieChart from "../../../components/Charts/PieChart";
+import { WidgetSkeleton, WidgetEmpty, StaleBadge } from "./WidgetStates";
 const SalesSumrDrpDown = lazy(() =>
   import("../../../components/Dropdown/SalesSumrDrpDown")
 );
 
-const CashCreditSales = () => {
+const CashCreditSales = ({ dateRange, canOpenReport = true }) => {
   const { headers } = useContext(AuthContext);
   const [apiData, setApiData] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [spinnerLoader, setSpinnerLoader] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
   const [printData, setPrintData] = useState({});
-  const countedDays = 365;
-  const [dateRang, setDateRang] = useState({
-    startDate: daysPrevToToday(countedDays),
-    endDate: DateFormater(new Date()),
-  });
+  const [dateRang, setDateRang] = useState(
+    dateRange || getPresetRange(DEFAULT_PRESET)
+  );
+
+  //=>>> Follow the dashboard global date filter
+  useEffect(() => {
+    if (dateRange) setDateRang(dateRange);
+  }, [dateRange]);
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
-      setSpinnerLoader(true);
-      const fromDate = dateRang?.startDate || daysPrevToToday(countedDays);
-      const toDate = dateRang?.endDate || DateFormater(new Date());
-      const api = `/cashCreditSale?from_date=${fromDate}&to_date=${toDate}`;
+      setLoading(true);
+      const { startDate, endDate } = dateRang;
+      const api = `/cashCreditSale?from_date=${startDate}&to_date=${endDate}`;
       const response = await ApiConfig.get(api, { headers });
       if (response.data.status) {
-        const datas = Object.values(response.data.data);
-        if (dateRang !== "0" && dateRang !== 0) {
-          setApiData(datas);
-          sessionStorage.setItem("Cash/credit sales", JSON.stringify(datas));
-          //=>>> For Print
-          sessionStorage.setItem("printCashCreditSales", JSON.stringify(datas));
-          setPrintData(datas);
-        } else {
-          setApiData([]);
-          //=>>> For Print
-          sessionStorage.setItem("printCashCreditSales", JSON.stringify([]));
-          setPrintData([]);
-          setMsg("Opps! Data not found.");
-        }
-
+        const datas = Object.values(response.data.data || {});
+        setApiData(datas);
+        setIsStale(false);
+        //=>>> For Print
+        sessionStorage.setItem("printCashCreditSales", JSON.stringify(datas));
+        setPrintData(datas);
         //==> For offline use
         localStorage.setItem("CashCreditSales", JSON.stringify(datas));
+      } else {
+        setApiData([]);
       }
     } catch (error) {
       console.error(error);
-      setMsg(error.message);
       //==> For offline use
-      const cachedData = localStorage.getItem("CashCreditSales");
+      const cachedData = readCache("CashCreditSales");
       if (cachedData) {
-        setApiData(JSON.parse(cachedData));
+        setApiData(cachedData);
+        setIsStale(true);
       }
     } finally {
-      setSpinnerLoader(false);
+      setLoading(false);
     }
   }, [headers, dateRang]);
 
@@ -77,124 +77,99 @@ const CashCreditSales = () => {
     fetchData();
   }, [fetchData]);
 
-  //=>>> For print modal
-  const tableHead = [];
-  // const tableHead = ["Sl", "Cash", "Credit"];
-
-  //=>>> For chart start
-  const data = {
-    labels: ["Cash", "Credit"],
-    datasets: [
-      {
-        label: "# of Amount",
-        data: [apiData[0], apiData[1]], // The values for each slice
-        backgroundColor: ["rgba(54, 162, 235, 0.6)", "rgba(255, 206, 86, 0.6)"],
-        borderColor: ["rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)"],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "bottom",
-      },
-      title: {
-        display: true,
-        text: "Cash/Credit wise sales",
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            const value = Number(context.raw).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            return ` ${context.label}: ${value} /-`;
-          },
-        },
-      },
-      datalabels: {
-        formatter: (value) => {
-          return Number(value).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        },
-        color: "#333",
-        font: {
-          weight: "bold",
-          size: 12,
-        },
-      },
-    },
-  };
-  //=>>> For chart end
+  //=>>> Guard against missing values (previously rendered "NaN/-")
+  const cash = Number(apiData[0]) || 0;
+  const credit = Number(apiData[1]) || 0;
+  const total = cash + credit;
+  const cashPct = total > 0 ? (cash / total) * 100 : 0;
+  const creditPct = total > 0 ? 100 - cashPct : 0;
 
   return (
     <>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: "10",
-          background: "var(--light-1)",
-          borderBottom: "var(--border)",
-        }}
-      >
-        <div className="flex items-center justify-between gap-2 py-1 px-1 flex-wrap">
-          <h1 className="m-0">Cash/Credit wise sales</h1>
-          <div className="flex items-center gap-2">
+      <div className="HomeWidget-head">
+        <div className="HomeWidget-title-wrap">
+          <h3 className="HomeWidget-title">Cash vs Credit Sales</h3>
+          <StaleBadge show={isStale} />
+        </div>
+        <div className="HomeWidget-actions">
+          <Suspense fallback={null}>
             <SalesSumrDrpDown
-              countedDays={countedDays}
+              range={dateRang}
               setDateRang={setDateRang}
               printData={printData}
-              spinnerLoader={spinnerLoader}
-              tableHead={tableHead}
+              spinnerLoader={loading}
+              tableHead={[]}
               slug="Cash/Credit wise sales"
               identifierForPrintModal="printCashCreditSales"
             />
+          </Suspense>
+          {canOpenReport && (
             <Link
               to="/cash-credit-sales-report"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "4px",
-                fontSize: "0.78rem",
-                fontWeight: "600",
-                color: "#3b5898",
-                backgroundColor: "#edf2fc",
-                border: "1px solid #c5d3ea",
-                padding: "3px 8px",
-                borderRadius: "6px",
-                textDecoration: "none",
-                transition: "all 0.2s"
-              }}
+              className="HomeWidget-link"
               title="View full cash & credit sales report"
             >
               <span>Full Report</span>
               <FaArrowRight size={10} />
             </Link>
-          </div>
+          )}
         </div>
       </div>
+      <p className="HomeWidget-range">
+        {dateRang.startDate} &rarr; {dateRang.endDate}
+      </p>
 
-      {apiData.length > 0 ? (
-        <PieChart chartData={data} chartOptions={options} />
+      {loading && total === 0 ? (
+        <WidgetSkeleton rows={4} />
+      ) : total === 0 ? (
+        <WidgetEmpty
+          title="No sales in this period"
+          hint="Try a wider date range."
+          onRetry={fetchData}
+        />
       ) : (
-        <p className="message">{msg}</p>
-      )}
+        <div className="CashCredit">
+          <div className="CashCredit-total">
+            <span className="CashCredit-total-label">Total sales</span>
+            <span className="CashCredit-total-value" title={formatCurrency(total)}>
+              {formatCompactCurrency(total)}
+            </span>
+          </div>
 
-      <div className="flex items-center justify-end gap-5 sm:gap-16 flex-col sm:flex-row">
-        <p>
-          Cash :{" "}
-          <span style={{ color: "rgba(7, 155, 253, 1)" }}>
-            {Number(apiData[0]).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/-
-          </span>
-        </p>
-        <p>
-          Credit :{" "}
-          <span style={{ color: "rgba(247, 132, 0, 1)" }}>
-            {Number(apiData[1]).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/-
-          </span>
-        </p>
-      </div>
+          {/* Split bar: easier to compare than a 2-slice pie */}
+          <div
+            className="CashCredit-bar"
+            role="img"
+            aria-label={`Cash ${cashPct.toFixed(1)} percent, credit ${creditPct.toFixed(1)} percent`}
+          >
+            <div className="CashCredit-bar-cash" style={{ width: `${cashPct}%` }} />
+            <div className="CashCredit-bar-credit" style={{ width: `${creditPct}%` }} />
+          </div>
+
+          <div className="CashCredit-stats">
+            <div className="CashCredit-stat">
+              <span className="CashCredit-dot dot-cash" />
+              <div>
+                <p className="CashCredit-stat-label">Cash</p>
+                <p className="CashCredit-stat-value" title={formatCurrency(cash)}>
+                  {formatCompactCurrency(cash)}
+                </p>
+                <p className="CashCredit-stat-pct">{cashPct.toFixed(1)}%</p>
+              </div>
+            </div>
+            <div className="CashCredit-stat">
+              <span className="CashCredit-dot dot-credit" />
+              <div>
+                <p className="CashCredit-stat-label">Credit</p>
+                <p className="CashCredit-stat-value" title={formatCurrency(credit)}>
+                  {formatCompactCurrency(credit)}
+                </p>
+                <p className="CashCredit-stat-pct">{creditPct.toFixed(1)}%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

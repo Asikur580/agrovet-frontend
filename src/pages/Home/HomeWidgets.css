@@ -1,0 +1,570 @@
+/* HomeWidgets.css - shared dashboard widget styles (header, states, rows, filters) */
+
+/* ===== Header extras ===== */
+.Home-role {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--home-brand);
+  background: var(--home-brand-soft);
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.Home-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--home-brand);
+  background: var(--home-brand-soft);
+  border: 1px solid #c5d3ea;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.Home-refresh-btn:hover {
+  background: #dfe8f8;
+}
+
+/* ===== Global period filter ===== */
+.Home-period-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.Home-period-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--home-text-2);
+}
+.Home-period-options {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--home-border-soft);
+  border: 1px solid var(--home-border);
+  border-radius: 8px;
+  overflow-x: auto;
+  max-width: 100%;
+}
+.Home-period-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--home-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.Home-period-btn.active {
+  background: var(--home-surface);
+  color: var(--home-brand);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.Home-period-range {
+  font-size: 0.72rem;
+  color: var(--home-muted);
+}
+
+/* ===== Shared widget header (replaces repeated inline sticky styles) ===== */
+.HomeWidget-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 2px 6px;
+  background: var(--home-surface);
+}
+.HomeWidget-head.is-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--home-border-soft);
+}
+.HomeWidget-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.HomeWidget-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--home-text);
+}
+.HomeWidget-count {
+  font-weight: 500;
+  color: var(--home-muted);
+}
+.HomeWidget-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.HomeWidget-total {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--home-text-2);
+}
+.HomeWidget-range {
+  margin: 0 0 8px;
+  font-size: 0.7rem;
+  color: var(--home-muted);
+}
+.HomeWidget-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--home-brand);
+  background: var(--home-brand-soft);
+  border: 1px solid #c5d3ea;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.HomeWidget-link:hover {
+  background: #dfe8f8;
+}
+.HomeWidget-viewall {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--home-brand);
+}
+.HomeWidget-viewall:hover {
+  text-decoration: underline;
+}
+
+/* ===== Loading / empty / stale states ===== */
+.HomeSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 2px;
+}
+.HomeSkeleton-row {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef2f7 25%, #e2e8f0 37%, #eef2f7 63%);
+  background-size: 400% 100%;
+  animation: home-shimmer 1.2s ease infinite;
+}
+.HomeSkeleton-row:nth-child(even) {
+  width: 75%;
+}
+@keyframes home-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+.HomeEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 28px 12px;
+  color: var(--home-muted);
+}
+.HomeEmpty-icon {
+  color: #cbd5e1;
+  margin-bottom: 4px;
+}
+.HomeEmpty-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--home-text-2);
+}
+.HomeEmpty-hint {
+  margin: 0;
+  font-size: 0.75rem;
+}
+.HomeEmpty-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--home-brand);
+  background: var(--home-brand-soft);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.HomeStaleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--home-warn);
+  background: var(--home-warn-bg);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ===== List rows (due, credit, share, stock) ===== */
+.HomeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+}
+.HomeRow.is-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+.HomeRow-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.HomeRow-main {
+  min-width: 0;
+  flex: 1;
+}
+.HomeRow-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.HomeRow-title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--home-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.HomeRow-rank {
+  color: var(--home-muted);
+  font-weight: 500;
+}
+.HomeRow-sub {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--home-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.HomeRow-amount {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.HomeRow-pct {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.HomeAging {
+  display: inline-block;
+  padding: 1px 7px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.HomeAging.aging-ok {
+  color: var(--home-ok);
+  background: var(--home-ok-bg);
+}
+.HomeAging.aging-warn {
+  color: var(--home-warn);
+  background: var(--home-warn-bg);
+}
+.HomeAging.aging-danger {
+  color: var(--home-danger);
+  background: var(--home-danger-bg);
+}
+.HomeAging-legend {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 6px 2px;
+}
+
+.HomeUsage {
+  height: 6px;
+  background: var(--home-border-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.HomeUsage-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.HomeUsage-fill.usage-ok {
+  background: #22c55e;
+}
+.HomeUsage-fill.usage-warn {
+  background: #f59e0b;
+}
+.HomeUsage-fill.usage-danger {
+  background: #ef4444;
+}
+.HomeUsage-fill.usage-share {
+  background: var(--home-brand);
+}
+.HomeRow-pct.usage-ok {
+  color: var(--home-ok);
+}
+.HomeRow-pct.usage-warn {
+  color: var(--home-warn);
+}
+.HomeRow-pct.usage-danger {
+  color: var(--home-danger);
+}
+
+.HomeHubTab-badge {
+  min-width: 18px;
+  padding: 0 5px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  color: #ffffff;
+  background: var(--home-muted);
+  border-radius: 999px;
+}
+.HomeHubTab.active .HomeHubTab-badge {
+  background: var(--home-brand);
+}
+.HomeHubTab.tab-warning .HomeHubTab-badge {
+  background: #d97706;
+}
+
+/* ===== Low stock rows ===== */
+.HomeStock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 4px;
+  border-bottom: 1px solid var(--home-border-soft);
+}
+.HomeStock-row:last-child {
+  border-bottom: none;
+}
+.HomeStock-pill {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.HomeStock-pill.stock-out {
+  color: var(--home-danger);
+  background: var(--home-danger-bg);
+}
+.HomeStock-pill.stock-low {
+  color: var(--home-warn);
+  background: var(--home-warn-bg);
+}
+
+.Home-hub-column > .Home-inventory-alert-card {
+  height: 100%;
+}
+
+/* Performance hub: two columns of rows when it spans the full width */
+.Home-section .HomeShareGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+}
+.Home-section .HomeHubCard-body {
+  max-height: 420px;
+}
+
+/* Non-admin: performance hub sits inside a chart box */
+.Home-chart-box .HomeHubCard {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.Home-territory-note {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  color: var(--home-brand);
+  background: var(--home-brand-soft);
+  border-radius: 8px;
+}
+.Home-territory-note .HomeWidget-link {
+  margin-left: auto;
+  background: var(--home-surface);
+}
+
+/* ===== Cash vs credit split ===== */
+.CashCredit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 2px;
+}
+.CashCredit-total {
+  display: flex;
+  flex-direction: column;
+}
+.CashCredit-total-label {
+  font-size: 0.74rem;
+  color: var(--home-muted);
+}
+.CashCredit-total-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--home-text);
+}
+.CashCredit-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--home-border-soft);
+}
+.CashCredit-bar-cash {
+  background: #2563eb;
+}
+.CashCredit-bar-credit {
+  background: #f59e0b;
+}
+.CashCredit-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.CashCredit-stat {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--home-surface-2);
+  border: 1px solid var(--home-border-soft);
+  border-radius: 10px;
+}
+.CashCredit-stat p {
+  margin: 0;
+}
+.CashCredit-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.CashCredit-dot.dot-cash {
+  background: #2563eb;
+}
+.CashCredit-dot.dot-credit {
+  background: #f59e0b;
+}
+.CashCredit-stat-label {
+  font-size: 0.74rem;
+  color: var(--home-muted);
+}
+.CashCredit-stat-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--home-text);
+}
+.CashCredit-stat-pct {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--home-text-2);
+}
+
+/* Visible keyboard focus for dashboard controls */
+.Home a:focus-visible,
+.Home button:focus-visible {
+  outline: 2px solid var(--home-brand);
+  outline-offset: 2px;
+}
+
+/* ===== Responsive ===== */
+@media screen and (max-width: 1080px) {
+  .Home-section .HomeShareGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .Home-top-bar {
+    padding: 12px 14px;
+  }
+  .Home-subheading {
+    flex-wrap: wrap;
+  }
+  .Home-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Tabs scroll sideways instead of squeezing */
+  .HomeHubTabs {
+    scrollbar-width: none;
+  }
+  .HomeHubTab {
+    flex: 1 0 auto;
+    white-space: nowrap;
+  }
+  .Home-chart-box {
+    min-height: 0;
+    padding: 12px;
+  }
+  .Home-period-range {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .Home-heading {
+    font-size: 1.05rem;
+  }
+  .CashCredit-stats {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,159 +1,30 @@
-import React, {
-  useState,
-  useEffect,
-  lazy,
-  Suspense,
-  useContext,
-  useCallback,
-} from "react";
+import React from "react";
+import SalesShareList from "./SalesShareList";
+import { formatNumber } from "../dashboardUtils";
 
-//=>> Utility
-import ApiConfig from "../../../assets/js/ApiConfig";
-import { AuthContext } from "../../../context/AuthContext";
-import { daysPrevToToday } from "../../../assets/js/DateFormater";
-import { DateFormater } from "../../../assets/js/DateFormater";
+const tableHead = ["Sl", "Category name", "Total invoice", "Total quantity", "Total amount"];
 
-//=>> Components
-const ModalTable = lazy(() =>
-  import("../../../components/Modal/CommonModal/ModalTable")
+const getId = (i) => i.id;
+const getName = (i) => i.category_name;
+const getValue = (i) => Number(i.total_amount) || 0;
+const getSub = (i) =>
+  `Qty ${formatNumber(i.total_quantity)} • ${formatNumber(i.total_invoice)} invoices`;
+
+const CategoryWiseSales = ({ dateRange }) => (
+  <SalesShareList
+    dateRange={dateRange}
+    title="Category wise sales"
+    endpoint="/categoryWiseSalesReport"
+    cacheKey="CategoryWiseSales"
+    printKey="printCategoryWiseSales"
+    slug="Category wise sales"
+    modalIdentifier="CategoryWiseSales"
+    tableHead={tableHead}
+    getId={getId}
+    getName={getName}
+    getValue={getValue}
+    getSub={getSub}
+  />
 );
-const SalesSumrDrpDown = lazy(() =>
-  import("../../../components/Dropdown/SalesSumrDrpDown")
-);
-
-const CategoryWiseSales = () => {
-  const { headers } = useContext(AuthContext);
-  const [btnStatus, setBtnStatus] = useState({});
-  const [apiData, setApiData] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [spinnerLoader, setSpinnerLoader] = useState(false);
-  const [printData, setPrintData] = useState({});
-  const countedDays = 30;
-  const [dateRang, setDateRang] = useState({
-    startDate: daysPrevToToday(countedDays),
-    endDate: DateFormater(new Date()),
-  });
-
-  //=>>> Fetch data from API
-  const fetchData = useCallback(async () => {
-    try {
-      setSpinnerLoader(true);
-      const fromDate = dateRang?.startDate || daysPrevToToday(countedDays);
-      const toDate = dateRang?.endDate || DateFormater(new Date());
-      const api = `/categoryWiseSalesReport?from_date=${fromDate}&to_date=${toDate}`;
-      const response = await ApiConfig.get(api, { headers });
-      if (response.data.status) {
-        const datas = Object.values(response.data.data);
-        if (dateRang !== "0" && dateRang !== 0) {
-          setApiData(datas);
-          //=>>> For Print
-          sessionStorage.setItem(
-            "printCategoryWiseSales",
-            JSON.stringify(datas)
-          );
-          setPrintData(datas);
-        } else {
-          setApiData([]);
-          //=>>> For Print
-          sessionStorage.setItem("printCategoryWiseSales", JSON.stringify([]));
-          setPrintData([]);
-          setMsg("Opps! Data not found.");
-        }
-
-        //==> For offline use
-        localStorage.setItem("CategoryWiseSales", JSON.stringify(datas));
-      }
-    } catch (error) {
-      console.error(error);
-      setMsg(error.message);
-      //==> For offline use
-      const cachedData = localStorage.getItem("CategoryWiseSales");
-      if (cachedData) {
-        setApiData(JSON.parse(cachedData));
-      }
-    } finally {
-      setSpinnerLoader(false);
-    }
-  }, [headers, dateRang]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  //=>>> For print modal
-  const tableHead = [
-    "Sl",
-    "Category name",
-    "Total invoice",
-    "Total quantity",
-    "Total amount",
-  ];
-
-  //==> Render individual invoice item
-  const renderInvoiceItem = (item, index) => (
-    <div className="reportBoxMini" key={item.id}>
-      <Suspense fallback="...">
-        <ModalTable
-          id={item.id}
-          slug="Category wise sales"
-          inputFields={[]}
-          ModalOpenBtnTitle={
-            <div className="w-full d-flex items-center justify-between text-dark_3">
-              <p>
-                <span>{index + 1}</span>.{" "}
-                {item.category_name.length >= 15
-                  ? item.category_name.slice(0, 15) + "..."
-                  : item.category_name}
-              </p>
-              <p className="text-red-500">Total Invoice : {item.total_invoice}</p>
-            </div>
-          }
-          className="modalTableOpenBtn"
-          identifier="CategoryWiseSales"
-          data={apiData.filter((filter) => filter.id === item.id)}
-          btnStatus={btnStatus}
-          setBtnStatus={setBtnStatus}
-          width="100%"
-          toolTip={``}
-        />
-      </Suspense>
-    </div>
-  );
-
-  return (
-    <>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: "10",
-          background: "var(--light-1)",
-          borderBottom: "var(--border)",
-        }}
-      >
-        <div className="flex items-center justify-center gap-2 py-1">
-          <h1 className="">
-            Category wise sales <span>({apiData.length})</span>
-          </h1>
-          <SalesSumrDrpDown
-            countedDays={countedDays}
-            setDateRang={setDateRang}
-            printData={printData}
-            spinnerLoader={spinnerLoader}
-            tableHead={tableHead}
-            slug="Category wise sales"
-            identifierForPrintModal="printCategoryWiseSales"
-          />
-        </div>
-      </div>
-
-      {apiData.length > 0 ? (
-        apiData.map(renderInvoiceItem)
-      ) : (
-        <p className="message">{msg}</p>
-      )}
-    </>
-  );
-};
 
 export default React.memo(CategoryWiseSales);

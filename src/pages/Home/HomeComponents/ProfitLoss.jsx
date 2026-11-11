@@ -10,64 +10,57 @@ import React, {
 //=>> Utility
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
-import { daysPrevToToday } from "../../../assets/js/DateFormater";
-import { DateFormater } from "../../../assets/js/DateFormater";
+import { getPresetRange, DEFAULT_PRESET, readCache } from "../dashboardUtils";
 
 //=>> Components
 import BarChart from "../../../components/Charts/BarChart";
+import { WidgetSkeleton, WidgetEmpty, StaleBadge } from "./WidgetStates";
 const SalesSumrDrpDown = lazy(() =>
   import("../../../components/Dropdown/SalesSumrDrpDown")
 );
 
-const ProfitLoss = () => {
+const ProfitLoss = ({ dateRange }) => {
   const { headers } = useContext(AuthContext);
-  const [apiData, setApiData] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [spinnerLoader, setSpinnerLoader] = useState(false);
+  const [apiData, setApiData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
   const [printData, setPrintData] = useState({});
-  const countedDays = 365;
-  const [dateRang, setDateRang] = useState({
-    startDate: daysPrevToToday(countedDays),
-    endDate: DateFormater(new Date()),
-  });
+  const [dateRang, setDateRang] = useState(
+    dateRange || getPresetRange(DEFAULT_PRESET)
+  );
+
+  //=>>> Follow the dashboard global date filter
+  useEffect(() => {
+    if (dateRange) setDateRang(dateRange);
+  }, [dateRange]);
 
   //=>>> Fetch data from API
   const fetchData = useCallback(async () => {
     try {
-      setSpinnerLoader(true);
-      const fromDate = dateRang?.startDate || daysPrevToToday(countedDays);
-      const toDate = dateRang?.endDate || DateFormater(new Date());
-      const api = `/profit-loss-report?from_date=${fromDate}&to_date=${toDate}`;
+      setLoading(true);
+      const { startDate, endDate } = dateRang;
+      const api = `/profit-loss-report?from_date=${startDate}&to_date=${endDate}`;
       const response = await ApiConfig.get(api, { headers });
       if (response.status == 200) {
-        const datas = response.data;
-        if (dateRang !== "0" && dateRang !== 0) {
-          setApiData(datas);
-          sessionStorage.setItem("ProfitLoss", JSON.stringify(datas));
-          //=>>> For Print
-          sessionStorage.setItem("printProfitLoss", JSON.stringify(datas));
-          setPrintData(datas);
-        } else {
-          setApiData([]);
-          //=>>> For Print
-          sessionStorage.setItem("printProfitLoss", JSON.stringify([]));
-          setPrintData([]);
-          setMsg("Opps! Data not found.");
-        }
-
+        const datas = response.data || {};
+        setApiData(datas);
+        setIsStale(false);
+        //=>>> For Print
+        sessionStorage.setItem("printProfitLoss", JSON.stringify(datas));
+        setPrintData(datas);
         //==> For offline use
         localStorage.setItem("ProfitLoss", JSON.stringify(datas));
       }
     } catch (error) {
       console.error(error);
-      setMsg(error.message);
       //==> For offline use
-      const cachedData = localStorage.getItem("ProfitLoss");
+      const cachedData = readCache("ProfitLoss");
       if (cachedData) {
-        setApiData(JSON.parse(cachedData));
+        setApiData(cachedData);
+        setIsStale(true);
       }
     } finally {
-      setSpinnerLoader(false);
+      setLoading(false);
     }
   }, [headers, dateRang]);
 
@@ -75,54 +68,44 @@ const ProfitLoss = () => {
     fetchData();
   }, [fetchData]);
 
-  //=>>> For print modal
-  const tableHead = [];
+  const hasData = apiData && Object.keys(apiData).length > 0;
 
   return (
     <>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: "10",
-          background: "var(--light-1)",
-          borderBottom: "var(--border)",
-        }}
-      >
-        <div className="flex items-center justify-center gap-2 py-1">
-          <h1>Profit / Loss Report</h1>
-          <SalesSumrDrpDown
-            countedDays={countedDays}
-            setDateRang={setDateRang}
-            printData={printData}
-            spinnerLoader={spinnerLoader}
-            tableHead={tableHead}
-            slug="Profit / Loss Report"
-            identifierForPrintModal="printProfitLoss"
-          />
+      <div className="HomeWidget-head">
+        <div className="HomeWidget-title-wrap">
+          <h3 className="HomeWidget-title">Profit / Loss</h3>
+          <StaleBadge show={isStale} />
+        </div>
+        <div className="HomeWidget-actions">
+          <Suspense fallback={null}>
+            <SalesSumrDrpDown
+              range={dateRang}
+              setDateRang={setDateRang}
+              printData={printData}
+              spinnerLoader={loading}
+              tableHead={[]}
+              slug="Profit / Loss Report"
+              identifierForPrintModal="printProfitLoss"
+            />
+          </Suspense>
         </div>
       </div>
+      <p className="HomeWidget-range">
+        {dateRang.startDate} &rarr; {dateRang.endDate}
+      </p>
 
-      {apiData && Object.keys(apiData).length > 0 ? (
+      {loading && !hasData ? (
+        <WidgetSkeleton rows={6} />
+      ) : hasData ? (
         <BarChart data={apiData} identifier="profit-loss report" />
       ) : (
-        <p className="message">{msg || "Opps! Data not found."}</p>
+        <WidgetEmpty
+          title="No profit / loss data for this period"
+          hint="Try a wider date range."
+          onRetry={fetchData}
+        />
       )}
-
-      {/* <div className="flex items-center justify-end gap-5 mt-10 sm:gap-16 flex-col sm:flex-row">
-        <p>
-          Net profit : <span>{Number(apiData.net_profit).toFixed(2)}/-</span>
-        </p>
-        <p>
-          Costs : <span>{Number(apiData.costs).toFixed(2)}/-</span>
-        </p>
-        <p>
-          Sales : <span>{Number(apiData.sales).toFixed(2)}/-</span>
-        </p>
-        <p>
-          Dues : <span>{Number(apiData.dues).toFixed(2)}/-</span>
-        </p>
-      </div> */}
     </>
   );
 };

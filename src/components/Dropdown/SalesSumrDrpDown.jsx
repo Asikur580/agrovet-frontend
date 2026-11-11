@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Dropdown, Space } from "antd";
 import { FaGear } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
@@ -17,10 +17,21 @@ const SalesSumrDrpDown = ({
   tableHead,
   slug,
   identifierForPrintModal,
+  range, // optional { startDate, endDate } controlled from parent (dashboard global filter)
 }) => {
   const [btnRotater, setBtnRotater] = useState(false);
-  const [fromDate, setFromDate] = useState(countedDays ? daysPrevToToday(countedDays) : "");
-  const [toDate, setToDate] = useState(countedDays ? DateFormater(new Date()) : "");
+  const [fromDate, setFromDate] = useState(
+    range?.startDate || (countedDays ? daysPrevToToday(countedDays) : "")
+  );
+  const [toDate, setToDate] = useState(
+    range?.endDate || (countedDays ? DateFormater(new Date()) : "")
+  );
+
+  //=>>> Keep inputs in sync when parent range changes
+  useEffect(() => {
+    if (range?.startDate) setFromDate(range.startDate);
+    if (range?.endDate) setToDate(range.endDate);
+  }, [range?.startDate, range?.endDate]);
 
   const handleDateRange = () => {
     if (fromDate || toDate) {

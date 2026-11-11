@@ -98,6 +98,15 @@ const TopSellingProducts = ({ setLoader }) => {
 
   const activeTopProduct = activeMonthData?.top_product;
 
+  // Months after the current real month have no data yet; disable them
+  const isFutureMonth = useCallback(
+    (m) =>
+      Number(m?.year ?? selectedYear) > currentRealYear ||
+      (Number(m?.year ?? selectedYear) === currentRealYear &&
+        Number(m?.month_number) > currentRealMonth),
+    [selectedYear, currentRealYear, currentRealMonth]
+  );
+
   const handlePrevMonth = () => {
     if (activeMonthIndex > 0 && data.monthly_data?.[activeMonthIndex - 1]) {
       setActiveMonthKey(data.monthly_data[activeMonthIndex - 1].month_key);
@@ -105,10 +114,8 @@ const TopSellingProducts = ({ setLoader }) => {
   };
 
   const handleNextMonth = () => {
-    if (
-      activeMonthIndex < (data.monthly_data?.length || 12) - 1 &&
-      data.monthly_data?.[activeMonthIndex + 1]
-    ) {
+    const next = data.monthly_data?.[activeMonthIndex + 1];
+    if (next && !isFutureMonth(next)) {
       setActiveMonthKey(data.monthly_data[activeMonthIndex + 1].month_key);
     }
   };
@@ -191,12 +198,17 @@ const TopSellingProducts = ({ setLoader }) => {
         </div>
       </div>
 
-      {loading ? (
+      {loading && !data.monthly_data?.length ? (
         <div className="flex items-center justify-center py-12">
           <Spin tip="Loading top selling products..." />
         </div>
       ) : (
-        <>
+        <div className={`TopSellingWidget-content ${loading ? "is-refreshing" : ""}`}>
+          {loading && (
+            <div className="TopSellingWidget-overlay">
+              <Spin />
+            </div>
+          )}
           {/* Active / Featured Month Top Selling Product Highlight */}
           <div className="TopSellingWidget-featured">
             {/* Top Navigation & Month Badge Bar */}
@@ -223,12 +235,16 @@ const TopSellingProducts = ({ setLoader }) => {
                   <span>Prev</span>
                 </button>
                 <span className="TopSellingWidget-nav-counter">
-                  {monthShortNames[activeMonthIndex]} ({activeMonthIndex + 1}/12)
+                  {activeMonthData?.month_name || monthShortNames[activeMonthIndex]}{" "}
+                  {activeMonthData?.year || selectedYear}
                 </span>
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  disabled={activeMonthIndex >= (data.monthly_data?.length || 12) - 1}
+                  disabled={
+                    !data.monthly_data?.[activeMonthIndex + 1] ||
+                    isFutureMonth(data.monthly_data[activeMonthIndex + 1])
+                  }
                   className="TopSellingWidget-nav-btn"
                   title="Next Month"
                 >
@@ -370,16 +386,31 @@ const TopSellingProducts = ({ setLoader }) => {
               {data.monthly_data?.map((m) => {
                 const isActive = m.month_key === activeMonthKey;
                 const topProd = m.top_product;
+                const isFuture = isFutureMonth(m);
+                const select = () => {
+                  if (!isFuture) setActiveMonthKey(m.month_key);
+                };
 
                 return (
                   <div
                     key={m.month_key}
                     className={`TopSellingWidget-month-card ${
                       isActive ? "active" : ""
-                    } ${topProd ? "has-data" : "no-data"}`}
-                    onClick={() => setActiveMonthKey(m.month_key)}
+                    } ${topProd ? "has-data" : "no-data"} ${isFuture ? "is-future" : ""}`}
+                    onClick={select}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        select();
+                      }
+                    }}
                     role="button"
-                    tabIndex={0}
+                    tabIndex={isFuture ? -1 : 0}
+                    aria-pressed={isActive}
+                    aria-disabled={isFuture}
+                    aria-label={`${m.month_name || monthShortNames[m.month_number - 1]} ${m.year || selectedYear}${
+                      topProd ? `, top seller ${topProd.product_name}` : ", no sales"
+                    }`}
                   >
                     <div className="TopSellingWidget-month-top">
                       <span className="TopSellingWidget-month-name">
@@ -413,7 +444,9 @@ const TopSellingProducts = ({ setLoader }) => {
                       </div>
                     ) : (
                       <div className="TopSellingWidget-month-content">
-                        <p className="TopSellingWidget-month-empty">No sales</p>
+                        <p className="TopSellingWidget-month-empty">
+                          {isFuture ? "Upcoming" : "No sales"}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -421,7 +454,7 @@ const TopSellingProducts = ({ setLoader }) => {
               })}
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* Top 5 Modal for active month */}

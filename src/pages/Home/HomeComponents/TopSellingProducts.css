@@ -721,3 +721,30 @@
     align-items: flex-start;
   }
 }
+
+/* Keep old data visible while refetching (no layout jump) */
+.TopSellingWidget-content {
+  position: relative;
+}
+.TopSellingWidget-content.is-refreshing > *:not(.TopSellingWidget-overlay) {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.TopSellingWidget-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+/* Future months are not selectable */
+.TopSellingWidget-month-card.is-future {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.TopSellingWidget-month-card:focus-visible {
+  outline: 2px solid var(--main-clr, #3b5898);
+  outline-offset: 2px;
+}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -21,9 +21,35 @@ import "./Summery.css";
 // Utilities
 import ApiConfig from "../../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../../context/AuthContext";
+import {
+  formatNumber,
+  formatCurrency,
+  formatCompactCurrency,
+  readCache,
+} from "../../dashboardUtils";
+import { StaleBadge } from "../WidgetStates";
 
-const Summery = () => {
+// Big money values use compact format; full value stays in the tooltip
+const Money = ({ value }) => (
+  <span title={formatCurrency(value)}>{formatCompactCurrency(value)}</span>
+);
+
+// Card is a link only when the user may open the target page
+const CardLink = ({ allowed, to, children, ...rest }) =>
+  allowed ? (
+    <Link to={to} {...rest}>
+      {children}
+    </Link>
+  ) : (
+    <div {...rest} style={{ cursor: "default" }}>
+      {children}
+    </div>
+  );
+
+const Summery = ({ canSeeSales = true, canSeeOrders = true, canSeeProducts = true, canSeeCustomers = true, canSeeEmployees = true, canSeeSuppliers = true }) => {
   const { headers } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
   const [apiData, setApiData] = useState({
     total_customer: 0,
     total_order: 0,
@@ -39,17 +65,22 @@ const Summery = () => {
 
   const getApiData = async () => {
     try {
+      setLoading(true);
       const response = await ApiConfig.get("/dashboard-report", { headers });
       if (response.data?.status && response.data?.data) {
         setApiData(response.data.data);
+        setIsStale(false);
         localStorage.setItem("DashboardReport", JSON.stringify(response.data.data));
       }
     } catch (error) {
       console.error("Dashboard report error:", error);
-      const cachedData = localStorage.getItem("DashboardReport");
+      const cachedData = readCache("DashboardReport");
       if (cachedData) {
-        setApiData(JSON.parse(cachedData));
+        setApiData(cachedData);
+        setIsStale(true);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,20 +88,9 @@ const Summery = () => {
     getApiData();
   }, [headers]);
 
-  const formatCurrency = (val) => {
-    const num = Number(val || 0);
-    return (
-      "Tk " +
-      num.toLocaleString("en-IN", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
-    );
-  };
-
-  const formatNumber = (val) => {
-    return Number(val || 0).toLocaleString("en-IN");
-  };
+  // Value placeholder while first load runs (avoid showing false zeros)
+  const val = (node) =>
+    loading ? <span className="SummerySkeleton" aria-label="Loading" /> : node;
 
   const todayStr = dayjs().format("YYYY-MM-DD");
   const monthStartStr = dayjs().startOf("month").format("YYYY-MM-DD");
@@ -78,10 +98,16 @@ const Summery = () => {
 
   return (
     <div className="SummeryWrapper">
+      {isStale && (
+        <div className="flex justify-end">
+          <StaleBadge show />
+        </div>
+      )}
       {/* Primary KPI Cards Grid */}
       <div className="SummeryGrid">
         {/* Today's Sales */}
-        <Link
+        <CardLink
+          allowed={canSeeSales}
           to={`/sales?filter=today&startDate=${todayStr}&endDate=${todayStr}`}
           className="SummeryCard card-today"
           title="View today's sales and invoices"
@@ -93,16 +119,17 @@ const Summery = () => {
             </div>
           </div>
           <div className="SummeryValue value-today">
-            {formatCurrency(apiData.today_sales)}
+            {val(<Money value={apiData.today_sales} />)}
           </div>
           <div className="SummeryFooter">
             <span>{formatNumber(apiData.today_invoices)} Invoices Today</span>
             <FaArrowRight size={10} className="arrow" />
           </div>
-        </Link>
+        </CardLink>
 
         {/* Month Sales */}
-        <Link
+        <CardLink
+          allowed={canSeeSales}
           to={`/sales?filter=month&startDate=${monthStartStr}&endDate=${monthEndStr}`}
           className="SummeryCard card-month"
           title="View this month's sales"
@@ -114,16 +141,17 @@ const Summery = () => {
             </div>
           </div>
           <div className="SummeryValue value-month">
-            {formatCurrency(apiData.month_sales)}
+            {val(<Money value={apiData.month_sales} />)}
           </div>
           <div className="SummeryFooter">
             <span>Cumulative Month Total</span>
             <FaArrowRight size={10} className="arrow" />
           </div>
-        </Link>
+        </CardLink>
 
         {/* Market Due */}
-        <Link
+        <CardLink
+          allowed={canSeeSales}
           to="/sales?filter=due"
           className="SummeryCard card-due"
           title="View due invoices"
@@ -135,16 +163,16 @@ const Summery = () => {
             </div>
           </div>
           <div className="SummeryValue value-due">
-            {formatCurrency(apiData.total_due)}
+            {val(<Money value={apiData.total_due} />)}
           </div>
           <div className="SummeryFooter">
             <span>{formatNumber(apiData.due_invoices_count)} Due Invoices</span>
             <FaArrowRight size={10} className="arrow" />
           </div>
-        </Link>
+        </CardLink>
 
         {/* Active Orders */}
-        <Link to="/orders" className="SummeryCard card-orders">
+        <CardLink allowed={canSeeOrders} to="/orders" className="SummeryCard card-orders">
           <div className="SummeryCardHeader">
             <span className="SummeryLabel">Total Orders</span>
             <div className="SummeryIconWrap icon-orders">
@@ -152,16 +180,17 @@ const Summery = () => {
             </div>
           </div>
           <div className="SummeryValue value-orders">
-            {formatNumber(apiData.total_order)}
+            {val(<>{formatNumber(apiData.total_order)}</>)}
           </div>
           <div className="SummeryFooter">
             <span>Customer Orders Placed</span>
             <FaArrowRight size={10} className="arrow" />
           </div>
-        </Link>
+        </CardLink>
 
         {/* Low Stock Alerts */}
-        <Link
+        <CardLink
+          allowed={canSeeProducts}
           to="/products?filter=low_stock"
           className="SummeryCard card-stock"
           title="View low stock products"
@@ -173,36 +202,36 @@ const Summery = () => {
             </div>
           </div>
           <div className="SummeryValue value-stock">
-            {formatNumber(apiData.low_stock_count)} Items
+            {val(<>{formatNumber(apiData.low_stock_count)} Items</>)}
           </div>
           <div className="SummeryFooter">
             <span>Stock &lt;= 10 Units</span>
             <FaArrowRight size={10} className="arrow" />
           </div>
-        </Link>
+        </CardLink>
       </div>
 
       {/* Secondary Entity Count Pills Bar */}
       <div className="SummeryPillsBar">
         <span className="SummeryPillsLabel">Quick Entity Summary:</span>
 
-        <Link to="/customers" className="SummeryPill" title="View all customers">
+        <CardLink allowed={canSeeCustomers} to="/customers" className="SummeryPill" title="View all customers">
           <FaUsers className="pill-icon text-indigo-600" size={13} />
           <span>Customers:</span>
           <strong>{formatNumber(apiData.total_customer)}</strong>
-        </Link>
+        </CardLink>
 
-        <Link to="/employees" className="SummeryPill" title="View all employees">
+        <CardLink allowed={canSeeEmployees} to="/employees" className="SummeryPill" title="View all employees">
           <FaUserTie className="pill-icon text-emerald-600" size={13} />
           <span>Employees:</span>
           <strong>{formatNumber(apiData.total_employee)}</strong>
-        </Link>
+        </CardLink>
 
-        <Link to="/suppliers" className="SummeryPill" title="View all suppliers">
+        <CardLink allowed={canSeeSuppliers} to="/suppliers" className="SummeryPill" title="View all suppliers">
           <FaBuilding className="pill-icon text-amber-600" size={13} />
           <span>Suppliers:</span>
           <strong>{formatNumber(apiData.total_supplier)}</strong>
-        </Link>
+        </CardLink>
       </div>
     </div>
   );
