@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Spinner from "../Loader/Spinner";
+import { compressImage } from "../../assets/js/imageCompressor";
 //___ Icons ___//
 import { RxCross2 } from "react-icons/rx";
 import { IoMdCloudUpload } from "react-icons/io";
@@ -9,22 +10,24 @@ const ImageUploader = (props) => {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       setLoading(true);
-      setImg(file);
-      console.log(file);
-
-      // Simulate image upload
-      setTimeout(() => {
+      try {
+        const compressed = await compressImage(file, { maxWidth: 1000, quality: 0.75 });
+        setImg(compressed);
         const reader = new FileReader();
         reader.onloadend = () => {
           setImage(reader.result);
           setLoading(false);
         };
-        reader.readAsDataURL(file);
-      }, 1000); // Simulate a delay for upload
+        reader.readAsDataURL(compressed);
+      } catch (err) {
+        console.error(err);
+        setImg(file);
+        setLoading(false);
+      }
     }
   };
 

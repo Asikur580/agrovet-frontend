@@ -86,6 +86,7 @@ const SaleCartUpdateModal2 = (props) => {
   const [dueQuantity, setDueQuantity] = useState({});
   const [totals, setTotals] = useState({});
   const [grandTotal, setGrandTotal] = useState(0);
+  const [customerPaymentType, setCustomerPaymentType] = useState("both");
   const [inputValues, setInputValues] = useState({
     customer_id: "0",
     customer_name: "",
@@ -117,6 +118,7 @@ const SaleCartUpdateModal2 = (props) => {
           customer_name: response.data.data.customer.name,
           pay_type: response.data.data.sale_type,
         });
+        setCustomerPaymentType(response.data.data.customer?.payment_type || "both");
         setLess(response.data.data.less);
         setPaid(response.data.data.paid);
         const fetchedDiscountPercent = response.data.data.total_price > 0 
@@ -604,16 +606,35 @@ const SaleCartUpdateModal2 = (props) => {
                 <div className="select-from-cart-modal">
                   <label>
                     Payment method<span className="text-red-500 ml-1">*</span>
+                    {customerPaymentType === "cash" && (
+                      <span className="text-xs text-emerald-600 font-semibold ml-2">
+                        (Only Cash allowed)
+                      </span>
+                    )}
+                    {customerPaymentType === "credit" && (
+                      <span className="text-xs text-amber-600 font-semibold ml-2">
+                        (Only Credit allowed)
+                      </span>
+                    )}
                   </label>
                   <select
                     className="select"
                     name="pay_type"
                     value={inputValues.pay_type}
                     onChange={handleInputValue}
+                    disabled={customerPaymentType === "cash" || customerPaymentType === "credit"}
                   >
-                    <option value="0">Select payment method</option>
-                    <option value="cash">Cash</option>
-                    <option value="credit">Credit</option>
+                    {customerPaymentType === "cash" ? (
+                      <option value="cash">Cash</option>
+                    ) : customerPaymentType === "credit" ? (
+                      <option value="credit">Credit</option>
+                    ) : (
+                      <>
+                        <option value="0">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="credit">Credit</option>
+                      </>
+                    )}
                   </select>
                 </div>
               )}

@@ -1,12 +1,14 @@
 import { lazy, Suspense, useState, useEffect, useContext } from "react";
 import { useLocation, useParams, Link } from "react-router-dom";
 import { HelmetProvider, Helmet } from "react-helmet-async";
+import { Image } from "antd";
+import { toast } from "react-toastify";
 
 //=>>> Css
 import "../../../assets/css/ViewDetails.css";
 
 //=>>> Additional utility
-import ApiConfig from "../../../assets/js/ApiConfig";
+import ApiConfig, { imgUrl } from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 
 //=>>> Components
@@ -27,6 +29,8 @@ const ViewDetails = ({ setLoader }) => {
   const [info, setInfo] = useState({
     cust_id: "",
     image: "",
+    trade_license: "",
+    nid: "",
     employee_id: "",
     customer_id: "",
     customer_name: "",
@@ -51,6 +55,8 @@ const ViewDetails = ({ setLoader }) => {
             setInfo({
               cust_id: res.customer_details.id,
               image: res.customer_details.image,
+              trade_license: res.customer_details.trade_license,
+              nid: res.customer_details.nid,
               employee_id: res.customer_details.employee_id,
               customer_id: res.customer_details.customer_id,
               customer_name: res.customer_details.customer_name,
@@ -76,6 +82,37 @@ const ViewDetails = ({ setLoader }) => {
     };
     getApiData();
   }, []);
+
+  const handleDeleteDocument = async (type) => {
+    const label =
+      type === "image"
+        ? "customer photo"
+        : type === "trade_license"
+        ? "trade license"
+        : "NID card";
+
+    if (confirm(`Are you sure you want to delete this ${label}?`)) {
+      try {
+        setLoader(true);
+        const response = await ApiConfig.post(
+          `/customerDeleteDocument/${id}`,
+          { type },
+          { headers }
+        );
+        if (response.data.status) {
+          toast.success(response.data.message);
+          setInfo((prev) => ({ ...prev, [type]: null }));
+        } else {
+          toast.error(response.data.message || "Failed to delete document");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to delete document");
+      } finally {
+        setLoader(false);
+      }
+    }
+  };
 
   //=>>> Input For modal
   const inputFields = [
@@ -125,6 +162,17 @@ const ViewDetails = ({ setLoader }) => {
                         radius="0.5rem"
                       />
                     </Suspense>
+                    {info.image && (
+                      <div className="text-center mt-1">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDocument("image")}
+                          className="text-red-500 hover:text-red-700 text-xs font-semibold underline cursor-pointer"
+                        >
+                          Delete photo
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="txt-box px-4 pb-4">
@@ -177,6 +225,86 @@ const ViewDetails = ({ setLoader }) => {
                       </tr>
                     </tbody>
                   </table>
+
+                  {/* Customer Documents Section */}
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                      Customer Documents
+                    </h4>
+                    <div className="flex flex-col gap-2 text-xs">
+                      {/* Trade License */}
+                      <div className="flex items-center justify-between p-2 rounded bg-gray-50 border border-gray-200">
+                        <span className="font-semibold text-gray-700">Trade License:</span>
+                        {info.trade_license ? (
+                          <div className="flex items-center gap-2">
+                            {info.trade_license.toLowerCase().endsWith(".pdf") ? (
+                              <a
+                                href={`${imgUrl}${info.trade_license}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 hover:underline font-bold"
+                              >
+                                📄 View PDF
+                              </a>
+                            ) : (
+                              <Image
+                                src={`${imgUrl}${info.trade_license}`}
+                                width={40}
+                                height={40}
+                                className="object-cover rounded cursor-pointer border"
+                              />
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDocument("trade_license")}
+                              className="text-red-500 hover:text-red-700 text-xs font-bold px-1.5 py-0.5 rounded border border-red-200 bg-red-50 hover:bg-red-100 cursor-pointer"
+                              title="Delete trade license"
+                            >
+                              🗑 Delete
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 italic">Not Uploaded</span>
+                        )}
+                      </div>
+
+                      {/* NID Card */}
+                      <div className="flex items-center justify-between p-2 rounded bg-gray-50 border border-gray-200">
+                        <span className="font-semibold text-gray-700">NID Card:</span>
+                        {info.nid ? (
+                          <div className="flex items-center gap-2">
+                            {info.nid.toLowerCase().endsWith(".pdf") ? (
+                              <a
+                                href={`${imgUrl}${info.nid}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 hover:underline font-bold"
+                              >
+                                📄 View PDF
+                              </a>
+                            ) : (
+                              <Image
+                                src={`${imgUrl}${info.nid}`}
+                                width={40}
+                                height={40}
+                                className="object-cover rounded cursor-pointer border"
+                              />
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDocument("nid")}
+                              className="text-red-500 hover:text-red-700 text-xs font-bold px-1.5 py-0.5 rounded border border-red-200 bg-red-50 hover:bg-red-100 cursor-pointer"
+                              title="Delete NID card"
+                            >
+                              🗑 Delete
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 italic">Not Uploaded</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="mt-8 flex justify-between items-center">
                     {["Developer", "Customer-payment-create"].some((item) =>
