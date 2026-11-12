@@ -55,6 +55,34 @@ const InvoiceMobile = ({ setLoader }) => {
   const contentRef = useRef();
   const reactToPrintFn = useReactToPrint({
     contentRef,
+    documentTitle: `Invoice-${custData.customer_name || id || ""}`,
+    pageStyle: `
+      @page {
+        size: A4 portrait;
+        margin: 15mm 10mm;
+      }
+      * {
+        animation: none !important;
+        -webkit-animation: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+      .no-print, .printBtn {
+        display: none !important;
+      }
+      .invoice-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        color: #000 !important;
+        background: #fff !important;
+      }
+    `,
   });
 
   return (
@@ -74,10 +102,11 @@ const InvoiceMobile = ({ setLoader }) => {
 
       <div
         ref={contentRef}
-        className="invoice-container content animated fadeInDown"
+        className="invoice-container content"
       >
         <div className="invoice-header">
           <button
+            type="button"
             className="button printBtn no-print"
             onClick={() => reactToPrintFn()}
           >

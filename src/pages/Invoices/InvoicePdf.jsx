@@ -32,41 +32,41 @@ const styles = StyleSheet.create({
     fontFamily: "Kalpurush",
     color: "#000",
     backgroundColor: "#fff",
-    paddingTop: 30,
-    paddingBottom: 25,
-    paddingLeft: 30,
-    paddingRight: 30,
+    paddingTop: "25px",
+    paddingBottom: "25px",
+    paddingHorizontal: "35px",
   },
 
   //=>>> Header start
   compName: {
     fontFamily: "BlippoBlack",
-    fontSize: "1.5rem",
+    fontSize: "2.1rem",
     textAlign: "center",
-    letterSpacing: "-3px",
+    letterSpacing: "-2px",
   },
   address: {
-    fontSize: "0.65rem",
+    fontSize: "0.85rem",
     textAlign: "center",
-    marginTop: "10px",
+    marginTop: "6px",
   },
   invoiceTitle: {
     textAlign: "center",
-    fontSize: "0.9rem",
-    marginTop: "25px",
-    marginBottom: "60px",
+    fontSize: "1.2rem",
+    marginTop: "15px",
+    marginBottom: "20px",
+    fontWeight: "bold",
   },
   //=>>> Header end
 
   //=>>> Customer details start
   customerDetails: {
-    fontSize: "0.68rem",
+    fontSize: "0.88rem",
     flexDirection: "row",
-    lineHeight: "1rem",
-    marginBottom: "50px",
+    lineHeight: "1.35rem",
+    marginBottom: "20px",
   },
-  customerDetailsLeft: { width: "65%" },
-  customerDetailsRight: { width: "35%" },
+  customerDetailsLeft: { width: "58%" },
+  customerDetailsRight: { width: "42%" },
   customerDetailsVal: { fontFamily: "Kalpurush" },
   //=>>> Customer details end
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderStyle: "solid",
     borderColor: "#000",
-    borderWidth: 1,
+    borderWidth: 1.3,
     borderRightWidth: 0,
     borderBottomWidth: 0,
   },
@@ -84,25 +84,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tableColHeader: {
-    fontSize: 12,
+    fontSize: "0.72rem",
     borderStyle: "solid",
     borderColor: "#000",
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    paddingVertical: 5,
-    paddingHorizontal: 2,
-    backgroundColor: "#ebebeb",
+    paddingVertical: "6px",
+    paddingHorizontal: "2px",
+    backgroundColor: "#e4e4e4",
   },
   tableCol: {
-    fontSize: 12,
+    fontSize: "0.72rem",
     borderStyle: "solid",
     borderColor: "#000",
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    paddingVertical: 4,
-    paddingHorizontal: 2,
+    paddingVertical: "6px",
+    paddingHorizontal: "2px",
   },
   tableCellHeader: {
     fontWeight: "bold",
@@ -111,35 +111,35 @@ const styles = StyleSheet.create({
   tableCell: {
     textAlign: "center",
   },
-  tableSlNo: { width: "5%" },
-  tableProdName: { width: "24%" },
+  tableSlNo: { width: "6%" },
+  tableProdName: { width: "25%" },
   tablePackSize: { width: "9%" },
-  tableTpFlat: { width: "9%" },
+  tablePrice: { width: "10%" },
   tableQty: { width: "6%" },
-  tableDueQty: { width: "8%" },
+  tableDueQty: { width: "7%" },
   tableTotalTp: { width: "10%" },
-  tableBonusQty: { width: "10%" },
-  tableNetQty: { width: "8%" },
-  tableNetAmmount: { width: "11%" },
+  tableBonusQty: { width: "8%" },
+  tableNetQty: { width: "7%" },
+  tableNetAmmount: { width: "12%" },
   //=>>> Table end
 
   //=>>> Total section start
   totalSection: {
-    marginTop: "80px",
-    marginBottom: "40px",
+    marginTop: "20px",
+    marginBottom: "20px",
     flexDirection: "row",
   },
-  totalSectionLeft: { width: "65%" },
-  totalSectionRight: { width: "35%" },
+  totalSectionLeft: { width: "42%" },
+  totalSectionRight: { width: "58%" },
   totalSectionRow: {
     flexDirection: "row",
     marginBottom: 5,
-    fontSize: "0.65rem",
+    fontSize: "0.82rem",
   },
-  totalSectionLabel: { width: "500px" },
+  totalSectionLabel: { width: 175 },
   totalSectionValBox: { flexDirection: "row" },
-  totalSectionColon: { marginRight: "30px" },
-  totalSectionValue: {},
+  totalSectionColon: { marginRight: 15 },
+  totalSectionValue: { fontWeight: "bold" },
   //=>>> Total section end
 
   //=>>> Footer start
@@ -147,10 +147,15 @@ const styles = StyleSheet.create({
   signatureSection: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 30,
-    fontSize: "0.7rem",
+    marginTop: "35px",
+    fontSize: "0.9rem",
   },
-  note: { fontSize: "0.5rem", textAlign: "center", marginTop: "80px" },
+  note: {
+    fontSize: "0.68rem",
+    textAlign: "center",
+    marginTop: "25px",
+    letterSpacing: "0.5px",
+  },
   //=>>> Footer end
 });
 
@@ -301,25 +306,25 @@ const InvoicePdf = ({ setLoader }) => {
                   <Text style={styles.tableCellHeader} wrap={false}>Product Name</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tablePackSize]}>
-                  <Text style={styles.tableCellHeader} wrap={false}>Pack Size</Text>
+                  <Text style={styles.tableCellHeader}>Pack Size</Text>
                 </View>
-                <View style={[styles.tableColHeader, styles.tableTpFlat]}>
-                  <Text style={styles.tableCellHeader} wrap={false}>TP/Flat</Text>
+                <View style={[styles.tableColHeader, styles.tablePrice]}>
+                  <Text style={styles.tableCellHeader}>TP/Flat</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableQty]}>
                   <Text style={styles.tableCellHeader} wrap={false}>Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableDueQty]}>
-                  <Text style={styles.tableCellHeader} wrap={false}>Due qty</Text>
+                  <Text style={styles.tableCellHeader}>Due qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableTotalTp]}>
-                  <Text style={styles.tableCellHeader} wrap={false}>Total TP</Text>
+                  <Text style={styles.tableCellHeader}>Total TP</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableBonusQty]}>
                   <Text style={styles.tableCellHeader} wrap={false}>Bonus Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableNetQty]}>
-                  <Text style={styles.tableCellHeader} wrap={false}>Net Qty</Text>
+                  <Text style={styles.tableCellHeader}>Net Qty</Text>
                 </View>
                 <View style={[styles.tableColHeader, styles.tableNetAmmount]}>
                   <Text style={styles.tableCellHeader} wrap={false}>Net Amount</Text>
@@ -344,10 +349,10 @@ const InvoicePdf = ({ setLoader }) => {
                           {item.product.pack_size}
                         </Text>
                       </View>
-                      <View style={[styles.tableCol, styles.tableTpFlat]}>
+                      <View style={[styles.tableCol, styles.tablePrice]}>
                         <Text style={styles.tableCell}>
                           {item.unit_price}/-
-                          <Text style={{ fontSize: 10 }}>
+                          <Text style={{ fontSize: "0.55rem" }}>
                             ({item.price_type})
                           </Text>
                         </Text>
