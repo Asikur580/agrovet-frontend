@@ -13,6 +13,7 @@ import {
   FaSackDollar,
   FaPeopleGroup,
   FaUserGraduate,
+  FaChartColumn,
 } from "react-icons/fa6";
 import { FaUserAlt, FaTools, FaUsers, FaHandPointRight } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
@@ -50,51 +51,35 @@ const sidenav = (props) => {
   const [dropdown, setDropdown] = useState({
     sms: false,
     product_settings: false,
+    reports: false,
   });
   useEffect(() => {
-    if (
-      dropdown.product_settings == true ||
-      location.pathname == "/orders" ||
-      location.pathname == "/order-create" ||
-      location.pathname == "/sales" ||
-      location.pathname == "/sales-create" ||
-      location.pathname == "/sales-report" ||
-      location.pathname == "/payment-history-report" ||
-      location.pathname == "/top-selling-products" ||
-      location.pathname == "/cash-credit-sales-report" ||
-      location.pathname == "/cash-credit-sales-report" ||
-      (Array.isArray(location.pathname.match("/invoice/")) &&
-        location.pathname.match("/invoice/")[0] == "/invoice/")
-    ) {
-      setDropdown({ ...dropdown, product_settings: true });
-    } else if (
-      dropdown.sms == true ||
-      location.pathname == "/send-sms-anyone" ||
-      location.pathname == "/send-sms-everyone" ||
-      location.pathname == "/sms-template" ||
-      location.pathname == "/sms-history"
-    ) {
-      setDropdown({ ...dropdown, sms: true });
-    } else {
-      setDropdown({ sms: false, product_settings: false });
-    }
-  }, [
-    //==> Sms
-    location.pathname == "/send-sms-anyone" ||
-      location.pathname == "/send-sms-everyone" ||
-      location.pathname == "/sms-template" ||
-      location.pathname == "/sms-history" ||
-      //==> Product settings
-      location.pathname == "/orders" ||
-      location.pathname == "/order-create" ||
-      location.pathname == "/sales" ||
-      location.pathname == "/sales-create" ||
-      location.pathname == "/sales-report" ||
-      location.pathname == "/payment-history-report" ||
-      location.pathname == "/top-selling-products" ||
-      (Array.isArray(location.pathname.match("/invoice/")) &&
-        location.pathname.match("/invoice/")[0] == "/invoice/"),
-  ]);
+    const path = location.pathname;
+    const isProductPath =
+      path == "/orders" ||
+      path == "/order-create" ||
+      path == "/sales" ||
+      path == "/sales-create" ||
+      (Array.isArray(path.match("/invoice/")) &&
+        path.match("/invoice/")[0] == "/invoice/");
+    const isReportPath =
+      path == "/sales-report" ||
+      path == "/payment-history-report" ||
+      path == "/top-selling-products" ||
+      path == "/cash-credit-sales-report" ||
+      path == "/total-sales-summary";
+    const isSmsPath =
+      path == "/send-sms-anyone" ||
+      path == "/send-sms-everyone" ||
+      path == "/sms-template" ||
+      path == "/sms-history";
+
+    setDropdown({
+      sms: isSmsPath,
+      product_settings: isProductPath,
+      reports: isReportPath,
+    });
+  }, [location.pathname]);
 
   //=>>> Manage Permissions
   const dashboard = useMemo(
@@ -476,40 +461,62 @@ const sidenav = (props) => {
                 </NavLink>
               </li>
             )}
-            {sales == true && (
+          </ul>
+        </li>
+
+        {/* Reports Dropdown menu */}
+        {sales == true && (
+          <li
+            className={`side-nav-dropdown-parent ${
+              dropdown.reports ? "active" : ""
+            }`}
+          >
+            <span
+              className={`drpLink ${dropdown.reports ? "active" : ""}`}
+              onClick={() => {
+                setDropdown({ ...dropdown, reports: !dropdown.reports });
+              }}
+            >
+              <div className="d-flex">
+                <FaChartColumn className="icon" size={16} />
+                <p>Reports</p>
+              </div>
+              <FaAngleDown className="right-icon" />
+            </span>
+            <ul className="side-nav-dropdown">
               <li>
-                <NavLink to="/sales-report" onClick={CloseSideNav}>
+                <NavLink to="/total-sales-summary" onClick={CloseSideNav}>
                   <FaHandPointRight className="icon" size={16} />
-                  <p>Sales report</p>
+                  <p>Total Sales Summary</p>
                 </NavLink>
               </li>
-            )}
-            {sales == true && (
-              <li>
-                <NavLink to="/payment-history-report" onClick={CloseSideNav}>
-                  <FaHandPointRight className="icon" size={16} />
-                  <p>Payment history</p>
-                </NavLink>
-              </li>
-            )}
-            {sales == true && (
-              <li>
-                <NavLink to="/top-selling-products" onClick={CloseSideNav}>
-                  <FaHandPointRight className="icon" size={16} />
-                  <p>Top selling products</p>
-                </NavLink>
-              </li>
-            )}
-            {sales == true && (
               <li>
                 <NavLink to="/cash-credit-sales-report" onClick={CloseSideNav}>
                   <FaHandPointRight className="icon" size={16} />
                   <p>Cash & Credit sales</p>
                 </NavLink>
               </li>
-            )}
-          </ul>
-        </li>
+              <li>
+                <NavLink to="/sales-report" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Sales report</p>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/payment-history-report" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Payment history</p>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/top-selling-products" onClick={CloseSideNav}>
+                  <FaHandPointRight className="icon" size={16} />
+                  <p>Top selling products</p>
+                </NavLink>
+              </li>
+            </ul>
+          </li>
+        )}
 
         {/* Dropdown menu */}
         {/* <li className={`side-nav-dropdown-parent ${navDrp_2 ? "active" : ""}`}>

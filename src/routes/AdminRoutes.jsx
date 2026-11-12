@@ -42,6 +42,7 @@ import SalesReport from "../pages/Sale/SalesReport/SalesReport";
 import PaymentHistoryReport from "../pages/Sale/PaymentHistoryReport/PaymentHistoryReport";
 import TopSellingProducts from "../pages/Sale/TopSellingProducts/TopSellingProducts";
 import CashCreditSalesReport from "../pages/Sale/CashCreditSalesReport/CashCreditSalesReport";
+import TotalSalesSummary from "../pages/Sale/TotalSalesSummary/TotalSalesSummary";
 import InvoiceMobile from "../pages/Invoices/InvoiceMobile";
 import InvoicePdf from "../pages/Invoices/InvoicePdf";
 import CostCategories from "../pages/CostCategories/CostCategories";
@@ -549,6 +550,18 @@ const AdminRoutes = ({ userRole, isAuthenticated }) => {
                       isAuthenticated={isAuthenticated}
                     >
                       <CashCreditSalesReport setLoader={setLoader} />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/total-sales-summary"
+                  element={
+                    <PrivateRoute
+                      roles={["Developer", "Sale-page", "Dashboard-page"]}
+                      userRole={userRole}
+                      isAuthenticated={isAuthenticated}
+                    >
+                      <TotalSalesSummary setLoader={setLoader} />
                     </PrivateRoute>
                   }
                 />
