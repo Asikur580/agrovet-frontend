@@ -112,8 +112,8 @@ const CustomerTable = ({
     }
   };
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const cols = [
       {
         name: "Sl No",
         width: "72px",
@@ -127,9 +127,16 @@ const CustomerTable = ({
       { name: "Credit Limit", selector: (row) => row.credit_limit || 0 },
       {
         name: "Due",
-        selector: (row) => row.due ? parseFloat(row.due).toFixed(2) : "0.00",
+        selector: (row) => (row.due ? parseFloat(row.due).toFixed(2) : "0.00"),
       },
-      {
+    ];
+
+    if (
+      ["Developer", "Customer-sms", "Customer-sms-toggle"].some((r) =>
+        userRole?.includes(r)
+      )
+    ) {
+      cols.push({
         name: "SMS",
         width: "90px",
         cell: (row) => (
@@ -140,86 +147,88 @@ const CustomerTable = ({
             unCheckedChildren="Off"
           />
         ),
-      },
-      {
-        name: "Action",
-        width: "150px",
-        cell: (row) => (
-          <div className="d-flex gap-4">
-            {["Developer", "Customer-edit"].some((r) =>
-              userRole.includes(r)
-            ) && (
-              <Suspense fallback={null}>
-                <CommonModal
-                  id={row.id}
-                  slug="Edit customer"
-                  inputFields={inputFields}
-                  ModalOpenBtnTitle={<FaEdit />}
-                  className="editBtn"
-                  identifier="customerUpdate"
-                  api={`/customerUpdate/${row.id}`}
-                  data={officersData}
-                  getSpecificDataApi="/customerShow"
-                  setRelodeTable={setRelodeTable}
-                  setLoader={setLoader}
-                  toolTip={`Edit ${row.customer_name}`}
-                />
-              </Suspense>
-            )}
+      });
+    }
 
-            {["Developer", "Customer-delete"].some((r) =>
-              userRole.includes(r)
-            ) && (
-              <Tooltip title={`Delete ${row.customer_name}`}>
-                <button>
-                  <IoTrashBinSharp
-                    className="deleteIcon cursor-pointer"
-                    size={20}
-                    onClick={async () => {
-                      if (confirm(`Delete ${row.customer_name}?`)) {
-                        try {
-                          setLoader(true);
-                          const payload = new FormData();
-                          payload.append("id", row.id);
-                          const response = await ApiConfig.post(
-                            `/customerDelete/${row.id}`,
-                            payload,
-                            { headers }
-                          );
-                          if (response.data.status) {
-                            toast.success(response.data.message);
-                            setRelodeTable((prev) => !prev);
-                          } else {
-                            toast.error(response.data.error);
-                          }
-                        } catch (err) {
-                          console.error(err);
-                          toast.error("Something went wrong!");
-                        } finally {
-                          setLoader(false);
+    cols.push({
+      name: "Action",
+      width: "150px",
+      cell: (row) => (
+        <div className="d-flex gap-4">
+          {["Developer", "Customer-edit"].some((r) =>
+            userRole?.includes(r)
+          ) && (
+            <Suspense fallback={null}>
+              <CommonModal
+                id={row.id}
+                slug="Edit customer"
+                inputFields={inputFields}
+                ModalOpenBtnTitle={<FaEdit />}
+                className="editBtn"
+                identifier="customerUpdate"
+                api={`/customerUpdate/${row.id}`}
+                data={officersData}
+                getSpecificDataApi="/customerShow"
+                setRelodeTable={setRelodeTable}
+                setLoader={setLoader}
+                toolTip={`Edit ${row.customer_name}`}
+              />
+            </Suspense>
+          )}
+
+          {["Developer", "Customer-delete"].some((r) =>
+            userRole?.includes(r)
+          ) && (
+            <Tooltip title={`Delete ${row.customer_name}`}>
+              <button>
+                <IoTrashBinSharp
+                  className="deleteIcon cursor-pointer"
+                  size={20}
+                  onClick={async () => {
+                    if (confirm(`Delete ${row.customer_name}?`)) {
+                      try {
+                        setLoader(true);
+                        const payload = new FormData();
+                        payload.append("id", row.id);
+                        const response = await ApiConfig.post(
+                          `/customerDelete/${row.id}`,
+                          payload,
+                          { headers }
+                        );
+                        if (response.data.status) {
+                          toast.success(response.data.message);
+                          setRelodeTable((prev) => !prev);
+                        } else {
+                          toast.error(response.data.error);
                         }
+                      } catch (err) {
+                        console.error(err);
+                        toast.error("Something went wrong!");
+                      } finally {
+                        setLoader(false);
                       }
-                    }}
-                  />
-                </button>
-              </Tooltip>
-            )}
+                    }
+                  }}
+                />
+              </button>
+            </Tooltip>
+          )}
 
-            {["Developer", "Customer-details-page"].some((r) =>
-              userRole.includes(r)
-            ) && (
-              <Tooltip title={`View ${row.customer_name}`}>
-                <Link to={`/customers/view-details/${row.id}`}>
-                  <FaEye className="text-blue-600 text-lg" />
-                </Link>
-              </Tooltip>
-            )}
-          </div>
-        ),
-      },
-    ],
-    [userRole, inputFields, officersData, setRelodeTable, setLoader]
-  );
+          {["Developer", "Customer-details-page"].some((r) =>
+            userRole?.includes(r)
+          ) && (
+            <Tooltip title={`View ${row.customer_name}`}>
+              <Link to={`/customers/view-details/${row.id}`}>
+                <FaEye className="text-blue-600 text-lg" />
+              </Link>
+            </Tooltip>
+          )}
+        </div>
+      ),
+    });
+
+    return cols;
+  }, [userRole, inputFields, officersData, setRelodeTable, setLoader, headers]);
 
   return (
     <DataTable
