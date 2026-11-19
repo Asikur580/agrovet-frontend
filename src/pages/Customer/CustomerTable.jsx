@@ -172,8 +172,8 @@ const CustomerTable = ({
     }
   };
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const cols = [
       {
         name: "Sl No",
         width: "68px",
@@ -239,28 +239,16 @@ const CustomerTable = ({
       },
       {
         name: "Due",
-        width: "135px",
-        sortable: true,
-        selector: (row) => Number(row.due || 0),
-        cell: (row) => {
-          const num = Number(row.due || 0);
-          return (
-            <span
-              style={{
-                fontWeight: "700",
-                color: num > 0 ? "#dc2626" : "#16a34a",
-              }}
-            >
-              Tk{" "}
-              {num.toLocaleString("en-IN", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </span>
-          );
-        },
+        selector: (row) => (row.due ? parseFloat(row.due).toFixed(2) : "0.00"),
       },
-      {
+    ];
+
+    if (
+      ["Developer", "Customer-sms", "Customer-sms-toggle"].some((r) =>
+        userRole?.includes(r)
+      )
+    ) {
+      cols.push({
         name: "SMS",
         width: "85px",
         cell: (row) => (
@@ -271,44 +259,47 @@ const CustomerTable = ({
             unCheckedChildren="Off"
           />
         ),
-      },
-      {
-        name: "Action",
-        width: "135px",
-        cell: (row) => (
-          <div className="d-flex align-items-center gap-3">
-            {["Developer", "Customer-edit"].some((r) =>
-              userRole.includes(r)
-            ) && (
-              <Suspense fallback={null}>
-                <CommonModal
-                  id={row.id}
-                  slug="Edit customer"
-                  inputFields={inputFields}
-                  ModalOpenBtnTitle={<FaEdit />}
-                  className="editBtn"
-                  identifier="customerUpdate"
-                  api={`/customerUpdate/${row.id}`}
-                  data={officersData}
-                  getSpecificDataApi="/customerShow"
-                  setRelodeTable={setRelodeTable}
-                  setLoader={setLoader}
-                  toolTip={`Edit ${row.customer_name}`}
-                />
-              </Suspense>
-            )}
+      });
+    }
 
-            {["Developer", "Customer-delete"].some((r) =>
-              userRole.includes(r)
-            ) && (
-              <Tooltip title={`Delete ${row.customer_name}`}>
-                <button
-                  type="button"
-                  className="bg-transparent border-0 p-0 cursor-pointer"
+    cols.push({
+      name: "Action",
+      width: "150px",
+      cell: (row) => (
+        <div className="d-flex gap-4">
+          {["Developer", "Customer-edit"].some((r) =>
+            userRole?.includes(r)
+          ) && (
+            <Suspense fallback={null}>
+              <CommonModal
+                id={row.id}
+                slug="Edit customer"
+                inputFields={inputFields}
+                ModalOpenBtnTitle={<FaEdit />}
+                className="editBtn"
+                identifier="customerUpdate"
+                api={`/customerUpdate/${row.id}`}
+                data={officersData}
+                getSpecificDataApi="/customerShow"
+                setRelodeTable={setRelodeTable}
+                setLoader={setLoader}
+                toolTip={`Edit ${row.customer_name}`}
+              />
+            </Suspense>
+          )}
+
+          {["Developer", "Customer-delete"].some((r) =>
+            userRole?.includes(r)
+          ) && (
+            <Tooltip title={`Delete ${row.customer_name}`}>
+              <button>
+                <IoTrashBinSharp
+                  className="deleteIcon cursor-pointer"
+                  size={20}
                   onClick={async () => {
                     if (confirm(`Delete ${row.customer_name}?`)) {
                       try {
-                        if (setLoader) setLoader(true);
+                        setLoader(true);
                         const payload = new FormData();
                         payload.append("id", row.id);
                         const response = await ApiConfig.post(
@@ -316,56 +307,40 @@ const CustomerTable = ({
                           payload,
                           { headers }
                         );
-                        if (response.data?.status) {
+                        if (response.data.status) {
                           toast.success(response.data.message);
-                          if (setRelodeTable) setRelodeTable((prev) => !prev);
+                          setRelodeTable((prev) => !prev);
                         } else {
-                          toast.error(response.data?.error || "Delete failed");
+                          toast.error(response.data.error);
                         }
                       } catch (err) {
                         console.error(err);
                         toast.error("Something went wrong!");
                       } finally {
-                        if (setLoader) setLoader(false);
+                        setLoader(false);
                       }
                     }
                   }}
-                >
-                  <IoTrashBinSharp
-                    className="deleteIcon cursor-pointer text-red-500 hover:text-red-700"
-                    size={18}
-                  />
-                </button>
-              </Tooltip>
-            )}
+                />
+              </button>
+            </Tooltip>
+          )}
 
-            {["Developer", "Customer-details-page"].some((r) =>
-              userRole.includes(r)
-            ) && (
-              <Tooltip title={`View ${row.customer_name}`}>
-                <Link
-                  to={`/customers/view-details/${row.id}`}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <FaEye size={17} />
-                </Link>
-              </Tooltip>
-            )}
-          </div>
-        ),
-      },
-    ],
-    [
-      currentPage,
-      perPage,
-      userRole,
-      inputFields,
-      officersData,
-      setRelodeTable,
-      setLoader,
-      headers,
-    ]
-  );
+          {["Developer", "Customer-details-page"].some((r) =>
+            userRole?.includes(r)
+          ) && (
+            <Tooltip title={`View ${row.customer_name}`}>
+              <Link to={`/customers/view-details/${row.id}`}>
+                <FaEye className="text-blue-600 text-lg" />
+              </Link>
+            </Tooltip>
+          )}
+        </div>
+      ),
+    });
+
+    return cols;
+  }, [userRole, inputFields, officersData, setRelodeTable, setLoader, headers]);
 
   return (
     <DataTable
