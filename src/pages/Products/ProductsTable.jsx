@@ -205,12 +205,19 @@ const ProductsTable = ({
       },
       {
         name: "Stock Qty",
-        width: "120px",
+        width: "135px",
         sortable: true,
         selector: (row) => Number(row.quantity || 0),
         cell: (row) => {
           const qty = Number(row.quantity || 0);
-          if (qty <= 0) {
+          if (qty < 0) {
+            return (
+              <span className="text-red-700 font-bold bg-red-100 px-2 py-0.5 rounded text-xs border border-red-300">
+                Out of Stock ({qty})
+              </span>
+            );
+          }
+          if (qty === 0) {
             return (
               <span className="text-red-700 font-bold bg-red-100 px-2 py-0.5 rounded text-xs border border-red-200">
                 Out of Stock (0)

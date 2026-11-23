@@ -81,6 +81,24 @@ const SalesCreateTable = (props) => {
       name: "Quantity",
       field: "quantity",
       selector: (row) => row.quantity,
+      cell: (row) => {
+        const q = Number(row.quantity || 0);
+        if (q < 0) {
+          return (
+            <span className="text-red-700 font-bold bg-red-100 px-2 py-0.5 rounded text-xs border border-red-300">
+              {q}
+            </span>
+          );
+        }
+        if (q === 0) {
+          return (
+            <span className="text-red-600 font-semibold bg-red-50 px-2 py-0.5 rounded text-xs">
+              0
+            </span>
+          );
+        }
+        return <span>{q}</span>;
+      },
     },
   ];
   //=>>> Column for datatable end ____//

@@ -362,7 +362,7 @@ const Products = ({ setLoader }) => {
                 <option value="all">All Products ({allProducts.length})</option>
                 <option value="in_stock">In Stock (&gt; 10)</option>
                 <option value="low_stock">Low Stock (&le; 10)</option>
-                <option value="out_of_stock">Out of Stock (0)</option>
+                <option value="out_of_stock">Out of Stock (&le; 0)</option>
               </select>
             </div>
 

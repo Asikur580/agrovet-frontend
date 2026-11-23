@@ -197,6 +197,62 @@
   cursor: not-allowed;
 }
 
+.ReportPage-btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  background: #25D366;
+  color: #ffffff;
+  border: 1px solid #1eb956;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(37, 211, 102, 0.2);
+}
+
+.ReportPage-btn-whatsapp:hover:not(:disabled) {
+  background: #1eb956;
+  border-color: #179b47;
+  transform: translateY(-1px);
+}
+
+.ReportPage-btn-whatsapp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ReportPage-btn-gmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  background: #ea4335;
+  color: #ffffff;
+  border: 1px solid #d93025;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(234, 67, 53, 0.2);
+}
+
+.ReportPage-btn-gmail:hover:not(:disabled) {
+  background: #d93025;
+  border-color: #c5221f;
+  transform: translateY(-1px);
+}
+
+.ReportPage-btn-gmail:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* KPI Summary Cards Grid */
 .ReportPage-kpi-grid {
   display: grid;
@@ -328,10 +384,13 @@
   .ReportPage-actions {
     margin-left: 0;
     width: 100%;
+    flex-wrap: wrap;
   }
   .ReportPage-btn-excel,
-  .ReportPage-btn-print {
-    flex: 1;
+  .ReportPage-btn-print,
+  .ReportPage-btn-whatsapp,
+  .ReportPage-btn-gmail {
+    flex: 1 1 calc(50% - 6px);
     justify-content: center;
   }
 }

@@ -94,7 +94,22 @@ const ViewDetails = ({ setLoader }) => {
                       <tr className="align-top">
                         <td className="w-20">Quantity</td>
                         <td className="w-5 text-center font-black">:</td>
-                        <td>{info.quantity}</td>
+                        <td
+                          className={
+                            Number(info.quantity || 0) < 0
+                              ? "text-red-600 font-bold"
+                              : Number(info.quantity || 0) === 0
+                              ? "text-red-500 font-semibold"
+                              : ""
+                          }
+                        >
+                          {info.quantity}
+                          {Number(info.quantity || 0) < 0
+                            ? " (Out of Stock / Minus)"
+                            : Number(info.quantity || 0) === 0
+                            ? " (Out of Stock)"
+                            : ""}
+                        </td>
                       </tr>
                       <tr className="align-top">
                         <td className="w-20">Expire</td>

@@ -18,12 +18,18 @@ import {
   FaSortDown,
   FaCircleCheck,
   FaClock,
+  FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa6";
 
 // Utilities
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 import useStickyScroll from "../../../hooks/useStickyScroll";
+import {
+  shareReportWhatsApp,
+  shareReportGmail,
+} from "../../../assets/js/reportSharing";
 
 // Styles
 import "./TotalSalesSummary.css";
@@ -279,6 +285,88 @@ const TotalSalesSummary = ({ setLoader }) => {
     }
     return dayjs().format("DD MMM YYYY");
   }, [preset, dateRange]);
+
+  const handleShareWhatsApp = () => {
+    shareReportWhatsApp({
+      title: "Total Sales Summary",
+      period: periodLabel,
+      officer: searchQuery.trim() ? `Search: "${searchQuery}"` : "All Officers",
+      summaryItems: [
+        {
+          label: "Total Sales",
+          value: formatCurrency(reportData.summary?.total_sales),
+        },
+        {
+          label: "Cash Sales",
+          value: `${formatCurrency(reportData.summary?.cash_sales)} (${
+            reportData.summary?.cash_percentage
+          }%)`,
+        },
+        {
+          label: "Credit Sales",
+          value: `${formatCurrency(reportData.summary?.credit_sales)} (${
+            reportData.summary?.credit_percentage
+          }%)`,
+        },
+        {
+          label: "Total Invoices",
+          value: formatNumber(reportData.summary?.total_invoices),
+        },
+        {
+          label: "Active Officers",
+          value: formatNumber(reportData.summary?.active_selling_employees),
+        },
+        { label: "Officers Displayed", value: filteredEmployees.length },
+      ],
+      topItems: filteredEmployees.slice(0, 5).map((emp) => ({
+        name: emp.employee_name,
+        value: `${formatCurrency(emp.total_sales)} (${formatNumber(
+          emp.invoices_count
+        )} inv)`,
+      })),
+    });
+  };
+
+  const handleShareGmail = () => {
+    shareReportGmail({
+      title: "Total Sales Summary",
+      period: periodLabel,
+      officer: searchQuery.trim() ? `Search: "${searchQuery}"` : "All Officers",
+      summaryItems: [
+        {
+          label: "Total Sales",
+          value: formatCurrency(reportData.summary?.total_sales),
+        },
+        {
+          label: "Cash Sales",
+          value: `${formatCurrency(reportData.summary?.cash_sales)} (${
+            reportData.summary?.cash_percentage
+          }%)`,
+        },
+        {
+          label: "Credit Sales",
+          value: `${formatCurrency(reportData.summary?.credit_sales)} (${
+            reportData.summary?.credit_percentage
+          }%)`,
+        },
+        {
+          label: "Total Invoices",
+          value: formatNumber(reportData.summary?.total_invoices),
+        },
+        {
+          label: "Active Officers",
+          value: formatNumber(reportData.summary?.active_selling_employees),
+        },
+        { label: "Officers Displayed", value: filteredEmployees.length },
+      ],
+      topItems: filteredEmployees.slice(0, 5).map((emp) => ({
+        name: emp.employee_name,
+        value: `${formatCurrency(emp.total_sales)} (${formatNumber(
+          emp.invoices_count
+        )} inv)`,
+      })),
+    });
+  };
 
   const handleExportExcel = async () => {
     if (!filteredEmployees.length) {
@@ -590,13 +678,14 @@ const TotalSalesSummary = ({ setLoader }) => {
               <span>{hideZeroSales ? "Showing Active Sellers" : "Hide 0-Sale"}</span>
             </button>
 
-            {/* Export & Print */}
+            {/* Action Buttons: Export Excel, Print, WhatsApp & Gmail */}
             <div className="TotalSalesSummary-actions">
               <button
                 type="button"
                 onClick={handleExportExcel}
                 disabled={isExporting || !filteredEmployees.length}
                 className="TotalSalesSummary-btn-excel"
+                title="Export report to Excel"
               >
                 <FaFileExcel size={14} />
                 <span>{isExporting ? "Exporting..." : "Export Excel"}</span>
@@ -607,9 +696,32 @@ const TotalSalesSummary = ({ setLoader }) => {
                 onClick={() => window.print()}
                 disabled={!filteredEmployees.length}
                 className="TotalSalesSummary-btn-print"
+                title="Print report"
               >
                 <FaPrint size={14} />
                 <span>Print</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareWhatsApp}
+                disabled={!filteredEmployees.length}
+                className="TotalSalesSummary-btn-whatsapp"
+                title="Share report via WhatsApp"
+              >
+                <FaWhatsapp size={15} />
+                <span>WhatsApp</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareGmail}
+                disabled={!filteredEmployees.length}
+                className="TotalSalesSummary-btn-gmail"
+                title="Share report via Gmail"
+              >
+                <FaEnvelope size={14} />
+                <span>Gmail</span>
               </button>
             </div>
           </div>

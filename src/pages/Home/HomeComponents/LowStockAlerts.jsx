@@ -92,7 +92,11 @@ const LowStockAlerts = ({ canManageProducts = true }) => {
                       {name}
                     </p>
                     <span className={`HomeStock-pill ${isOut ? "stock-out" : "stock-low"}`}>
-                      {isOut ? "Out of stock" : `${formatNumber(stock)} left`}
+                      {stock < 0
+                        ? `${formatNumber(stock)} (Out of stock)`
+                        : isOut
+                        ? "Out of stock (0)"
+                        : `${formatNumber(stock)} left`}
                     </span>
                   </div>
                 );

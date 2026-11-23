@@ -16,11 +16,17 @@ import {
   FaFilter,
   FaArrowRotateLeft,
   FaCalendarDays,
+  FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa6";
 
 // Utilities
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
+import {
+  shareReportWhatsApp,
+  shareReportGmail,
+} from "../../../assets/js/reportSharing";
 
 // Styles
 import "../../../assets/css/ReportCommon.css";
@@ -530,6 +536,68 @@ const TopSellingProducts = ({ setLoader }) => {
     window.print();
   };
 
+  const handleShareWhatsApp = () => {
+    const selectedEmp = employees.find((e) => String(e.id) === String(employeeId));
+    const officerLabel = selectedEmp
+      ? `${selectedEmp.name} (${selectedEmp.employee_id || ""})`
+      : "All Officers";
+
+    shareReportWhatsApp({
+      title: "Top Selling Products Report",
+      period: periodLabel,
+      officer: officerLabel,
+      summaryItems: [
+        {
+          label: "Top Seller Product",
+          value: kpiStats.overallTop?.product_name
+            ? `${kpiStats.overallTop.product_name} (${formatNumber(
+                kpiStats.overallTop.total_quantity || kpiStats.overallTop.quantity
+              )} units)`
+            : "N/A",
+        },
+        { label: "Total Revenue", value: formatCurrency(kpiStats.totalAmount) },
+        { label: "Total Units Sold", value: formatNumber(kpiStats.totalQty) },
+        { label: "Total Invoices", value: formatNumber(kpiStats.totalInvoices) },
+        { label: "Products Listed", value: tableRows.length },
+      ],
+      topItems: tableRows.slice(0, 5).map((p) => ({
+        name: `#${p.rank} ${p.product_name} (${p.pack_size || ""})`,
+        value: `${formatNumber(p.total_quantity)} qty | ${formatCurrency(p.total_amount)}`,
+      })),
+    });
+  };
+
+  const handleShareGmail = () => {
+    const selectedEmp = employees.find((e) => String(e.id) === String(employeeId));
+    const officerLabel = selectedEmp
+      ? `${selectedEmp.name} (${selectedEmp.employee_id || ""})`
+      : "All Officers";
+
+    shareReportGmail({
+      title: "Top Selling Products Report",
+      period: periodLabel,
+      officer: officerLabel,
+      summaryItems: [
+        {
+          label: "Top Seller Product",
+          value: kpiStats.overallTop?.product_name
+            ? `${kpiStats.overallTop.product_name} (${formatNumber(
+                kpiStats.overallTop.total_quantity || kpiStats.overallTop.quantity
+              )} units)`
+            : "N/A",
+        },
+        { label: "Total Revenue", value: formatCurrency(kpiStats.totalAmount) },
+        { label: "Total Units Sold", value: formatNumber(kpiStats.totalQty) },
+        { label: "Total Invoices", value: formatNumber(kpiStats.totalInvoices) },
+        { label: "Products Listed", value: tableRows.length },
+      ],
+      topItems: tableRows.slice(0, 5).map((p) => ({
+        name: `#${p.rank} ${p.product_name} (${p.pack_size || ""})`,
+        value: `${formatNumber(p.total_quantity)} qty | ${formatCurrency(p.total_amount)}`,
+      })),
+    });
+  };
+
   const handleResetFilters = () => {
     setDateRange({ start: "", end: "" });
     setSelectedYear(currentRealYear);
@@ -692,6 +760,7 @@ const TopSellingProducts = ({ setLoader }) => {
               type="button"
               className="TopSellingPage-btn-excel"
               onClick={handleExportExcel}
+              disabled={!tableRows.length}
               title="Export report to Excel"
             >
               <FaFileExcel size={14} />
@@ -701,10 +770,31 @@ const TopSellingProducts = ({ setLoader }) => {
               type="button"
               className="TopSellingPage-btn-print"
               onClick={handlePrint}
+              disabled={!tableRows.length}
               title="Print report"
             >
               <FaPrint size={14} />
               Print
+            </button>
+            <button
+              type="button"
+              className="TopSellingPage-btn-whatsapp"
+              onClick={handleShareWhatsApp}
+              disabled={!tableRows.length}
+              title="Share report via WhatsApp"
+            >
+              <FaWhatsapp size={15} />
+              WhatsApp
+            </button>
+            <button
+              type="button"
+              className="TopSellingPage-btn-gmail"
+              onClick={handleShareGmail}
+              disabled={!tableRows.length}
+              title="Share report via Gmail"
+            >
+              <FaEnvelope size={14} />
+              Gmail
             </button>
           </div>
         </div>

@@ -226,6 +226,60 @@
   cursor: not-allowed;
 }
 
+.TotalSalesSummary-btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  background: #25D366;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(37, 211, 102, 0.2);
+}
+
+.TotalSalesSummary-btn-whatsapp:hover:not(:disabled) {
+  background: #1eb956;
+  transform: translateY(-1px);
+}
+
+.TotalSalesSummary-btn-whatsapp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.TotalSalesSummary-btn-gmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  background: #ea4335;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(234, 67, 53, 0.2);
+}
+
+.TotalSalesSummary-btn-gmail:hover:not(:disabled) {
+  background: #d93025;
+  transform: translateY(-1px);
+}
+
+.TotalSalesSummary-btn-gmail:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* KPI Grid */
 .TotalSalesSummary-kpi-grid {
   display: grid;
@@ -565,10 +619,13 @@
   .TotalSalesSummary-actions {
     margin-left: 0;
     width: 100%;
+    flex-wrap: wrap;
   }
   .TotalSalesSummary-btn-excel,
-  .TotalSalesSummary-btn-print {
-    flex: 1;
+  .TotalSalesSummary-btn-print,
+  .TotalSalesSummary-btn-whatsapp,
+  .TotalSalesSummary-btn-gmail {
+    flex: 1 1 calc(50% - 6px);
     justify-content: center;
   }
 }

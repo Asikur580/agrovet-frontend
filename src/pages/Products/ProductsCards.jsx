@@ -118,7 +118,7 @@ const ProductsCards = ({
       <div
         className={`SalesCard card-credit ${isOutOfStockActive ? "is-active" : ""}`}
         onClick={onToggleOutOfStock}
-        title="Click to filter completely out-of-stock items (0 units)"
+        title="Click to filter out-of-stock items (≤ 0 units)"
       >
         <div className="SalesCardHeader">
           <div className="SalesCardTitleWrap">
@@ -135,7 +135,7 @@ const ProductsCards = ({
           {metrics.outOfStockCount} Items
         </div>
         <div className="SalesCardFooter">
-          <span>Zero inventory units</span>
+          <span>Zero or negative units</span>
           <span className="filterHint">
             {isOutOfStockActive ? "Click to clear" : "Filter"}
           </span>

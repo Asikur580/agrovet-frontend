@@ -18,12 +18,18 @@ import {
   FaFileExcel,
   FaPrint,
   FaMagnifyingGlass,
+  FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa6";
 
 // Utilities
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 import useStickyScroll from "../../../hooks/useStickyScroll";
+import {
+  shareReportWhatsApp,
+  shareReportGmail,
+} from "../../../assets/js/reportSharing";
 
 // Styles
 import "../../../assets/css/ReportCommon.css";
@@ -149,6 +155,90 @@ const SalesReport = ({ setLoader }) => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleShareWhatsApp = () => {
+    const selectedEmp = employees.find((e) => String(e.id) === String(employeeId));
+    const officerLabel = selectedEmp
+      ? `${selectedEmp.name} (${selectedEmp.employee_id || ""})`
+      : "All Officers";
+    const period =
+      dateVal.start && dateVal.end
+        ? `${dateVal.start} to ${dateVal.end}`
+        : "All Time";
+
+    shareReportWhatsApp({
+      title: "Product-wise Sales Report",
+      period,
+      officer: officerLabel,
+      summaryItems: [
+        { label: "Total Products", value: filteredData.length },
+        {
+          label: "Total Units Sold",
+          value: Number(filteredTotals.quantity || 0).toLocaleString(),
+        },
+        {
+          label: "Cash Sales",
+          value: `৳ ${formatCurrency(filteredTotals.cash_sale)}`,
+        },
+        {
+          label: "Credit Sales",
+          value: `৳ ${formatCurrency(filteredTotals.credit_sale)}`,
+        },
+        {
+          label: "Grand Total Revenue",
+          value: `৳ ${formatCurrency(filteredTotals.amount)}`,
+        },
+      ],
+      topItems: filteredData.slice(0, 5).map((p) => ({
+        name: `${p.product_name} (${p.pack_size || ""})`,
+        value: `${Number(p.total_quantity || 0).toLocaleString()} qty | ৳ ${formatCurrency(
+          p.total_amount
+        )}`,
+      })),
+    });
+  };
+
+  const handleShareGmail = () => {
+    const selectedEmp = employees.find((e) => String(e.id) === String(employeeId));
+    const officerLabel = selectedEmp
+      ? `${selectedEmp.name} (${selectedEmp.employee_id || ""})`
+      : "All Officers";
+    const period =
+      dateVal.start && dateVal.end
+        ? `${dateVal.start} to ${dateVal.end}`
+        : "All Time";
+
+    shareReportGmail({
+      title: "Product-wise Sales Report",
+      period,
+      officer: officerLabel,
+      summaryItems: [
+        { label: "Total Products", value: filteredData.length },
+        {
+          label: "Total Units Sold",
+          value: Number(filteredTotals.quantity || 0).toLocaleString(),
+        },
+        {
+          label: "Cash Sales",
+          value: `৳ ${formatCurrency(filteredTotals.cash_sale)}`,
+        },
+        {
+          label: "Credit Sales",
+          value: `৳ ${formatCurrency(filteredTotals.credit_sale)}`,
+        },
+        {
+          label: "Grand Total Revenue",
+          value: `৳ ${formatCurrency(filteredTotals.amount)}`,
+        },
+      ],
+      topItems: filteredData.slice(0, 5).map((p) => ({
+        name: `${p.product_name} (${p.pack_size || ""})`,
+        value: `${Number(p.total_quantity || 0).toLocaleString()} qty | ৳ ${formatCurrency(
+          p.total_amount
+        )}`,
+      })),
+    });
   };
 
   const escapeExcelCell = (value) => {
@@ -390,13 +480,14 @@ const SalesReport = ({ setLoader }) => {
               <span>Reset</span>
             </button>
 
-            {/* Action Buttons: Export Excel & Print */}
+            {/* Action Buttons: Export Excel, Print, WhatsApp & Gmail */}
             <div className="ReportPage-actions">
               <button
                 type="button"
                 onClick={handleExportExcel}
                 disabled={!filteredData.length}
                 className="ReportPage-btn-excel"
+                title="Export report to Excel"
               >
                 <FaFileExcel size={14} />
                 <span>Export Excel</span>
@@ -407,9 +498,32 @@ const SalesReport = ({ setLoader }) => {
                 onClick={handlePrint}
                 disabled={!filteredData.length}
                 className="ReportPage-btn-print"
+                title="Print report"
               >
                 <FaPrint size={14} />
                 <span>Print</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareWhatsApp}
+                disabled={!filteredData.length}
+                className="ReportPage-btn-whatsapp"
+                title="Share report via WhatsApp"
+              >
+                <FaWhatsapp size={15} />
+                <span>WhatsApp</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareGmail}
+                disabled={!filteredData.length}
+                className="ReportPage-btn-gmail"
+                title="Share report via Gmail"
+              >
+                <FaEnvelope size={14} />
+                <span>Gmail</span>
               </button>
             </div>
           </div>

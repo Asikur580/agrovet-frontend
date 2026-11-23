@@ -15,12 +15,18 @@ import {
   FaBoxesStacked,
   FaCircleCheck,
   FaClock,
+  FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa6";
 
 // Utilities
 import ApiConfig from "../../../assets/js/ApiConfig";
 import { AuthContext } from "../../../context/AuthContext";
 import useStickyScroll from "../../../hooks/useStickyScroll";
+import {
+  shareReportWhatsApp,
+  shareReportGmail,
+} from "../../../assets/js/reportSharing";
 
 // Styles
 import "./CashCreditSalesReport.css";
@@ -223,6 +229,78 @@ const CashCreditSalesReport = ({ setLoader }) => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleShareWhatsApp = () => {
+    const selectedEmp = employees.find((e) => String(e.id) === String(employeeId));
+    const officerLabel = selectedEmp
+      ? `${selectedEmp.name} (${selectedEmp.employee_id || ""})`
+      : "All Officers";
+    const period =
+      dateRange.start && dateRange.end
+        ? `${dateRange.start} to ${dateRange.end}`
+        : "All Time";
+
+    shareReportWhatsApp({
+      title: "Cash & Credit Sales Report",
+      period,
+      officer: officerLabel,
+      summaryItems: [
+        { label: "Total Sales", value: formatCurrency(reportData.summary?.total_sales) },
+        {
+          label: "Cash Sales",
+          value: `${formatCurrency(reportData.summary?.cash_sales)} (${reportData.summary?.cash_percentage}%)`,
+        },
+        {
+          label: "Credit Sales",
+          value: `${formatCurrency(reportData.summary?.credit_sales)} (${reportData.summary?.credit_percentage}%)`,
+        },
+        { label: "Total Paid", value: formatCurrency(reportData.summary?.total_paid) },
+        { label: "Total Due", value: formatCurrency(reportData.summary?.total_due) },
+        { label: "Total Invoices", value: formatNumber(reportData.summary?.total_invoices) },
+        { label: "Current View", value: `${activeTab.toUpperCase()} (${filteredInvoices.length} invoices)` },
+      ],
+      topItems: filteredInvoices.slice(0, 5).map((inv) => ({
+        name: `#${inv.invoice_id} - ${inv.customer_name}`,
+        value: `${inv.sale_type?.toUpperCase()} | ${formatCurrency(inv.grand_total)} (Paid: ${formatCurrency(inv.paid)})`,
+      })),
+    });
+  };
+
+  const handleShareGmail = () => {
+    const selectedEmp = employees.find((e) => String(e.id) === String(employeeId));
+    const officerLabel = selectedEmp
+      ? `${selectedEmp.name} (${selectedEmp.employee_id || ""})`
+      : "All Officers";
+    const period =
+      dateRange.start && dateRange.end
+        ? `${dateRange.start} to ${dateRange.end}`
+        : "All Time";
+
+    shareReportGmail({
+      title: "Cash & Credit Sales Report",
+      period,
+      officer: officerLabel,
+      summaryItems: [
+        { label: "Total Sales", value: formatCurrency(reportData.summary?.total_sales) },
+        {
+          label: "Cash Sales",
+          value: `${formatCurrency(reportData.summary?.cash_sales)} (${reportData.summary?.cash_percentage}%)`,
+        },
+        {
+          label: "Credit Sales",
+          value: `${formatCurrency(reportData.summary?.credit_sales)} (${reportData.summary?.credit_percentage}%)`,
+        },
+        { label: "Total Paid", value: formatCurrency(reportData.summary?.total_paid) },
+        { label: "Total Due", value: formatCurrency(reportData.summary?.total_due) },
+        { label: "Total Invoices", value: formatNumber(reportData.summary?.total_invoices) },
+        { label: "Current View", value: `${activeTab.toUpperCase()} (${filteredInvoices.length} invoices)` },
+      ],
+      topItems: filteredInvoices.slice(0, 5).map((inv) => ({
+        name: `#${inv.invoice_id} - ${inv.customer_name}`,
+        value: `${inv.sale_type?.toUpperCase()} | ${formatCurrency(inv.grand_total)} (Paid: ${formatCurrency(inv.paid)})`,
+      })),
+    });
   };
 
   const formatCurrency = (num) => {
@@ -538,13 +616,14 @@ const CashCreditSalesReport = ({ setLoader }) => {
               <span>Reset</span>
             </button>
 
-            {/* Action Buttons: Export Excel & Print */}
+            {/* Action Buttons: Export Excel, Print, WhatsApp & Gmail */}
             <div className="CashCreditReport-actions">
               <button
                 type="button"
                 onClick={handleExportExcel}
                 disabled={isExporting || !filteredInvoices.length}
                 className="CashCreditReport-btn-excel"
+                title="Export report to Excel"
               >
                 <FaFileExcel size={14} />
                 <span>{isExporting ? "Exporting..." : "Export Excel"}</span>
@@ -555,9 +634,32 @@ const CashCreditSalesReport = ({ setLoader }) => {
                 onClick={handlePrint}
                 disabled={!filteredInvoices.length}
                 className="CashCreditReport-btn-print"
+                title="Print report"
               >
                 <FaPrint size={14} />
                 <span>Print</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareWhatsApp}
+                disabled={!filteredInvoices.length}
+                className="CashCreditReport-btn-whatsapp"
+                title="Share report via WhatsApp"
+              >
+                <FaWhatsapp size={15} />
+                <span>WhatsApp</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareGmail}
+                disabled={!filteredInvoices.length}
+                className="CashCreditReport-btn-gmail"
+                title="Share report via Gmail"
+              >
+                <FaEnvelope size={14} />
+                <span>Gmail</span>
               </button>
             </div>
           </div>
