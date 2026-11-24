@@ -1,4 +1,8 @@
-/* Summery.css - Primary Color: #3b5898 (Table Head / System Brand Color) */
+/* Summery.css - Strict 60-30-10 Design System
+   60% Surface: #ffffff with #e2e8f0 borders
+   30% Brand: #3b5898 for icons, structure, and text
+   10% Accent: #f48726 for primary today sales indicator
+*/
 
 .SummeryWrapper {
   display: flex;
@@ -17,45 +21,45 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   text-decoration: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.22s ease-in-out;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s ease-in-out;
   position: relative;
   overflow: hidden;
 }
 
 .SummeryCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(59, 88, 152, 0.1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   border-color: #cbd5e1;
 }
 
-/* Borders: #3b5898 for Sales & Orders, Slate for Due, Amber for Low Stock Alert */
+/* 10% Accent on Primary Metric (Today's Sales) - No rainbow left borders */
 .SummeryCard.card-today {
-  border-left: 4px solid var(--main-clr, #3b5898);
+  border-top: 3px solid #f48726;
 }
 .SummeryCard.card-month {
-  border-left: 4px solid var(--main-clr, #3b5898);
+  border-top: 3px solid #3b5898;
 }
 .SummeryCard.card-due {
-  border-left: 4px solid #334155;
+  border-top: 3px solid #64748b;
 }
 .SummeryCard.card-orders {
-  border-left: 4px solid var(--main-clr, #3b5898);
+  border-top: 3px solid #3b5898;
 }
 .SummeryCard.card-stock {
-  border-left: 4px solid #d97706; /* Functional warning alert */
+  border-top: 3px solid #64748b;
 }
 
 .SummeryCardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .SummeryLabel {
@@ -66,40 +70,40 @@
   color: #64748b;
 }
 
-/* Tonal Icon Wrappers */
+/* Unified Tonal Icon Wrappers (30% Brand Navy #3b5898 - No multicolor icons) */
 .SummeryIconWrap {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #edf2fc;
+  color: #3b5898;
+  transition: all 0.2s ease;
 }
 
+/* Today's Sales uses 10% Accent tint */
 .SummeryIconWrap.icon-today {
-  background: #edf2fc;
-  color: var(--main-clr, #3b5898);
+  background: #ffedd5;
+  color: #f48726;
 }
-.SummeryIconWrap.icon-month {
-  background: #edf2fc;
-  color: var(--main-clr, #3b5898);
-}
-.SummeryIconWrap.icon-due {
-  background: #f1f5f9;
-  color: #334155;
-}
+
+.SummeryIconWrap.icon-month,
 .SummeryIconWrap.icon-orders {
   background: #edf2fc;
-  color: var(--main-clr, #3b5898);
-}
-.SummeryIconWrap.icon-stock {
-  background: #fffbeb;
-  color: #d97706;
+  color: #3b5898;
 }
 
-/* Typography */
+.SummeryIconWrap.icon-due,
+.SummeryIconWrap.icon-stock {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Typography: Clean, Unified #0f172a (No rainbow text) */
 .SummeryValue {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.3px;
@@ -110,20 +114,12 @@
   text-overflow: ellipsis;
 }
 
-.SummeryValue.value-today {
-  color: #1e2d4f;
-}
-.SummeryValue.value-month {
-  color: #1e2d4f;
-}
-.SummeryValue.value-due {
-  color: #0f172a;
-}
-.SummeryValue.value-orders {
-  color: #0f172a;
-}
+.SummeryValue.value-today,
+.SummeryValue.value-month,
+.SummeryValue.value-due,
+.SummeryValue.value-orders,
 .SummeryValue.value-stock {
-  color: #92400e;
+  color: #0f172a;
 }
 
 .SummeryFooter {
@@ -133,14 +129,14 @@
   font-size: 0.72rem;
   color: #64748b;
   margin-top: auto;
-  padding-top: 4px;
+  padding-top: 6px;
 }
 
 .SummeryFooter .arrow {
   opacity: 0;
   transition: all 0.2s ease;
   transform: translateX(-3px);
-  color: var(--main-clr, #3b5898);
+  color: #3b5898;
 }
 
 .SummeryCard:hover .SummeryFooter .arrow {
@@ -148,8 +144,8 @@
   transform: translateX(0);
 }
 
-.SummeryCard.card-stock:hover .SummeryFooter .arrow {
-  color: #d97706;
+.SummeryCard.card-today:hover .SummeryFooter .arrow {
+  color: #f48726;
 }
 
 /* Secondary Pills Row */
@@ -188,9 +184,9 @@
 }
 
 .SummeryPill:hover {
-  border-color: var(--main-clr, #3b5898);
+  border-color: #3b5898;
   background: #edf2fc;
-  color: var(--main-clr, #3b5898);
+  color: #3b5898;
   transform: translateY(-1px);
 }
 
@@ -221,13 +217,13 @@
   }
 }
 
-/* Loading placeholder for KPI values (avoids flashing false zeros) */
+/* Loading placeholder */
 .SummerySkeleton {
   display: inline-block;
   width: 110px;
   height: 1.3rem;
   border-radius: 6px;
-  background: linear-gradient(90deg, #eef2f7 25%, #e2e8f0 37%, #eef2f7 63%);
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
   background-size: 400% 100%;
   animation: summery-shimmer 1.2s ease infinite;
   vertical-align: middle;

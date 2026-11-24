@@ -3,12 +3,13 @@
 /* ===== Header extras ===== */
 .Home-role {
   margin-left: 8px;
-  padding: 2px 8px;
-  font-size: 0.7rem;
+  padding: 3px 10px;
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: capitalize;
-  color: var(--home-brand);
-  background: var(--home-brand-soft);
+  color: #3b5898;
+  background: #edf2fc;
+  border: 1px solid #c5d3ea;
   border-radius: 999px;
   vertical-align: middle;
 }
@@ -16,19 +17,21 @@
 .Home-refresh-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 4px;
-  padding: 2px 8px;
+  gap: 5px;
+  margin-left: 6px;
+  padding: 3px 9px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--home-brand);
-  background: var(--home-brand-soft);
+  color: #3b5898;
+  background: #edf2fc;
   border: 1px solid #c5d3ea;
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.18s ease;
 }
 .Home-refresh-btn:hover {
-  background: #dfe8f8;
+  background: #3b5898;
+  color: #ffffff;
 }
 
 /* ===== Global period filter ===== */
@@ -469,10 +472,10 @@
   background: var(--home-border-soft);
 }
 .CashCredit-bar-cash {
-  background: #2563eb;
+  background: #3b5898;
 }
 .CashCredit-bar-credit {
-  background: #f59e0b;
+  background: #cbd5e1;
 }
 .CashCredit-stats {
   display: grid;
@@ -498,10 +501,10 @@
   flex-shrink: 0;
 }
 .CashCredit-dot.dot-cash {
-  background: #2563eb;
+  background: #3b5898;
 }
 .CashCredit-dot.dot-credit {
-  background: #f59e0b;
+  background: #cbd5e1;
 }
 .CashCredit-stat-label {
   font-size: 0.74rem;

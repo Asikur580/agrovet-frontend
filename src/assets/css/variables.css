@@ -1,33 +1,63 @@
 :root {
-  --light-1: #fff;
-  --light-2: #f5f4f4;
-  --light-3: #d6d4d4;
+  /* Legacy tokens updated to cohesive 60-30-10 Design System */
+  --light-1: #ffffff;
+  --light-2: #f8fafc;
+  --light-3: #e2e8f0;
 
-  --dark-1: #1f1e1e;
-  --dark-2: #2c2b2b;
-  --dark-3: #616161;
+  --dark-1: #0f172a;
+  --dark-2: #1e293b;
+  --dark-3: #475569;
 
-  /* --main-clr: #fa8d26; */
+  /* 30% Secondary & Brand Base */
   --main-clr: #3b5898;
-  --light-blue: rgb(194 205 241);
-  --dark-blue: #0d0144;
+  --light-blue: #edf2fc;
+  --dark-blue: #1e3a8a;
 
+  /* 10% Accent */
   --orange: #f48726;
-  --red: #fd1010;
-  --green: #2baf03;
+
+  /* Semantics */
+  --red: #dc2626;
+  --green: #16a34a;
   --light-purple: #8805fc;
-  --dropdown-box-clr: #dfdbdb;
-  /* --link-hover: #4644461c; */
-  --link-hover: #0609f42b;
+  --dropdown-box-clr: #f1f5f9;
+  --link-hover: #edf2fc;
 
-  --gradient-bg: rgb(2, 135, 157);
-  --gradient_1: linear-gradient(330deg, rgb(2 154 179) 0%, rgb(0 45 71) 100%);
+  --gradient-bg: #3b5898;
+  --gradient_1: linear-gradient(135deg, #1e3a8a 0%, #3b5898 100%);
 
-  --trans: 0.3s all ease;
-  --shadow: 3px 3px 5px var(--light-3);
-  --cardShadow: 2px 2px 5px var(--light-3), -2px -2px 5px var(--light-3);
-  --border: 1px solid #d6d6d6;
-  --table-border: 1px solid #adacac;
+  --trans: 0.2s all ease;
+  --shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08);
+  --cardShadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+  --border: 1px solid #e2e8f0;
+  --table-border: 1px solid #e2e8f0;
+
+  /* 60-30-10 Design System Tokens */
+  /* 60% Dominant Canvas */
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+
+  /* 30% Secondary & Structure */
+  --brand-primary: #3b5898;
+  --brand-dark: #1e3a8a;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+
+  /* 10% Accent */
+  --accent-color: #f48726;
+  --accent-hover: #dd6b10;
+  --accent-light: #ffedd5;
+
+  /* Status Semantics */
+  --status-success: #16a34a;
+  --status-warning: #d97706;
+  --status-danger: #dc2626;
+  --status-info: #2563eb;
+
+  /* Modern Elevation */
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+  --shadow-modal: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
 }
-
-/* @media (prefers-color-scheme: dark) {} */

@@ -13,12 +13,12 @@ import { Bar } from "react-chartjs-2";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
 const barColors = [
-  "rgba(34, 197, 94, 0.6)",   // green - Product Sales
-  "rgba(239, 68, 68, 0.6)",   // red - Product Buy Price
-  "rgba(59, 130, 246, 0.6)",  // blue - Salary Cost
-  "rgba(249, 115, 22, 0.6)",  // orange - Employee Add Cost
-  "rgba(168, 85, 247, 0.6)",  // purple - Office Cost
-  "rgba(20, 184, 166, 0.6)",  // teal - Net Profit / Loss
+  "#3b5898", // 30% Brand Navy - Product Sales
+  "#64748b", // Slate 500 - Product Buy Price
+  "#94a3b8", // Slate 400 - Salary Cost
+  "#cbd5e1", // Slate 300 - Employee Add Cost
+  "#475569", // Slate 600 - Office Cost
+  "#f48726", // 10% Accent - Net Profit / Loss
 ];
 
 export default function BarChart(props) {

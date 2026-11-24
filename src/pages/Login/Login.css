@@ -1,11 +1,18 @@
-.loginContainer {
-  width: 100%;
-  max-width: 2000px;
-  height: 100vh;
-  padding: 0 30px;
+/* Radiant Agrovet Glassmorphism Login Card */
+.glass-login-card {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 35px 0 rgba(0, 0, 0, 0.15), 0 2px 6px 0 rgba(255, 255, 255, 0.2) inset;
 }
 
-.login {
-  width: 100%;
-  justify-content: center;
+.login-viewport {
+  background-position: center bottom;
+}
+
+@supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .glass-login-card {
+    background: rgba(255, 255, 255, 0.85);
+  }
 }

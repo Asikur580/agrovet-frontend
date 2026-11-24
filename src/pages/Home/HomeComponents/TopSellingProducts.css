@@ -29,15 +29,14 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: #edf2fc;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.15);
 }
 
 .TopSellingWidget-icon {
-  color: #d97706;
+  color: #3b5898;
   font-size: 20px;
 }
 
@@ -148,8 +147,8 @@
 
 /* Featured Month Banner */
 .TopSellingWidget-featured {
-  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fd 100%);
-  border: 1px solid #bfdbfe;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 20px;
@@ -164,7 +163,7 @@
   right: -50px;
   width: 180px;
   height: 180px;
-  background: radial-gradient(circle, rgba(59, 88, 152, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 88, 152, 0.05) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -189,22 +188,22 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fde68a;
+  background: #ffedd5;
+  color: #c25e00;
+  border: 1px solid #fed7aa;
 }
 
 .TopSellingWidget-crown-icon {
-  color: #d97706;
+  color: #f48726;
 }
 
 .TopSellingWidget-badge-divider {
-  color: #d97706;
+  color: #f48726;
   opacity: 0.6;
 }
 
 .TopSellingWidget-badge-highlight {
-  color: #b45309;
+  color: #c25e00;
 }
 
 /* Month Navigation */
@@ -375,18 +374,7 @@
 .TopSellingWidget-stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-}
-
-.TopSellingWidget-stat-card.card-sold:hover {
-  border-color: #93c5fd;
-}
-
-.TopSellingWidget-stat-card.card-sales:hover {
-  border-color: #86efac;
-}
-
-.TopSellingWidget-stat-card.card-invoices:hover {
-  border-color: #fde047;
+  border-color: #3b5898;
 }
 
 .TopSellingWidget-stat-header {
@@ -403,21 +391,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.TopSellingWidget-stat-icon-wrap.icon-sold {
   background: #edf2fc;
   color: #3b5898;
 }
 
-.TopSellingWidget-stat-icon-wrap.icon-sales {
-  background: #edf2fc;
-  color: #3b5898;
-}
-
+.TopSellingWidget-stat-icon-wrap.icon-sold,
+.TopSellingWidget-stat-icon-wrap.icon-sales,
 .TopSellingWidget-stat-icon-wrap.icon-invoices {
-  background: #fffbeb;
-  color: #d97706;
+  background: #edf2fc;
+  color: #3b5898;
 }
 
 .TopSellingWidget-stat-label {
@@ -434,18 +416,13 @@
   line-height: 1.2;
   margin-bottom: 2px;
   white-space: nowrap;
+  color: #0f172a;
 }
 
-.TopSellingWidget-stat-value.primary {
-  color: #2d4373;
-}
-
-.TopSellingWidget-stat-value.success {
-  color: #2d4373;
-}
-
+.TopSellingWidget-stat-value.primary,
+.TopSellingWidget-stat-value.success,
 .TopSellingWidget-stat-value.amber {
-  color: #b45309;
+  color: #0f172a;
 }
 
 .TopSellingWidget-stat-unit {

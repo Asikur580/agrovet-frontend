@@ -76,23 +76,25 @@
 }
 
 .Home-action-btn.btn-primary {
-  background: var(--main-clr, #3b5898);
+  background: #f48726;
   color: #ffffff;
-  box-shadow: 0 1px 3px rgba(59, 88, 152, 0.28);
+  box-shadow: 0 2px 6px rgba(244, 135, 38, 0.35);
 }
 .Home-action-btn.btn-primary:hover {
-  background: #2d4373;
+  background: #dd6b10;
   transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(244, 135, 38, 0.45);
 }
 
 .Home-action-btn.btn-secondary {
-  background: #1e293b;
+  background: #3b5898;
   color: #ffffff;
-  box-shadow: 0 1px 3px rgba(30, 41, 59, 0.25);
+  box-shadow: 0 2px 6px rgba(59, 88, 152, 0.25);
 }
 .Home-action-btn.btn-secondary:hover {
-  background: #0f172a;
+  background: #2d4373;
   transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(59, 88, 152, 0.35);
 }
 
 .Home-action-btn.btn-outline {
@@ -181,6 +183,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .HomeHubCard-icon-box.icon-perf {
@@ -189,8 +193,8 @@
 }
 
 .HomeHubCard-icon-box.icon-due {
-  background: #f1f5f9;
-  color: #334155;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
 }
 
 .HomeHubCard-title {
@@ -236,15 +240,12 @@
   color: #0f172a;
 }
 
-.HomeHubTab.active {
+.HomeHubTab.active,
+.HomeHubTab.tab-warning.active {
   background: #ffffff;
   color: var(--main-clr, #3b5898);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   font-weight: 700;
-}
-
-.HomeHubTab.tab-warning.active {
-  color: #d97706;
 }
 
 .HomeHubCard-body {
@@ -285,13 +286,13 @@
   border-bottom: none;
 }
 
-/* Low Stock Inventory Alert Card (Functional Amber Alert) */
+/* Low Stock Inventory Alert Card (60-30-10 Design System) */
 .Home-inventory-alert-card {
   background: #ffffff;
-  border: 1px solid #fde68a;
-  border-left: 4px solid #d97706;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid #f48726;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.06);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   padding: 14px 18px;
 }
 

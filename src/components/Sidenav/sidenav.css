@@ -72,13 +72,17 @@
 .side-nav .side-menu li a div .icon {
   margin-right: 10px;
 }
-.side-nav .side-menu li a:hover,
+.side-nav .side-menu li a:hover {
+  color: var(--main-clr, #3b5898);
+  background: #f1f5f9;
+  border-radius: 8px;
+}
 .side-nav .side-menu li a.active {
-  color: var(--main-clr);
-  background: var(--link-hover);
-  border-radius: 50px;
-  /* border-top-right-radius: 50px;
-  border-bottom-right-radius: 50px; */
+  color: var(--main-clr, #3b5898);
+  background: #edf2fc;
+  border-radius: 8px;
+  font-weight: 600;
+  border-left: 3px solid #f48726;
 }
 .side-nav .side-menu .indicate-section {
   padding-left: 7px;
@@ -112,11 +116,15 @@
 .side-nav .side-nav-dropdown-parent .drpLink .icon {
   margin-right: 10px;
 }
-.side-nav .side-nav-dropdown-parent:hover,
+.side-nav .side-nav-dropdown-parent:hover {
+  background: #f1f5f9;
+  color: var(--main-clr, #3b5898);
+  border-radius: 8px;
+}
 .side-nav .side-nav-dropdown-parent.active {
-  background: var(--link-hover);
-  color: var(--main-clr);
-  border-radius: 20px;
+  background: #edf2fc;
+  color: var(--main-clr, #3b5898);
+  border-radius: 8px;
 }
 .side-nav .side-menu .side-nav-dropdown-parent .right-icon {
   transition: var(--trans);
